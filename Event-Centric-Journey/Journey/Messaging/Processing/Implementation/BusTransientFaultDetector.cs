@@ -2,7 +2,7 @@
 using System.Data.SqlClient;
 using System.Linq;
 
-namespace Journey.Messaging.Processing.Implementation
+namespace Journey.Messaging.Processing
 {
     public class BusTransientFaultDetector : IBusTransientFaultDetector
     {

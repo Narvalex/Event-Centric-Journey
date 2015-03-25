@@ -1,13 +1,12 @@
-using System;
 using Microsoft.Practices.Unity;
-using Microsoft.Practices.Unity.Configuration;
+using System;
 
 namespace Journey.Web.App_Start
 {
     /// <summary>
     /// Specifies the Unity configuration for the main container.
     /// </summary>
-    public class UnityConfig
+    partial class UnityConfig
     {
         #region Unity Container
         private static Lazy<IUnityContainer> container = new Lazy<IUnityContainer>(() =>
@@ -37,6 +36,10 @@ namespace Journey.Web.App_Start
 
             // TODO: Register your types here
             // container.RegisterType<IProductRepository, ProductRepository>();
+
+            OnCreateContainer(container);
         }
+
+        static partial void OnCreateContainer(IUnityContainer container);
     }
 }

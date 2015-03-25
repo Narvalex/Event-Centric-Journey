@@ -111,8 +111,6 @@
     <Compile Include="Messaging\Core\IMessageReceiver.cs" />
     <Compile Include="Messaging\Core\IMessageSender.cs" />
     <Compile Include="Messaging\Core\IMessagingSettings.cs" />
-    <Compile Include="Messaging\Core\Implementation\ClientCommandBus.cs" />
-    <Compile Include="Messaging\Core\Implementation\ClientEventBus.cs" />
     <Compile Include="Messaging\Core\Implementation\Command.cs" />
     <Compile Include="Messaging\Core\Implementation\CommandBus.cs" />
     <Compile Include="Messaging\Core\Implementation\CommandBusExtensions.cs" />
@@ -125,7 +123,6 @@
     <Compile Include="Messaging\Core\ISqlBus.cs" />
     <Compile Include="Messaging\Core\Message.cs" />
     <Compile Include="Messaging\Core\MessageReceivedEventArgs.cs" />
-    <Compile Include="Messaging\IClientCommandBus.cs" />
     <Compile Include="Messaging\Logging\EventLogExtensions.cs" />
     <Compile Include="Messaging\Logging\EventLogQueryCriteria.cs" />
     <Compile Include="Messaging\Logging\IEventLogReader.cs" />
@@ -163,9 +160,11 @@
     <Compile Include="Utils\Testing\EnumerableCommandsExtensions.cs" />
     <Compile Include="Utils\Testing\EnumerableEventsExtensions.cs" />
     <Compile Include="Utils\Testing\EventSourcingTestHelper.cs" />
+    <Compile Include="Worker\IDomainContainer.cs" />
     <Compile Include="Worker\Implementation\ConsoleWorkerTracer.cs" />
     <Compile Include="Worker\Implementation\WebWorkerTracer.cs" />
     <Compile Include="Worker\Implementation\Worker.cs" />
+    <Compile Include="Worker\Implementation\WorkerRoleManager.cs" />
     <Compile Include="Worker\Implementation\WorkerRoleStatusUrlProvider.cs" />
     <Compile Include="Worker\IWorker.cs" />
     <Compile Include="Worker\IWorkerRoleStatusUrlProvider.cs" />
