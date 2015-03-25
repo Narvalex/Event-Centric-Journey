@@ -20,6 +20,7 @@ namespace Journey.Messaging
         private readonly TimeSpan pollDelay;
         private readonly object lockObject = new object();
         private CancellationTokenSource cancellationSource;
+        private Action delegateMessageReceiving;
 
         public MessageReceiver(IDbConnectionFactory connectionFactory, string dbName, string tableName, TimeSpan busPollDelay, int numberOfThreads)
         {
@@ -55,6 +56,8 @@ namespace Journey.Messaging
                 {0}.TraceInfo = @TraceInfo
                 where {0}.Id = @Id",
                 tableName);
+
+            this.delegateMessageReceiving = () => { };
         }
 
         public event EventHandler<MessageReceivedEventArgs> MessageReceived = (sender, args) => { };
@@ -66,14 +69,14 @@ namespace Journey.Messaging
                 if (this.cancellationSource == null)
                 {
                     this.cancellationSource = new CancellationTokenSource();
+                    this.delegateMessageReceiving = () => this.StartNewMessageReceiver();
 
                     for (int i = 0; i < this.numberOfThreads; i++)
-                    {
                         this.StartNewMessageReceiver();
-                    }
                 }
             }
         }
+
 
         private void StartNewMessageReceiver()
         {
@@ -93,6 +96,7 @@ namespace Journey.Messaging
                     if (this.cancellationSource != null)
                     {
                         this.cancellationSource.Cancel();
+                        this.delegateMessageReceiving = () => { };
                         this.cancellationSource = null;
                     }
                 }
@@ -148,8 +152,7 @@ namespace Journey.Messaging
                             }
                         }
 
-                        // Async feature of the bus
-                        this.StartNewMessageReceiver();
+                        this.delegateMessageReceiving.Invoke();
                         this.MessageReceived(this, new MessageReceivedEventArgs(message));
 
                         using (var command = connection.CreateCommand())
@@ -170,9 +173,6 @@ namespace Journey.Messaging
                     {
                         try
                         {
-                            // NOTE: we catch ANY exceptions as this is for local.
-                            // This supports retries and dead-lettering.
-
                             // Dead Lettering
                             using (var command = connection.CreateCommand())
                             {
@@ -190,7 +190,15 @@ namespace Journey.Messaging
                         }
                         catch (Exception)
                         {
-                            transaction.Rollback();
+                            try
+                            {
+                                transaction.Rollback();
+                            }
+                            catch (Exception)
+                            {
+                                // NOTE: we catch ANY exceptions. This implementation 
+                                // supports retries and dead-lettering.
+                            }
                         }
                     }
                 }

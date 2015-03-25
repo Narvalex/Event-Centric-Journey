@@ -1,5 +1,5 @@
-﻿using Journey.Worker;
-using Journey.Serialization;
+﻿using Journey.Serialization;
+using Journey.Worker;
 using System;
 using System.IO;
 
@@ -95,6 +95,7 @@ namespace Journey.Messaging.Processing
 
         private void OnMessageReceived(object sender, MessageReceivedEventArgs args)
         {
+
             try
             {
                 var body = this.Deserialize(args.Message.Body);
@@ -105,9 +106,6 @@ namespace Journey.Messaging.Processing
             }
             catch (Exception e)
             {
-                // NOTE: we catch ANY exceptions. This implementation 
-                // supports retries and dead-lettering.
-
                 this.tracer.Notify(string.Format("An exception happened while processing message through handler/s:\r\n{0}", e));
                 this.tracer.Notify("The message will be flagged as dead letter in the bus.");
                 this.tracer.Notify("Error will be ignored and message receiving will continue.");
