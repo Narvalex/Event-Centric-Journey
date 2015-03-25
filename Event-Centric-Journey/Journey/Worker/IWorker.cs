@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Infrastructure.CQRS.Worker
+namespace Journey.Worker
 {
     public interface IWorker : IDisposable
     {

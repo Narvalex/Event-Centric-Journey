@@ -1,6 +1,6 @@
-﻿using Infrastructure.CQRS.Messaging.Processing;
+﻿using Journey.Messaging.Processing;
 
-namespace Infrastructure.CQRS.Messaging.Logging
+namespace Journey.Messaging.Logging
 {
     /// <summary>
     /// The SQL version of the event log runs directly in-proc

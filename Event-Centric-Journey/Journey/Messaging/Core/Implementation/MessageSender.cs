@@ -8,7 +8,7 @@ using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Transactions;
 
-namespace Infrastructure.CQRS.Messaging
+namespace Journey.Messaging
 {
     public class MessageSender : IMessageSender, ISqlBus
     {

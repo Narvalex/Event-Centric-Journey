@@ -1,7 +1,7 @@
-﻿using Infrastructure.CQRS.Messaging;
+﻿using Journey.Messaging;
 using System.Threading.Tasks;
 
-namespace Infrastructure.CQRS.EventSourcing.Handling
+namespace Journey.EventSourcing.Handling
 {
     public interface IHandlerOf { }
 

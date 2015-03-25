@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading;
 
-namespace Infrastructure.CQRS.EventSourcing.ReadModeling
+namespace Journey.EventSourcing.ReadModeling
 {
     public abstract class Dao : IDao
     {

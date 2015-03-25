@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.CQRS.Worker
+﻿namespace Journey.Worker
 {
     public interface IWorkerRoleTracer
     {

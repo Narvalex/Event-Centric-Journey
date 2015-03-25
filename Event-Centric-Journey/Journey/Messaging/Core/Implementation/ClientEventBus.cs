@@ -1,10 +1,10 @@
-﻿using Infrastructure.CQRS.Serialization;
+﻿using Journey.Serialization;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
 
-namespace Infrastructure.CQRS.Messaging
+namespace Journey.Messaging
 {
     /// <summary>
     /// An event bus that sends serialized object payloads through a <see cref="IMessageSender"/>.

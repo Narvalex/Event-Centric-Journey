@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Infrastructure.CQRS.Messaging.Logging
+namespace Journey.Messaging.Logging
 {
     /// <summary>
     /// The query criteria for filtering events from the message log when reading.

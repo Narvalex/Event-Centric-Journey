@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Infrastructure.CQRS.EventSourcing.ReadModeling
+namespace Journey.EventSourcing.ReadModeling
 {
     public interface IDao
     {

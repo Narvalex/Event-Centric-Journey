@@ -1,7 +1,7 @@
-﻿using Infrastructure.CQRS.Serialization;
-using Infrastructure.CQRS.Worker;
+﻿using Journey.Serialization;
+using Journey.Worker;
 
-namespace Infrastructure.CQRS.Messaging.Processing
+namespace Journey.Messaging.Processing
 {
     /// <summary>
     /// Processes incoming events from the bus and routes them to the appropriate 

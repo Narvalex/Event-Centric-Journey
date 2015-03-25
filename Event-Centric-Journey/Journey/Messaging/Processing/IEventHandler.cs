@@ -1,5 +1,5 @@
 ﻿
-namespace Infrastructure.CQRS.Messaging.Processing
+namespace Journey.Messaging.Processing
 {
     /// <summary>
     /// Marker interface that makes it easier to discover handlers via reflection.

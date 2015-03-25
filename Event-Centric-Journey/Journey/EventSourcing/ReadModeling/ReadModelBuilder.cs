@@ -1,14 +1,14 @@
-﻿using Infrastructure.CQRS.Database;
-using Infrastructure.CQRS.Messaging;
-using Infrastructure.CQRS.Messaging.Processing;
-using Infrastructure.CQRS.Serialization;
-using Infrastructure.CQRS.Utils;
-using Infrastructure.CQRS.Worker;
+﻿using Journey.Database;
+using Journey.Messaging;
+using Journey.Messaging.Processing;
+using Journey.Serialization;
+using Journey.Utils;
+using Journey.Worker;
 using System;
 using System.IO;
 using System.Linq;
 
-namespace Infrastructure.CQRS.EventSourcing.ReadModeling
+namespace Journey.EventSourcing.ReadModeling
 {
     public abstract class ReadModelBuilder
     {

@@ -1,6 +1,6 @@
 ﻿using System.Data.Entity;
 
-namespace Infrastructure.CQRS.Database
+namespace Journey.Database
 {
     public static class DatabaseSetup
     {

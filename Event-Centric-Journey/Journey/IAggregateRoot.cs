@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Infrastructure.CQRS
+namespace Journey
 {
     public interface IAggregateRoot
     {

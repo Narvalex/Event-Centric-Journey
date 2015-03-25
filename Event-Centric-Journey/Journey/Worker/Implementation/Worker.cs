@@ -1,10 +1,10 @@
-﻿using Infrastructure.CQRS.Messaging.Processing;
+﻿using Journey.Messaging.Processing;
 using Microsoft.Practices.Unity;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Infrastructure.CQRS.Worker
+namespace Journey.Worker
 {
     public class Worker : IWorker
     {

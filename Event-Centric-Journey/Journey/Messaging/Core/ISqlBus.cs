@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.CQRS.Messaging
+﻿namespace Journey.Messaging
 {
     /// <summary>
     /// Revela para todos los implementadores los datos del schema en el cual 

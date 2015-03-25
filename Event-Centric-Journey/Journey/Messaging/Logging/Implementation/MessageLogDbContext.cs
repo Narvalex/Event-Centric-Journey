@@ -1,7 +1,7 @@
-﻿using Infrastructure.CQRS.Database;
+﻿using Journey.Database;
 using System.Data.Entity;
 
-namespace Infrastructure.CQRS.Messaging.Logging
+namespace Journey.Messaging.Logging
 {
     [DbConfigurationType(typeof(TransientFaultHandlingDbConfiguration))]
     public class MessageLogDbContext : DbContext

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization;
 
-namespace Infrastructure.CQRS.Serialization
+namespace Journey.Serialization
 {
     public class JsonTextSerializer : ITextSerializer
     {

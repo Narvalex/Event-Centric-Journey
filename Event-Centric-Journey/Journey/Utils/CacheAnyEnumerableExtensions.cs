@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Infrastructure.CQRS.Utils
+namespace Journey.Utils
 {
     /// <summary>
     /// Prevents double enumeration (and potential roundtrip to the data source) when checking 

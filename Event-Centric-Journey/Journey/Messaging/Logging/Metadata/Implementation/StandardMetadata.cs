@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.CQRS.Messaging.Logging.Metadata
+﻿namespace Journey.Messaging.Logging.Metadata
 {
     /// <summary>
     /// Exposes the property names of standard metadata added to all 

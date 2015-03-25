@@ -1,4 +1,4 @@
-﻿using Infrastructure.CQRS.Worker;
+﻿using Journey.Worker;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Infrastructure.CQRS.Messaging.Processing
+namespace Journey.Messaging.Processing
 {
     public class AsynchronousEventDispatcher : IEventDispatcher
     {

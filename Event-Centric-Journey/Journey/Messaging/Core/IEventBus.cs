@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 
-namespace Infrastructure.CQRS.Messaging
+namespace Journey.Messaging
 {
     /// <summary>
     /// Abstracts an event bus that sends serialied object payloads.

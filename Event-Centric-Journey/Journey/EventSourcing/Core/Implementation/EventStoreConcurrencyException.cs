@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Infrastructure.CQRS.EventSourcing
+namespace Journey.EventSourcing
 {
     [Serializable]
     public class EventStoreConcurrencyException : Exception

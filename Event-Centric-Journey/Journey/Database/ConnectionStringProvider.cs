@@ -1,6 +1,6 @@
 ﻿using System.Web.Configuration;
 
-namespace Infrastructure.CQRS.Database
+namespace Journey.Database
 {
     public class ConnectionStringProvider : IConnectionStringProvider
     {

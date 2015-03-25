@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.CQRS.Database
+﻿namespace Journey.Database
 {
     public interface IConnectionStringProvider
     {

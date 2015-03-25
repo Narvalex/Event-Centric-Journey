@@ -1,8 +1,8 @@
-﻿using Infrastructure.CQRS.Messaging;
+﻿using Journey.Messaging;
 using System;
 using System.Collections.Generic;
 
-namespace Infrastructure.CQRS.EventSourcing
+namespace Journey.EventSourcing
 {
     /// <summary>
     /// Base class for event sourced entities that implements <see cref="IEventSourced"/>. 

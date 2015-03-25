@@ -1,7 +1,7 @@
 ﻿using System.Data.Entity;
 using System.Linq;
 
-namespace Infrastructure.CQRS.EventSourcing.ReadModeling
+namespace Journey.EventSourcing.ReadModeling
 {
     public class ReadModelDbContext : DbContext
     {

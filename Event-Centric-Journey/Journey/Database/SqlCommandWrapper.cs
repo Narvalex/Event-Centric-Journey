@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Infrastructure.CQRS.Database
+namespace Journey.Database
 {
     public class SqlCommandWrapper
     {

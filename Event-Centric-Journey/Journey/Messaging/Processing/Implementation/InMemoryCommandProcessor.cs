@@ -1,9 +1,9 @@
-﻿using Infrastructure.CQRS.Worker;
+﻿using Journey.Worker;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Infrastructure.CQRS.Messaging.Processing
+namespace Journey.Messaging.Processing
 {
     /// <summary>
     /// Processes incoming commands from the bus and routes them to the appropriate handlers.

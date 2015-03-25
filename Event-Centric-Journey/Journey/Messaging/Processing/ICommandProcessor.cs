@@ -1,5 +1,5 @@
 ﻿
-namespace Infrastructure.CQRS.Messaging.Processing
+namespace Journey.Messaging.Processing
 {
     public interface ICommandProcessor
     {

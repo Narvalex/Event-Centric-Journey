@@ -1,8 +1,8 @@
-﻿using Infrastructure.CQRS.Messaging;
+﻿using Journey.Messaging;
 using System;
 using System.Collections.Generic;
 
-namespace Infrastructure.CQRS.EventSourcing
+namespace Journey.EventSourcing
 {
     /// <summary>
     /// A Saga aggregate that publishes commands to the bus.

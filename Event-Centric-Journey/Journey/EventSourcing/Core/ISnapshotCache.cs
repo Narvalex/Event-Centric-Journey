@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Caching;
 
-namespace Infrastructure.CQRS.EventSourcing
+namespace Journey.EventSourcing
 {
     public interface ISnapshotCache
     {

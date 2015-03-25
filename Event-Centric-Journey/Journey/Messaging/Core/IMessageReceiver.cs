@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Infrastructure.CQRS.Messaging
+namespace Journey.Messaging
 {
     /// <summary>
     /// Abstracts the behavior of a receiving component that raises 

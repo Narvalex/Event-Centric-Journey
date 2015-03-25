@@ -1,6 +1,6 @@
-﻿using Infrastructure.CQRS.Messaging;
+﻿using Journey.Messaging;
 
-namespace Infrastructure.CQRS.EventSourcing
+namespace Journey.EventSourcing
 {
     public interface ISubscribedTo { }
 

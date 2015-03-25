@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Infrastructure.CQRS.Utils
+namespace Journey.Utils
 {
     /// <summary>
     /// Usability extensions for dictionaries.

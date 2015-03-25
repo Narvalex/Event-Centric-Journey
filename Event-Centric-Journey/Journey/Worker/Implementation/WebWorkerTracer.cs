@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Infrastructure.CQRS.Worker
+namespace Journey.Worker
 {
     public class WebWorkerTracer : IWorkerRoleTracer
     {

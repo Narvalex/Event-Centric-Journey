@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 
-namespace Infrastructure.CQRS.Database
+namespace Journey.Database
 {
     /// <summary>
     /// Provides usability overloads for <see cref="SqlDataReader"/>.

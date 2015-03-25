@@ -1,9 +1,9 @@
-﻿using Infrastructure.CQRS.Worker;
-using Infrastructure.CQRS.Serialization;
+﻿using Journey.Worker;
+using Journey.Serialization;
 using System;
 using System.IO;
 
-namespace Infrastructure.CQRS.Messaging.Processing
+namespace Journey.Messaging.Processing
 {
     /// <summary>
     /// Provides basic common processing code for components that handle 

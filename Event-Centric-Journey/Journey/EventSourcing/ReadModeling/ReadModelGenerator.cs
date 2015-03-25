@@ -1,7 +1,7 @@
-﻿using Infrastructure.CQRS.Worker;
+﻿using Journey.Worker;
 using System;
 
-namespace Infrastructure.CQRS.EventSourcing.ReadModeling
+namespace Journey.EventSourcing.ReadModeling
 {
     public class ReadModelGenerator<C> where C : ReadModelDbContext
     {

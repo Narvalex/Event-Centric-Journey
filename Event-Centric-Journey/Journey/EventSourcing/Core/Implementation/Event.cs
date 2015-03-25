@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Infrastructure.CQRS.EventSourcing
+namespace Journey.EventSourcing
 {
     public class TraceableEventSourcedEntity
     {

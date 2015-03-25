@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Infrastructure.CQRS.Messaging.Logging
+namespace Journey.Messaging.Logging
 {
     /// <summary>
     /// Exposes the message log for all events that the system processed.

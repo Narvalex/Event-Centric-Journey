@@ -4,7 +4,7 @@ using System.Data.Common;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 
-namespace Infrastructure.CQRS.Database
+namespace Journey.Database
 {
     public class ServiceConfigurationSettingConnectionFactory : IDbConnectionFactory
     {

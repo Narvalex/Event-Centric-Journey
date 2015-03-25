@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Infrastructure.CQRS.Messaging
+namespace Journey.Messaging
 {
     /// <summary>
     /// Abstracts a command bus for clients that sends serialized object payloads through a <see cref="IMessageSender"/> 

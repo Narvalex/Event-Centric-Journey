@@ -1,12 +1,12 @@
-﻿using Infrastructure.CQRS.EventSourcing;
-using Infrastructure.CQRS.Messaging;
-using Infrastructure.CQRS.Messaging.Processing;
+﻿using Journey.EventSourcing;
+using Journey.Messaging;
+using Journey.Messaging.Processing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace Infrastructure.CQRS.Utils.Testing
+namespace Journey.Utils.Testing
 {
     public class EventSourcingTestHelper<T> where T : IEventSourced
     {

@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Infrastructure.CQRS.Serialization
+namespace Journey.Serialization
 {
     /// <summary>
     /// Usability overloads for <see cref="ITextSerializer"/>.

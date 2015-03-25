@@ -1,8 +1,8 @@
-﻿using Infrastructure.CQRS.Utils;
+﻿using Journey.Utils;
 using System;
 using System.Linq.Expressions;
 
-namespace Infrastructure.CQRS.Messaging.Logging
+namespace Journey.Messaging.Logging
 {
     internal static class MessageLogQueryCriteriaExtensions
     {

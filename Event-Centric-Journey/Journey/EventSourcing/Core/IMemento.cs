@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.CQRS.EventSourcing
+﻿namespace Journey.EventSourcing
 {
     /// <summary>
     /// An opaque object that contains the state of another object (a snapshot) and can be used to restore its state.

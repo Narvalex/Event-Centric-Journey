@@ -1,7 +1,7 @@
-﻿using Infrastructure.CQRS.Database;
+﻿using Journey.Database;
 using System.Data.Entity;
 
-namespace Infrastructure.CQRS.Messaging.Processing.Implementation
+namespace Journey.Messaging.Processing.Implementation
 {
     public class EventSubscriptionDbContext : DbContext
     {

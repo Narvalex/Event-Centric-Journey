@@ -1,8 +1,8 @@
-﻿using Infrastructure.CQRS.EventSourcing;
-using Infrastructure.CQRS.Messaging;
+﻿using Journey.EventSourcing;
+using Journey.Messaging;
 using System.Linq;
 
-namespace Infrastructure.CQRS.Utils.Testing
+namespace Journey.Utils.Testing
 {
     public static class EnumerableEventsExtensions
     {

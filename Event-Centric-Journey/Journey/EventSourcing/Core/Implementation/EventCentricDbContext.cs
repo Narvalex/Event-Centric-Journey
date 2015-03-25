@@ -1,7 +1,7 @@
-﻿using Infrastructure.CQRS.Database;
+﻿using Journey.Database;
 using System.Data.Entity;
 
-namespace Infrastructure.CQRS.EventSourcing
+namespace Journey.EventSourcing
 {
     /// <summary>
     /// Used by <see cref="SqlEventSourcedRepository{T}"/>.

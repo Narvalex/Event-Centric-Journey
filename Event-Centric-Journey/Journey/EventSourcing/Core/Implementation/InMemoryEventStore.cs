@@ -1,14 +1,14 @@
-﻿using Infrastructure.CQRS.Database;
-using Infrastructure.CQRS.Serialization;
-using Infrastructure.CQRS.Utils;
-using Infrastructure.CQRS.Worker;
+﻿using Journey.Database;
+using Journey.Serialization;
+using Journey.Utils;
+using Journey.Worker;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
 
-namespace Infrastructure.CQRS.EventSourcing
+namespace Journey.EventSourcing
 {
     /// <summary>
     /// This is an extremely basic implementation of the event store (straw man), that is used only for running the application

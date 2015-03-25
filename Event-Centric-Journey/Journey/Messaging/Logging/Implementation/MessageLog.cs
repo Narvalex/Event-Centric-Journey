@@ -1,13 +1,13 @@
-﻿using Infrastructure.CQRS.EventSourcing;
-using Infrastructure.CQRS.Messaging.Logging.Metadata;
-using Infrastructure.CQRS.Serialization;
-using Infrastructure.CQRS.Utils;
+﻿using Journey.EventSourcing;
+using Journey.Messaging.Logging.Metadata;
+using Journey.Serialization;
+using Journey.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Infrastructure.CQRS.Messaging.Logging
+namespace Journey.Messaging.Logging
 {
     public class MessageLog : IEventLogReader
  {

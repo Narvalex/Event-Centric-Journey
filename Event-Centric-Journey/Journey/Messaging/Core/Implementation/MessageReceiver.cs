@@ -7,7 +7,7 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Infrastructure.CQRS.Messaging
+namespace Journey.Messaging
 {
     public class MessageReceiver : IMessageReceiver, IDisposable
     {

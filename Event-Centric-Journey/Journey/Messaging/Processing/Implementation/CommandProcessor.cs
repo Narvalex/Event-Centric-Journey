@@ -1,12 +1,12 @@
-﻿using Infrastructure.CQRS.Database;
-using Infrastructure.CQRS.Serialization;
-using Infrastructure.CQRS.Worker;
+﻿using Journey.Database;
+using Journey.Serialization;
+using Journey.Worker;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 
-namespace Infrastructure.CQRS.Messaging.Processing
+namespace Journey.Messaging.Processing
 {
     /// <summary>
     /// Processes incoming commands from the bus and routes them to the appropriate handlers.

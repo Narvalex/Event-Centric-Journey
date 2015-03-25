@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Infrastructure.CQRS.Messaging
+namespace Journey.Messaging
 {
     /// <summary>
     /// Represents an event message.

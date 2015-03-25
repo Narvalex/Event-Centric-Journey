@@ -1,7 +1,7 @@
-﻿using Infrastructure.CQRS.Messaging;
+﻿using Journey.Messaging;
 using System.Collections.Generic;
 
-namespace Infrastructure.CQRS.EventSourcing
+namespace Journey.EventSourcing
 {
     /// <summary>
     /// Interface implemented by Sagas (also known as Process Managers in the CQRS community) that 

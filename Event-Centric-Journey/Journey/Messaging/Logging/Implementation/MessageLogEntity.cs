@@ -1,5 +1,5 @@
 ﻿
-namespace Infrastructure.CQRS.Messaging.Logging
+namespace Journey.Messaging.Logging
 {
     public class MessageLogEntity
     {

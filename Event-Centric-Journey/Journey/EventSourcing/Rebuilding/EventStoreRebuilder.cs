@@ -1,14 +1,14 @@
-﻿using Infrastructure.CQRS.Messaging;
-using Infrastructure.CQRS.Messaging.Logging;
-using Infrastructure.CQRS.Messaging.Processing;
-using Infrastructure.CQRS.Serialization;
-using Infrastructure.CQRS.Utils;
+﻿using Journey.Messaging;
+using Journey.Messaging.Logging;
+using Journey.Messaging.Processing;
+using Journey.Serialization;
+using Journey.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Infrastructure.CQRS.EventSourcing.Rebuilding
+namespace Journey.EventSourcing.Rebuilding
 {
     public class EventStoreRebuilder : IEventStoreRebuilder
     {

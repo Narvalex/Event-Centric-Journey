@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Infrastructure.CQRS.Serialization
+namespace Journey.Serialization
 {
     /// <summary>
     /// Interface for serializers that can read/write an object graph to a stream

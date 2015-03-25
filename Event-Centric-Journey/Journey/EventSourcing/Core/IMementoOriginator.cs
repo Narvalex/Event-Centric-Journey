@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.CQRS.EventSourcing
+﻿namespace Journey.EventSourcing
 {
     /// <summary>
     /// Defines that the implementor can create memento objects (snapshots), that can be used to recreate the original state.

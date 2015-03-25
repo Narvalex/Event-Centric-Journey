@@ -1,14 +1,14 @@
-﻿using Infrastructure.CQRS.Database;
-using Infrastructure.CQRS.Messaging.Logging;
-using Infrastructure.CQRS.Messaging.Logging.Metadata;
-using Infrastructure.CQRS.Serialization;
-using Infrastructure.CQRS.Utils;
+﻿using Journey.Database;
+using Journey.Messaging.Logging;
+using Journey.Messaging.Logging.Metadata;
+using Journey.Serialization;
+using Journey.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Infrastructure.CQRS.Messaging.Implementation
+namespace Journey.Messaging.Implementation
 {
     /// <summary>
     /// A command bus taht sends serialized object payloads thorugh a <see cref="IMessageSender"/>.

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Runtime.Caching;
 
-namespace Infrastructure.CQRS.EventSourcing
+namespace Journey.EventSourcing
 {
     public class InMemorySnapshotCache : MemoryCache, ISnapshotCache
     {

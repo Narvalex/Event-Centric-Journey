@@ -4,7 +4,7 @@ using System.Data.Entity.Infrastructure;
 using System.Data.Entity.SqlServer;
 using System.Runtime.Remoting.Messaging;
 
-namespace Infrastructure.CQRS.Database
+namespace Journey.Database
 {
     /// <summary>
     /// An Entity Framework 6 Code-Based Configuration.

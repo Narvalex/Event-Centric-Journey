@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Infrastructure.CQRS.Messaging.Logging.Metadata
+namespace Journey.Messaging.Logging.Metadata
 {
     /// <summary>
     /// Extracts metadata about a payload so that it's placed in the message envelope.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Infrastructure.CQRS.EventSourcing
+namespace Journey.EventSourcing
 {
     /// <summary>
     /// Un evento versionado. Este tipo de evento es extendido cuando 

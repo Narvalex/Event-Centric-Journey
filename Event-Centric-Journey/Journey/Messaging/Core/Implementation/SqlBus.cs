@@ -1,7 +1,7 @@
-﻿using Infrastructure.CQRS.Serialization;
+﻿using Journey.Serialization;
 using System;
 
-namespace Infrastructure.CQRS.Messaging
+namespace Journey.Messaging
 {
     public abstract class SqlBus : ISqlBus
     {

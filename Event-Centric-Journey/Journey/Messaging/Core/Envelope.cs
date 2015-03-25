@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Infrastructure.CQRS.Messaging
+namespace Journey.Messaging
 {
 	/// <summary>
 	/// Static factory class for <see cref="Envelope{T}"/>.

@@ -1,8 +1,8 @@
-﻿using Infrastructure.CQRS.EventSourcing;
+﻿using Journey.EventSourcing;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Infrastructure.CQRS.Messaging.Logging.Metadata
+namespace Journey.Messaging.Logging.Metadata
 {
     /// <summary>
     /// Extracts metadata about a payload do that it's placed in the 

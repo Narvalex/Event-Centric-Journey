@@ -1,7 +1,7 @@
-﻿using Infrastructure.CQRS.Messaging;
+﻿using Journey.Messaging;
 using System;
 
-namespace Infrastructure.CQRS.EventSourcing
+namespace Journey.EventSourcing
 {
     /// <summary>
     /// Represents an event message that belongs to an ordered event stream.

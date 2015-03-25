@@ -1,5 +1,5 @@
 ﻿
-namespace Infrastructure.CQRS.EventSourcing.Rebuilding
+namespace Journey.EventSourcing.Rebuilding
 {
     public interface IEventStoreRebuilder
     {
