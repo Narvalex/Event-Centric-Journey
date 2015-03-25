@@ -1,9 +1,7 @@
-﻿using Journey.Database;
-using Journey.Serialization;
+﻿using Journey.Serialization;
 using Journey.Worker;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 
 namespace Journey.Messaging.Processing
@@ -14,7 +12,7 @@ namespace Journey.Messaging.Processing
     public class CommandProcessor : MessageProcessor, ICommandHandlerRegistry, ICommandProcessor
     {
         private Dictionary<Type, ICommandHandler> handlers = new Dictionary<Type, ICommandHandler>();
-        private readonly SqlCommandWrapper sql;
+        private readonly IBusTransientFaultDetector faultDetector;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandProcessor"/> class.
@@ -22,10 +20,10 @@ namespace Journey.Messaging.Processing
         /// <param name="receiver">The receiver to use. If the receiver is <see cref="IDisposable"/>, it will be
         ///  disposed.</param>
         /// <param name="serializer">The serializer to use for the message body.</param>
-        public CommandProcessor(IMessageReceiver receiver, ITextSerializer serializer, IWorkerRoleTracer tracer, IConnectionStringProvider connectionProvider)
+        public CommandProcessor(IMessageReceiver receiver, ITextSerializer serializer, IWorkerRoleTracer tracer, IBusTransientFaultDetector faultDetector)
             : base(receiver, serializer, tracer)
         {
-            this.sql = new SqlCommandWrapper(connectionProvider);
+            this.faultDetector = faultDetector;
         }
 
         /// <summary>
@@ -57,10 +55,8 @@ namespace Journey.Messaging.Processing
         {
             ICommandHandler handler = null;
 
-            var alreadyProcessed = this.CheckIfCommandWasAlreadyProcessed(payload);
-
             // If command was already processed, then no op
-            if (!alreadyProcessed)
+            if (!this.faultDetector.CommandWasAlreadyProcessed(payload))
             {
                 var commandType = payload.GetType();
                 if (this.handlers.TryGetValue(commandType, out handler))
@@ -74,16 +70,6 @@ namespace Journey.Messaging.Processing
             {
                 this.HandleMessage(payload, handler);
             }
-        }
-
-        private bool CheckIfCommandWasAlreadyProcessed(object payload)
-        {
-            var alreadyProcessed = this.sql.ExecuteReader(@"
-            select count(*) from  EventStore.Events where TaskCommandId = @CommandId
-            ", r => r.SafeGetInt32(0) > 0 ? true : false,
-                new SqlParameter("@CommandId", ((dynamic)payload).Id)).FirstOrDefault();
-
-            return alreadyProcessed;
         }
 
         private void HandleMessage(object payload, ICommandHandler handler)
