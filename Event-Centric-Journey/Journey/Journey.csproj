@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{96B26DBF-0E5C-4677-84FC-37985EE1D2D0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Journey</RootNamespace>
+    <AssemblyName>Journey</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Database\ConnectionStringProvider.cs" />
+    <Compile Include="Database\DatabaseSetup.cs" />
+    <Compile Include="Database\IConnectionStringProvider.cs" />
+    <Compile Include="Database\ServiceConfigurationSettingConnectionFactory.cs" />
+    <Compile Include="Database\SqlCommandWrapper.cs" />
+    <Compile Include="Database\SqlDataReaderExtensions.cs" />
+    <Compile Include="Database\TransientFaultHandlingDbConfiguration.cs" />
+    <Compile Include="EventSourcing\Core\IEventSourced.cs" />
+    <Compile Include="EventSourcing\Core\IEventStore.cs" />
+    <Compile Include="EventSourcing\Core\IMemento.cs" />
+    <Compile Include="EventSourcing\Core\IMementoOriginator.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\EntityNotFoundException.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\Event.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\EventCentricDbContext.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\EventSourced.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\EventStore.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\EventStoreConcurrencyException.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\InMemoryEventStore.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\InMemorySnapshotCache.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\Saga.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\TraceableVersionedEvent.cs" />
+    <Compile Include="EventSourcing\Core\ISaga.cs" />
+    <Compile Include="EventSourcing\Core\ISnapshotCache.cs" />
+    <Compile Include="EventSourcing\Core\ITraceableVersionedEvent.cs" />
+    <Compile Include="EventSourcing\Handling\IDomainService.cs" />
+    <Compile Include="EventSourcing\Handling\IHandlerOf.cs" />
+    <Compile Include="EventSourcing\Handling\ISubscribedTo.cs" />
+    <Compile Include="EventSourcing\ReadModeling\Dao.cs" />
+    <Compile Include="EventSourcing\ReadModeling\IDao.cs" />
+    <Compile Include="EventSourcing\ReadModeling\ReadModelBuilder.cs" />
+    <Compile Include="EventSourcing\ReadModeling\ReadModelDbContext.cs" />
+    <Compile Include="EventSourcing\ReadModeling\ReadModelGenerator.cs" />
+    <Compile Include="EventSourcing\Rebuilding\EventStoreRebuilder.cs" />
+    <Compile Include="EventSourcing\Rebuilding\IEventStoreRebuilder.cs" />
+    <Compile Include="IAggregateRoot.cs" />
+    <Compile Include="Messaging\Core\Envelope.cs" />
+    <Compile Include="Messaging\Core\ICommand.cs" />
+    <Compile Include="Messaging\Core\ICommandBus.cs" />
+    <Compile Include="Messaging\Core\IEvent.cs" />
+    <Compile Include="Messaging\Core\IEventBus.cs" />
+    <Compile Include="Messaging\Core\IMessageReceiver.cs" />
+    <Compile Include="Messaging\Core\IMessageSender.cs" />
+    <Compile Include="Messaging\Core\IMessagingSettings.cs" />
+    <Compile Include="Messaging\Core\Implementation\ClientCommandBus.cs" />
+    <Compile Include="Messaging\Core\Implementation\ClientEventBus.cs" />
+    <Compile Include="Messaging\Core\Implementation\Command.cs" />
+    <Compile Include="Messaging\Core\Implementation\CommandBus.cs" />
+    <Compile Include="Messaging\Core\Implementation\CommandBusExtensions.cs" />
+    <Compile Include="Messaging\Core\Implementation\EventBus.cs" />
+    <Compile Include="Messaging\Core\Implementation\EventBusExtensions.cs" />
+    <Compile Include="Messaging\Core\Implementation\MessageReceiver.cs" />
+    <Compile Include="Messaging\Core\Implementation\MessageSender.cs" />
+    <Compile Include="Messaging\Core\Implementation\MessagingDbInitializer.cs" />
+    <Compile Include="Messaging\Core\Implementation\SqlBus.cs" />
+    <Compile Include="Messaging\Core\ISqlBus.cs" />
+    <Compile Include="Messaging\Core\Message.cs" />
+    <Compile Include="Messaging\Core\MessageReceivedEventArgs.cs" />
+    <Compile Include="Messaging\IClientCommandBus.cs" />
+    <Compile Include="Messaging\Logging\EventLogExtensions.cs" />
+    <Compile Include="Messaging\Logging\EventLogQueryCriteria.cs" />
+    <Compile Include="Messaging\Logging\IEventLogReader.cs" />
+    <Compile Include="Messaging\Logging\Implementation\MessageLog.cs" />
+    <Compile Include="Messaging\Logging\Implementation\MessageLogDbContext.cs" />
+    <Compile Include="Messaging\Logging\Implementation\MessageLogEntity.cs" />
+    <Compile Include="Messaging\Logging\Implementation\MessageLogHandler.cs" />
+    <Compile Include="Messaging\Logging\Implementation\MessageLogQueryCriteriaExtensions.cs" />
+    <Compile Include="Messaging\Logging\Metadata\IMetadataProvider.cs" />
+    <Compile Include="Messaging\Logging\Metadata\Implementation\StandardMetadata.cs" />
+    <Compile Include="Messaging\Logging\Metadata\Implementation\StandardMetadataProvider.cs" />
+    <Compile Include="Messaging\Processing\ICommandHandler.cs" />
+    <Compile Include="Messaging\Processing\ICommandHandlerRegistry.cs" />
+    <Compile Include="Messaging\Processing\ICommandProcessor.cs" />
+    <Compile Include="Messaging\Processing\IEventDispatcher.cs" />
+    <Compile Include="Messaging\Processing\IEventHandler.cs" />
+    <Compile Include="Messaging\Processing\IEventHandlerRegistry.cs" />
+    <Compile Include="Messaging\Processing\IMessageProcessor.cs" />
+    <Compile Include="Messaging\Processing\Implementation\AsynchronousEventDispatcher.cs" />
+    <Compile Include="Messaging\Processing\Implementation\CommandProcessor.cs" />
+    <Compile Include="Messaging\Processing\Implementation\EventProcessor.cs" />
+    <Compile Include="Messaging\Processing\Implementation\EventSubscriptionDbContext.cs" />
+    <Compile Include="Messaging\Processing\Implementation\InMemoryCommandProcessor.cs" />
+    <Compile Include="Messaging\Processing\Implementation\MessageProcessor.cs" />
+    <Compile Include="Messaging\Processing\Implementation\SynchronousEventDispatcher.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\Implementation\JsonTextSerializer.cs" />
+    <Compile Include="Serialization\Implementation\TextSerializerExtensions.cs" />
+    <Compile Include="Serialization\ITextSerializer.cs" />
+    <Compile Include="Utils\CacheAnyEnumerableExtensions.cs" />
+    <Compile Include="Utils\DictionaryExtensions.cs" />
+    <Compile Include="Utils\ExpressionCombiner.cs" />
+    <Compile Include="Utils\Testing\EnumerableCommandsExtensions.cs" />
+    <Compile Include="Utils\Testing\EnumerableEventsExtensions.cs" />
+    <Compile Include="Utils\Testing\EventSourcingTestHelper.cs" />
+    <Compile Include="Worker\Implementation\ConsoleWorkerTracer.cs" />
+    <Compile Include="Worker\Implementation\WebWorkerTracer.cs" />
+    <Compile Include="Worker\Implementation\Worker.cs" />
+    <Compile Include="Worker\Implementation\WorkerRoleStatusUrlProvider.cs" />
+    <Compile Include="Worker\IWorker.cs" />
+    <Compile Include="Worker\IWorkerRoleStatusUrlProvider.cs" />
+    <Compile Include="Worker\IWorkerRoleTracer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Instrumentation\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
