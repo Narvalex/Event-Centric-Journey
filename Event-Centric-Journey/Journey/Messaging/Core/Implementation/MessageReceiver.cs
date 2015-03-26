@@ -12,7 +12,7 @@ namespace Journey.Messaging
     public class MessageReceiver : IMessageReceiver, IDisposable
     {
         private readonly IDbConnectionFactory connectionFactory;
-        private readonly string dbName;
+        private readonly string connectionString;
         private readonly string readQuery;
         private readonly string deleteQuery;
         private readonly string setDeadLetterQuery;
@@ -22,10 +22,10 @@ namespace Journey.Messaging
         private CancellationTokenSource cancellationSource;
         private Action delegateMessageReceiving;
 
-        public MessageReceiver(IDbConnectionFactory connectionFactory, string dbName, string tableName, TimeSpan busPollDelay, int numberOfThreads)
+        public MessageReceiver(IDbConnectionFactory connectionFactory, string connectionString, string tableName, TimeSpan busPollDelay, int numberOfThreads)
         {
             this.connectionFactory = connectionFactory;
-            this.dbName = dbName;
+            this.connectionString = connectionString;
             this.pollDelay = busPollDelay;
             this.numberOfThreads = numberOfThreads;
 
@@ -115,7 +115,7 @@ namespace Journey.Messaging
         [SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Does not contain user input.")]
         protected bool ReceiveMessage()
         {
-            using (var connection = this.connectionFactory.CreateConnection(this.dbName))
+            using (var connection = this.connectionFactory.CreateConnection(this.connectionString))
             {
                 var currentDate = this.GetCurrentDate();
 

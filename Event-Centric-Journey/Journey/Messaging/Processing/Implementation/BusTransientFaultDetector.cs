@@ -8,9 +8,9 @@ namespace Journey.Messaging.Processing
     {
         private readonly SqlCommandWrapper sql;
 
-        public BusTransientFaultDetector(IConnectionStringProvider connectionProvider)
+        public BusTransientFaultDetector(string connectionString)
         {
-            this.sql = new SqlCommandWrapper(connectionProvider);
+            this.sql = new SqlCommandWrapper(connectionString);
         }
 
         public bool CommandWasAlreadyProcessed(object payload)

@@ -5,6 +5,7 @@ using Journey.Serialization;
 using Journey.Utils;
 using Journey.Worker;
 using System;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 
@@ -12,15 +13,15 @@ namespace Journey.EventSourcing.ReadModeling
 {
     public abstract class ReadModelBuilder
     {
-        protected readonly IConnectionStringProvider connectionProvider;
+        protected readonly string connectionString;
         protected readonly IWorkerRoleTracer tracer;
         private readonly ITextSerializer serializer;
         protected readonly IEventDispatcher eventDispatcher;
 
-        public ReadModelBuilder(IConnectionStringProvider connectionProvider, IWorkerRoleTracer tracer)
+        public ReadModelBuilder(string connectionString, IWorkerRoleTracer tracer)
         {
-            DatabaseSetup.Initialize();
-            this.connectionProvider = connectionProvider;
+            DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
+            this.connectionString = connectionString;
             this.serializer = new JsonTextSerializer();
             this.tracer = tracer;
             this.EventsCount = this.GetEventsCount();
@@ -43,7 +44,7 @@ namespace Journey.EventSourcing.ReadModeling
             DateTime startTime;
             this.tracer.Notify("====> Opening connection...");
 
-            using (var context = new EventStoreDbContext(this.connectionProvider.ConnectionString))
+            using (var context = new EventStoreDbContext(this.connectionString))
             {
                 this.tracer.Notify("====> Loading events...");
                 var events = context.Set<Event>()
@@ -119,7 +120,7 @@ namespace Journey.EventSourcing.ReadModeling
 
         private int GetEventsCount()
         {
-            var sql = new SqlCommandWrapper(this.connectionProvider.ConnectionString);
+            var sql = new SqlCommandWrapper(this.connectionString);
             return sql.ExecuteReader(@"
                         select count(*) as RwCnt 
                         from EventStore.Events 

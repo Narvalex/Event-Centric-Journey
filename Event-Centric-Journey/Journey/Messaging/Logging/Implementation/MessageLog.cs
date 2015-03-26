@@ -11,20 +11,20 @@ namespace Journey.Messaging.Logging
 {
     public class MessageLog : IEventLogReader
  {
-        private string nameOrConnectionString;
+        private string connectionString;
         private IMetadataProvider metadataProvider;
         private ITextSerializer serializer;
 
-        public MessageLog(string nameOrConnectionString, ITextSerializer serializer, IMetadataProvider metadataProvider)
+        public MessageLog(string connectionString, ITextSerializer serializer, IMetadataProvider metadataProvider)
         {
-            this.nameOrConnectionString = nameOrConnectionString;
+            this.connectionString = connectionString;
             this.serializer = serializer;
             this.metadataProvider = metadataProvider;
         }
 
         public void Save(IEvent @event)
         {
-            using (var context = new MessageLogDbContext(this.nameOrConnectionString))
+            using (var context = new MessageLogDbContext(this.connectionString))
             {
                 // first lets check if is not a duplicated command message;
                 var duplicatedMessage = context.Set<MessageLogEntity>()
@@ -58,7 +58,7 @@ namespace Journey.Messaging.Logging
 
         public void Save(ICommand command)
         {
-            using (var context = new MessageLogDbContext(this.nameOrConnectionString))
+            using (var context = new MessageLogDbContext(this.connectionString))
             {
                 // first lets check if is not a duplicated command message;
                 var duplicatedMessage = context.Set<MessageLogEntity>()
@@ -91,7 +91,7 @@ namespace Journey.Messaging.Logging
 
         public IEnumerable<IEvent> Query(EventLogQueryCriteria criteria)
         {
-            return new SqlQuery(this.nameOrConnectionString, this.serializer, criteria);
+            return new SqlQuery(this.connectionString, this.serializer, criteria);
         }
 
         private class SqlQuery : IEnumerable<IEvent>

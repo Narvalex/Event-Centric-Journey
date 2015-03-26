@@ -8,6 +8,7 @@ using Journey.Serialization;
 using Microsoft.Practices.Unity;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading;
 
@@ -27,6 +28,7 @@ namespace Journey.Worker
 
         public WorkerRole(IDomainContainer domainContainer)
         {
+            DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
             this.cancellationTokenSource = new CancellationTokenSource();
             this.CreateWebTracer();
             this.container = this.CreateContainer(domainContainer);
@@ -69,27 +71,24 @@ namespace Journey.Worker
         {
             var container = new UnityContainer();
 
-            //TODO: in config file
-            var messagingSettings = new MessagingSettings(1, TimeSpan.FromMilliseconds(100));
-            var connectionProvider = new ConnectionStringProvider("Data Source=WS11;Initial Catalog=SIRDAT_P9;User ID=so;Password=1joca395;Persist Security Info=True;packet size=4096");
+            container.RegisterInstance<IDomainContainer>(domainContainer);
 
             // Infrastructure
             container.RegisterInstance<ITextSerializer>(new JsonTextSerializer());
             container.RegisterInstance<IMetadataProvider>(new StandardMetadataProvider());
             container.RegisterInstance<IWorkerRoleTracer>(Tracer);
-            container.RegisterInstance<IMessagingSettings>(messagingSettings);
-            container.RegisterInstance<IConnectionStringProvider>(connectionProvider);
 
+            var config = container.Resolve<IDomainContainer>().WorkerRoleConfig;
 
             var serializer = container.Resolve<ITextSerializer>();
             var metadata = container.Resolve<IMetadataProvider>();
             var tracer = container.Resolve<IWorkerRoleTracer>();
 
-            var commandBus = new CommandBus(new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, "Bus", "Bus.Commands"), serializer);
-            var eventBus = new EventBus(new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, "Bus", "Bus.Events"), serializer);
+            var commandBus = new CommandBus(new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.BusConnectionString, "Bus.Commands"), serializer);
+            var eventBus = new EventBus(new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.BusConnectionString, "Bus.Events"), serializer);
 
-            var commandProcessor = new CommandProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, "Bus", "Bus.Commands", messagingSettings.BusPollDelay, messagingSettings.NumberOfThreads), serializer, tracer, new BusTransientFaultDetector(connectionProvider));
-            var eventProcessor = new EventProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, "Bus", "Bus.Events", messagingSettings.BusPollDelay, messagingSettings.NumberOfThreads), serializer, tracer);
+            var commandProcessor = new CommandProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.BusConnectionString, "Bus.Commands", config.BusPollDelay, config.NumberOfProcessorsThreads), serializer, tracer, new BusTransientFaultDetector(config.BusConnectionString));
+            var eventProcessor = new EventProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.BusConnectionString, "Bus.Events", config.BusPollDelay, config.NumberOfProcessorsThreads), serializer, tracer);
 
             var inMemorySnapshotCache = new InMemorySnapshotCache("EventStoreCache");
 
@@ -102,10 +101,10 @@ namespace Journey.Worker
             container.RegisterInstance<IMessageProcessor>("EventProcessor", eventProcessor);
 
             // Event log database and handler
-            this.RegisterMessageLogger(container, serializer, metadata, eventProcessor);
+            this.RegisterMessageLogger(container, serializer, metadata, eventProcessor, config.MessageLogConnectionString);
 
             // Event Store
-            this.RegisterEventStore(container);
+            this.RegisterEventStore(container, config.EventStoreConnectionString);
 
             // Bounded Context Registration
             if (domainContainer.DomainRegistrationList.Any())
@@ -119,19 +118,19 @@ namespace Journey.Worker
             return container;
         }
 
-        private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor)
+        private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString)
         {
             //Database.SetInitializer<MessageLogDbContext>(null);
-            container.RegisterType<MessageLog>(new InjectionConstructor("MessageLog", serializer, metadata));
+            container.RegisterType<MessageLog>(new InjectionConstructor(connectionString, serializer, metadata));
             container.RegisterType<IEventHandler, MessageLogHandler>("MessageLogHandler");
             container.RegisterType<ICommandHandler, MessageLogHandler>("MessageLogHandler");
             eventProcessor.Register(container.Resolve<MessageLogHandler>());
         }
 
-        private void RegisterEventStore(IUnityContainer container)
+        private void RegisterEventStore(IUnityContainer container, string connectionString)
         {
             //Database.SetInitializer<EventStoreDbContext>(null);
-            container.RegisterType<EventStoreDbContext>(new TransientLifetimeManager(), new InjectionConstructor("EventStore"));
+            container.RegisterType<EventStoreDbContext>(new TransientLifetimeManager(), new InjectionConstructor(connectionString));
             container.RegisterType(typeof(IEventStore<>), typeof(EventStore<>), new ContainerControlledLifetimeManager());
         }
 

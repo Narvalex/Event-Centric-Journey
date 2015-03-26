@@ -68,9 +68,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Database\ConnectionStringProvider.cs" />
-    <Compile Include="Database\DatabaseSetup.cs" />
-    <Compile Include="Database\IConnectionStringProvider.cs" />
     <Compile Include="Database\ServiceConfigurationSettingConnectionFactory.cs" />
     <Compile Include="Database\SqlCommandWrapper.cs" />
     <Compile Include="Database\SqlDataReaderExtensions.cs" />
@@ -145,7 +142,6 @@
     <Compile Include="Messaging\Processing\Implementation\AsynchronousEventDispatcher.cs" />
     <Compile Include="Messaging\Processing\Implementation\CommandProcessor.cs" />
     <Compile Include="Messaging\Processing\Implementation\EventProcessor.cs" />
-    <Compile Include="Messaging\Processing\Implementation\EventSubscriptionDbContext.cs" />
     <Compile Include="Messaging\Processing\Implementation\InMemoryCommandProcessor.cs" />
     <Compile Include="Messaging\Processing\Implementation\MessageProcessor.cs" />
     <Compile Include="Messaging\Processing\Implementation\SynchronousEventDispatcher.cs" />
@@ -160,16 +156,18 @@
     <Compile Include="Utils\Testing\EnumerableCommandsExtensions.cs" />
     <Compile Include="Utils\Testing\EnumerableEventsExtensions.cs" />
     <Compile Include="Utils\Testing\EventSourcingTestHelper.cs" />
-    <Compile Include="Worker\Implementation\DomainContainer.cs" />
-    <Compile Include="Worker\IDomainContainer.cs" />
-    <Compile Include="Worker\Implementation\ConsoleWorkerTracer.cs" />
-    <Compile Include="Worker\Implementation\WebWorkerTracer.cs" />
-    <Compile Include="Worker\Implementation\WorkerRole.cs" />
-    <Compile Include="Worker\Implementation\WorkerRoleManager.cs" />
-    <Compile Include="Worker\Implementation\WorkerRoleStatusUrlProvider.cs" />
-    <Compile Include="Worker\IWorkerRole.cs" />
-    <Compile Include="Worker\IWorkerRoleStatusUrlProvider.cs" />
-    <Compile Include="Worker\IWorkerRoleTracer.cs" />
+    <Compile Include="Worker\Config\IWorkerRoleConfig.cs" />
+    <Compile Include="Worker\Config\Implementation\DefaultConfigProvider.cs" />
+    <Compile Include="Worker\Core\Implementation\DomainContainer.cs" />
+    <Compile Include="Worker\Core\IDomainContainer.cs" />
+    <Compile Include="Worker\Core\Implementation\ConsoleWorkerTracer.cs" />
+    <Compile Include="Worker\Core\Implementation\WebWorkerTracer.cs" />
+    <Compile Include="Worker\Core\Implementation\WorkerRole.cs" />
+    <Compile Include="Worker\Core\Implementation\WorkerRoleManager.cs" />
+    <Compile Include="Worker\Core\Implementation\WorkerRoleStatusUrlProvider.cs" />
+    <Compile Include="Worker\Core\IWorkerRole.cs" />
+    <Compile Include="Worker\Core\IWorkerRoleStatusUrlProvider.cs" />
+    <Compile Include="Worker\Core\IWorkerRoleTracer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

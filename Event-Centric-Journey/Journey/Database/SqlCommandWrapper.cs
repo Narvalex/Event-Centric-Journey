@@ -17,11 +17,6 @@ namespace Journey.Database
             this.connectionString = connectionString;
         }
 
-        public SqlCommandWrapper(IConnectionStringProvider connectionStringProvider)
-        {
-            this.connectionString = connectionStringProvider.ConnectionString;
-        }
-
         public void CreateDatabase()
         {
             var builder = new SqlConnectionStringBuilder(this.connectionString);

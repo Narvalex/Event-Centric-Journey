@@ -13,7 +13,7 @@ namespace Journey.Messaging
     public class MessageSender : IMessageSender, ISqlBus
     {
         private readonly IDbConnectionFactory connectionFactory;
-        private readonly string dbName;
+        private readonly string connectionString;
         private readonly string insertQuery;
 
         private MessageSender(string tableName)
@@ -27,11 +27,11 @@ namespace Journey.Messaging
         /// <param name="connectionFactory">The connectionFactory.</param>
         /// <param name="dbName">The database name.</param>
         /// <param name="tableName">The table name of the bus to send messages.</param>
-        public MessageSender(IDbConnectionFactory connectionFactory, string dbName, string tableName)
+        public MessageSender(IDbConnectionFactory connectionFactory, string connectionString, string tableName)
             : this(tableName)
         {
             this.connectionFactory = connectionFactory;
-            this.dbName = dbName;
+            this.connectionString = connectionString;
             this.insertQuery = string.Format(@"
 INSERT INTO {0} 
 (Body, DeliveryDate, CorrelationId, IsDeadLetter) 
@@ -46,7 +46,7 @@ VALUES
         /// </summary>
         public void Send(Message message)
         {
-            using (var connection = this.connectionFactory.CreateConnection(this.dbName))
+            using (var connection = this.connectionFactory.CreateConnection(this.connectionString))
             {
                 connection.Open();
 
@@ -61,7 +61,7 @@ VALUES
         {
             using (var scope = new TransactionScope(TransactionScopeOption.Required))
             {
-                using (var connection = this.connectionFactory.CreateConnection(this.dbName))
+                using (var connection = this.connectionFactory.CreateConnection(this.connectionString))
                 {
                     connection.Open();
 
