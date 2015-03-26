@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Web.Hosting;
 
 namespace Journey.Worker
@@ -7,7 +6,7 @@ namespace Journey.Worker
     public sealed class WorkerRoleManager : IRegisteredObject, IDisposable
     {
         private static volatile WorkerRoleManager instance;
-        private static volatile IWorker worker;
+        private static volatile IWorkerRole worker;
         private static object lockObject = new object();
         private static volatile bool isWorking;
 
@@ -20,16 +19,11 @@ namespace Journey.Worker
         {
             get
             {
-                if (instance == null)
-                {
-                    return null;
-                }
-
                 return instance;
             }
         }
 
-        public static WorkerRoleManager CreateNew(IWorker workerInstance)
+        public static WorkerRoleManager CreateNew(IWorkerRole workerInstance)
         {
             if (instance == null)
             {

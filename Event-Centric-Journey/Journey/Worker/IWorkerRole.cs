@@ -2,7 +2,7 @@
 
 namespace Journey.Worker
 {
-    public interface IWorker : IDisposable
+    public interface IWorkerRole : IDisposable
     {
         void Start();
 

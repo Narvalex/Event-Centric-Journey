@@ -51,7 +51,7 @@ namespace Journey.Database
             {
                 CallContext.LogicalSetData("SuspendExecutionStrategy", value);
             }
-        }
+        }       
         
     }
 }

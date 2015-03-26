@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace Journey.Worker
 {
-    public class Worker : IWorker
+    public class WorkerRole : IWorkerRole
     {
         private readonly CancellationTokenSource cancellationTokenSource;
         private readonly IUnityContainer container;
@@ -25,7 +25,7 @@ namespace Journey.Worker
         public static int NotificationCountLimit = 50;
         public static volatile int NotificationCount = default(int);
 
-        public Worker(IDomainContainer domainContainer)
+        public WorkerRole(IDomainContainer domainContainer)
         {
             this.cancellationTokenSource = new CancellationTokenSource();
             this.CreateWebTracer();
@@ -70,7 +70,7 @@ namespace Journey.Worker
             var container = new UnityContainer();
 
             //TODO: in config file
-            var messagingSettings = new MessagingSettings(1, TimeSpan.FromMinutes(100));
+            var messagingSettings = new MessagingSettings(1, TimeSpan.FromMilliseconds(100));
             var connectionProvider = new ConnectionStringProvider("Data Source=WS11;Initial Catalog=SIRDAT_P9;User ID=so;Password=1joca395;Persist Security Info=True;packet size=4096");
 
             // Infrastructure
