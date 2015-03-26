@@ -160,6 +160,7 @@
     <Compile Include="Utils\Testing\EnumerableCommandsExtensions.cs" />
     <Compile Include="Utils\Testing\EnumerableEventsExtensions.cs" />
     <Compile Include="Utils\Testing\EventSourcingTestHelper.cs" />
+    <Compile Include="Worker\Implementation\DomainContainer.cs" />
     <Compile Include="Worker\IDomainContainer.cs" />
     <Compile Include="Worker\Implementation\ConsoleWorkerTracer.cs" />
     <Compile Include="Worker\Implementation\WebWorkerTracer.cs" />
