@@ -14,12 +14,6 @@ namespace Journey.Worker.Config
         { }
 
         [ConfigurationProperty(connectionString, IsRequired = true)]
-        public string BusConnectionString
-        {
-            get { return this[connectionString] as string; }
-        }
-
-        [ConfigurationProperty(connectionString, IsRequired = true)]
         public string EventStoreConnectionString
         {
             get { return this[connectionString] as string; }

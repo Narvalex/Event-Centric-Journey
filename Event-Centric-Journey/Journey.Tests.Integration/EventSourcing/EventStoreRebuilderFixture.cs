@@ -294,7 +294,5 @@ DROP DATABASE [{0}]
         #endregion
 
         #endregion
-
-
     }
 }

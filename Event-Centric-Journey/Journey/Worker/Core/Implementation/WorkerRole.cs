@@ -84,11 +84,11 @@ namespace Journey.Worker
             var metadata = container.Resolve<IMetadataProvider>();
             var tracer = container.Resolve<IWorkerRoleTracer>();
 
-            var commandBus = new CommandBus(new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.BusConnectionString, "Bus.Commands"), serializer);
-            var eventBus = new EventBus(new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.BusConnectionString, "Bus.Events"), serializer);
+            var commandBus = new CommandBus(new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Commands"), serializer);
+            var eventBus = new EventBus(new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Events"), serializer);
 
-            var commandProcessor = new CommandProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.BusConnectionString, "Bus.Commands", config.BusPollDelay, config.NumberOfProcessorsThreads), serializer, tracer, new BusTransientFaultDetector(config.BusConnectionString));
-            var eventProcessor = new EventProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.BusConnectionString, "Bus.Events", config.BusPollDelay, config.NumberOfProcessorsThreads), serializer, tracer);
+            var commandProcessor = new CommandProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Commands", config.BusPollDelay, config.NumberOfProcessorsThreads), serializer, tracer, new BusTransientFaultDetector(config.EventStoreConnectionString));
+            var eventProcessor = new EventProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Events", config.BusPollDelay, config.NumberOfProcessorsThreads), serializer, tracer);
 
             var inMemorySnapshotCache = new InMemorySnapshotCache("EventStoreCache");
 
