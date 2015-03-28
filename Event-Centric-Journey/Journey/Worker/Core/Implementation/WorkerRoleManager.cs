@@ -80,5 +80,7 @@ namespace Journey.Worker
         {
             this.Stop(true);
         }
+
+        public IWorkerRole WorkerRole { get { return worker; } }
     }
 }

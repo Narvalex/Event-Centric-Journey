@@ -21,16 +21,16 @@ namespace Journey.Worker
         private readonly List<IMessageProcessor> processors;
 
         private static object lockObject = new object();
-        public static IWorkerRoleTracer Tracer;
+        private static IWorkerRoleTracer _tracer;
         public static readonly Queue<Notification> Notifications = new Queue<Notification>(50);
         public static int NotificationCountLimit = 50;
         public static volatile int NotificationCount = default(int);
 
         public WorkerRole(IDomainContainer domainContainer)
         {
+            this.CreateWebTracer();
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
             this.cancellationTokenSource = new CancellationTokenSource();
-            this.CreateWebTracer();
             this.container = this.CreateContainer(domainContainer);
             this.processors = this.container.ResolveAll<IMessageProcessor>().ToList();
         }
@@ -51,7 +51,7 @@ namespace Journey.Worker
 
         private void CreateWebTracer()
         {
-            Tracer = new WebWorkerTracer((n) =>
+            _tracer = new WebWorkerTracer((n) =>
             {
                 lock (lockObject)
                 {
@@ -76,7 +76,7 @@ namespace Journey.Worker
             // Infrastructure
             container.RegisterInstance<ITextSerializer>(new JsonTextSerializer());
             container.RegisterInstance<IMetadataProvider>(new StandardMetadataProvider());
-            container.RegisterInstance<IWorkerRoleTracer>(Tracer);
+            container.RegisterInstance<IWorkerRoleTracer>(_tracer);
 
             var config = container.Resolve<IDomainContainer>().WorkerRoleConfig;
 
@@ -160,6 +160,11 @@ namespace Journey.Worker
         {
             this.container.Dispose();
             this.cancellationTokenSource.Dispose();
+        }
+
+        public IWorkerRoleTracer Tracer
+        {
+            get { return _tracer; }
         }
     }
 }

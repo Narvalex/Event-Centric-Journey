@@ -7,5 +7,7 @@ namespace Journey.Worker
         void Start();
 
         void Stop();
+
+        IWorkerRoleTracer Tracer { get; }
     }
 }

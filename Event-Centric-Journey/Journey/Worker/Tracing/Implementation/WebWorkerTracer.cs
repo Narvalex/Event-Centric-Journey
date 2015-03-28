@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Journey.Worker.Tracing;
+using System;
 using System.Threading.Tasks;
 
 namespace Journey.Worker
 {
-    public class WebWorkerTracer : IWorkerRoleTracer
+    public class WebWorkerTracer : IWebTracer
     {
         public readonly Action<string> notify;
 

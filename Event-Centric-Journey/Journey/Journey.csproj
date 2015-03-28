@@ -160,14 +160,15 @@
     <Compile Include="Worker\Config\Implementation\DefaultConfigProvider.cs" />
     <Compile Include="Worker\Core\Implementation\DomainContainer.cs" />
     <Compile Include="Worker\Core\IDomainContainer.cs" />
-    <Compile Include="Worker\Core\Implementation\ConsoleWorkerTracer.cs" />
-    <Compile Include="Worker\Core\Implementation\WebWorkerTracer.cs" />
+    <Compile Include="Worker\Tracing\Implementation\ConsoleWorkerTracer.cs" />
+    <Compile Include="Worker\Tracing\Implementation\WebWorkerTracer.cs" />
     <Compile Include="Worker\Core\Implementation\WorkerRole.cs" />
     <Compile Include="Worker\Core\Implementation\WorkerRoleManager.cs" />
     <Compile Include="Worker\Core\Implementation\WorkerRoleStatusUrlProvider.cs" />
     <Compile Include="Worker\Core\IWorkerRole.cs" />
     <Compile Include="Worker\Core\IWorkerRoleStatusUrlProvider.cs" />
-    <Compile Include="Worker\Core\IWorkerRoleTracer.cs" />
+    <Compile Include="Worker\Tracing\IWebTracer.cs" />
+    <Compile Include="Worker\Tracing\IWorkerRoleTracer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
