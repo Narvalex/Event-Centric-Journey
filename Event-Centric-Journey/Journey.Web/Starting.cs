@@ -9,7 +9,9 @@ namespace Journey.Web.App_Start
             // Implement Here you Own Domain Container.
             var worker = new WorkerRole(new DomainContainer());
 
-            WorkerRoleManager.CreateNew(worker).StartWorking();
+            WorkerRoleWebPortal.CreateNew(worker).StartWorking();
         }
     }
 }
+
+

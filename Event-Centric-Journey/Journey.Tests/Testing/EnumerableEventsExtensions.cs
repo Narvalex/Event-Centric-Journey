@@ -2,7 +2,7 @@
 using Journey.Messaging;
 using System.Linq;
 
-namespace Journey.Utils.Testing
+namespace Journey.Tests.Testing
 {
     public static class EnumerableEventsExtensions
     {

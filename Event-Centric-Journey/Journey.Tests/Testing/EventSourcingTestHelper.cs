@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace Journey.Utils.Testing
+namespace Journey.Tests.Testing
 {
     public class EventSourcingTestHelper<T> where T : IEventSourced
     {

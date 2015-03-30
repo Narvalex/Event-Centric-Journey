@@ -3,6 +3,13 @@
     ViewBag.Title = "Portal";
 }
 
+<style>
+body {
+    background-color: #1e1e1e;
+}
+</style>
+
+
 <script src="~/Scripts/jquery.signalR-2.2.0.js"></script>
 <script src="~/SignalR/hubs"></script>
 
@@ -12,7 +19,17 @@
 <div ng-app="app">
 
     <div ng-controller="portalController">
-        
+        <div style="margin: 50px">
+            <div data-bind="foreach:messages">
+                <br />
+                <div data-bind="text: $data"
+                     style="
+                        font-family:Consolas;
+                        color:white;
+                        white-space:pre-wrap">
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>

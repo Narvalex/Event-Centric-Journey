@@ -6,7 +6,6 @@ using Journey.Messaging.Logging.Metadata;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
 using Microsoft.Practices.Unity;
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -19,16 +18,12 @@ namespace Journey.Worker
         private readonly CancellationTokenSource cancellationTokenSource;
         private readonly IUnityContainer container;
         private readonly List<IMessageProcessor> processors;
-
-        private static object lockObject = new object();
-        private static IWorkerRoleTracer _tracer;
-        public static readonly Queue<Notification> Notifications = new Queue<Notification>(50);
-        public static int NotificationCountLimit = 50;
-        public static volatile int NotificationCount = default(int);
+        private static IWorkerRoleTracer _tracer;        
+        
 
         public WorkerRole(IDomainContainer domainContainer)
         {
-            this.CreateWebTracer();
+            _tracer = new WebWorkerTracer();
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
             this.cancellationTokenSource = new CancellationTokenSource();
             this.container = this.CreateContainer(domainContainer);
@@ -47,24 +42,6 @@ namespace Journey.Worker
 
             this.processors.ForEach(p => p.Stop());
             this.container.Resolve<IWorkerRoleTracer>().Notify("=== Worker Stopped ===");
-        }
-
-        private void CreateWebTracer()
-        {
-            _tracer = new WebWorkerTracer((n) =>
-            {
-                lock (lockObject)
-                {
-                    if (Notifications.Count >= NotificationCountLimit)
-                        Notifications.Dequeue();
-
-                    Notifications.Enqueue(new Notification
-                    {
-                        id = ++NotificationCount,
-                        message = string.Format("{0} - {1}", DateTime.Now.ToString(), n)
-                    });
-                }
-            });
         }
 
         private IUnityContainer CreateContainer(IDomainContainer domainContainer)
@@ -149,12 +126,6 @@ namespace Journey.Worker
             // Example: Logger
             //eventProcessor.Register(container.Resolve<MessageLogHandler>());
         }
-        public class Notification
-        {
-            public int id { get; set; }
-            public string message { get; set; }
-        }
-
 
         public void Dispose()
         {

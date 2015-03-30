@@ -3,19 +3,19 @@ using System.Web.Hosting;
 
 namespace Journey.Worker
 {
-    public sealed class WorkerRoleManager : IRegisteredObject, IDisposable
+    public sealed class WorkerRoleWebPortal : IRegisteredObject, IDisposable
     {
-        private static volatile WorkerRoleManager instance;
+        private static volatile WorkerRoleWebPortal instance;
         private static volatile IWorkerRole worker;
         private static object lockObject = new object();
         private static volatile bool isWorking;
 
-        private WorkerRoleManager() 
+        private WorkerRoleWebPortal() 
         {
             HostingEnvironment.RegisterObject(this);
         }
 
-        public static WorkerRoleManager Instance
+        public static WorkerRoleWebPortal Instance
         {
             get
             {
@@ -23,7 +23,7 @@ namespace Journey.Worker
             }
         }
 
-        public static WorkerRoleManager CreateNew(IWorkerRole workerInstance)
+        public static WorkerRoleWebPortal CreateNew(IWorkerRole workerInstance)
         {
             if (instance == null)
             {
@@ -31,7 +31,7 @@ namespace Journey.Worker
                 {
                     if (instance == null)
                     {
-                        instance = new WorkerRoleManager();
+                        instance = new WorkerRoleWebPortal();
                         isWorking = false;
 
                         if (worker != null)
