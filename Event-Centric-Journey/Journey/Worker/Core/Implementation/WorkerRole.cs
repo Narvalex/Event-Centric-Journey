@@ -20,10 +20,12 @@ namespace Journey.Worker
         private readonly List<IMessageProcessor> processors;
         private static IWorkerRoleTracer _tracer;        
         
-
-        public WorkerRole(IDomainContainer domainContainer)
+        /// <summary>
+        /// Acepta aparte del dominio un tracer, que puede ser de consola o web, hasta el momento.
+        /// </summary>
+        public WorkerRole(IDomainContainer domainContainer, IWorkerRoleTracer tracer)
         {
-            _tracer = new WebWorkerTracer();
+            _tracer = tracer;
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
             this.cancellationTokenSource = new CancellationTokenSource();
             this.container = this.CreateContainer(domainContainer);
