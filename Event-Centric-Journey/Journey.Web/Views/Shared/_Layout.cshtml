@@ -18,27 +18,89 @@
     <script src="~/Scripts/angular.js"></script>
     <script src="~/Scripts/knockout-3.3.0.debug.js"></script>
 
+
+    <!-- Portal  -->
+    <!-- Js -->
+    <script src="~/Scripts/jquery.signalR-2.2.0.js"></script>
+    <script src="~/SignalR/hubs"></script>
+
+    <script src="~/app/portal/app.js"></script>
+    <script src="~/app/portal/portalController.js"></script>
+
 </head>
-<body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("Event Centric Journey", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Portal", "Index", "Portal")</li>
-                </ul>
+<body ng-app="app">
+    <div ng-controller="portalController">
+
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    @Html.ActionLink("Event Centric Journey", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a ng-show="isWorking && !hideAll"
+                               href=""
+                               class="dropdown-toggle"
+                               data-toggle="dropdown"
+                               style="font-family:Arial; font-size: 12px; color:#00ff90; font-weight:600;">
+                                <span class="glyphicon glyphicon-ok-sign" style="margin-right: 2px"></span>
+                                Worker is online
+                            </a>
+                            <a ng-show="!isWorking && !hideAll"
+                               href=""
+                               class="dropdown-toggle"
+                               data-toggle="dropdown"
+                               style="font-family:Arial; font-size: 12px; color:#f35454; font-weight:600;">
+                                <span class="glyphicon glyphicon-alert" style="margin-right: 2px"></span>
+                                Worker is down
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li ng-show="!isWorking && !hideAll">
+                                    <a href=""
+                                       ng-click="start()">
+                                        <span class="glyphicon glyphicon-play"
+                                              style="margin-right: 2px"></span>
+                                        Start
+                                    </a>
+                                </li>
+                                <li ng-show="isWorking && !hideAll">
+                                    <a href=""
+                                       ng-click="stop()">
+                                        <span class="glyphicon glyphicon-stop"
+                                              style="margin-right: 2px"></span>
+                                        Stop
+                                    </a>
+                                </li>
+                                <li role="presentation" class="divider"></li>
+                                <li>
+                                    <a href="">
+                                        <span class="glyphicon glyphicon-refresh"
+                                              style="margin-right: 2px"></span>
+                                        Rebuild read model
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="">
+                                        <span class="glyphicon glyphicon-sort-by-attributes"
+                                              style="margin-right: 2px"></span>
+                                        Rebuild event store
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
+        <div>
+            @RenderBody()
+        </div>
     </div>
-    <div>
-        @RenderBody()
-    </div>    
 </body>
 </html>

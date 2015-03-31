@@ -168,6 +168,7 @@
     <Compile Include="Worker\Config\Implementation\DefaultConfigProvider.cs" />
     <Compile Include="Worker\Core\Implementation\DomainContainer.cs" />
     <Compile Include="Worker\Core\IDomainContainer.cs" />
+    <Compile Include="Worker\Core\IWorkerRolePortal.cs" />
     <Compile Include="Worker\Tracing\Implementation\ConsoleWorkerTracer.cs" />
     <Compile Include="Worker\Tracing\Implementation\PortalHub.cs" />
     <Compile Include="Worker\Tracing\Implementation\SignalRBase.cs" />

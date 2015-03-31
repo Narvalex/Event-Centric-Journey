@@ -22,9 +22,6 @@
 
         function activate() {
 
-            // Obtenemos el status del motor
-            getStatus();
-
             var Model = function () {
                 var self = this;
 
@@ -60,15 +57,14 @@
             };
 
             vm.portalHub.client.newMessage = function (message) {
-                toastr.info(message);
-                // SingalR is connected...
-                vm.portalHub.server.ping('Client connected');
+                //toastr.info(message);
             };
 
             $.connection.hub.logging = true;
             $.connection.hub.start().done(function () {
                 // SingalR is connected...
                 vm.portalHub.server.sendMessage('Client connected');
+                getStatus();
             });
 
             $(function () {
@@ -77,19 +73,21 @@
         }
 
         function start() {
-            toastr.info("Starting Engine...")
+            //toastr.info("Starting Engine...")
+            vm.portalHub.server.sendMessage('===> Starting worker...');
             return $http.get('/api/portal/start')
                         .then(function (response) {
-                            toastr.success("Engine is running!")
+                            //toastr.success("Engine is running!")
                             vm.isWorking = response.data;
                         });
         }
 
         function stop() {
-            toastr.warning("Stopping Engine...")
+            //toastr.warning("Stopping Engine...")
+            vm.portalHub.server.sendMessage('===> Stopping worker...');
             return $http.get('/api/portal/stop')
                         .then(function (response) {
-                            toastr.error("Engine stopped!")
+                            //toastr.error("Engine stopped!")
                             vm.isWorking = response.data;
                         });
         }
@@ -118,17 +116,17 @@
         }
 
         function getStatus() {
-            toastr.warning("Checking Bus Status...")
+            vm.portalHub.server.sendMessage("Checking worker status...");
             return $http.get('/api/portal/status')
                         .then(function (response) {
 
                             vm.isWorking = response.data;
 
                             if (vm.isWorking) {
-                                toastr.success("Engine is running")
+                                vm.portalHub.server.sendMessage("Worker is online");
                             }
                             else {
-                                toastr.error("Engine is shutted down")
+                                vm.portalHub.server.sendMessage("Worker is down");
                             }
                         });
         }

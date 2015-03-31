@@ -3,7 +3,7 @@ using System.Web.Hosting;
 
 namespace Journey.Worker
 {
-    public sealed class WorkerRoleWebPortal : IRegisteredObject, IDisposable
+    public sealed class WorkerRoleWebPortal : IWorkerRolePortal, IRegisteredObject, IDisposable
     {
         private static volatile WorkerRoleWebPortal instance;
         private static volatile IWorkerRole worker;
@@ -82,5 +82,7 @@ namespace Journey.Worker
         }
 
         public IWorkerRole WorkerRole { get { return worker; } }
+
+        public bool IsWorking { get { return isWorking; } }
     }
 }
