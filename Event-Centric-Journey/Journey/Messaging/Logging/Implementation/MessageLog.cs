@@ -2,6 +2,7 @@
 using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
 using Journey.Utils;
+using Journey.Utils.SystemDateTime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,14 +13,16 @@ namespace Journey.Messaging.Logging
     public class MessageLog : IEventLogReader
  {
         private string connectionString;
-        private IMetadataProvider metadataProvider;
-        private ITextSerializer serializer;
+        private readonly IMetadataProvider metadataProvider;
+        private readonly ITextSerializer serializer;
+        private readonly ISystemDateTime dateTime;
 
-        public MessageLog(string connectionString, ITextSerializer serializer, IMetadataProvider metadataProvider)
+        public MessageLog(string connectionString, ITextSerializer serializer, IMetadataProvider metadataProvider, ISystemDateTime dateTime)
         {
             this.connectionString = connectionString;
             this.serializer = serializer;
             this.metadataProvider = metadataProvider;
+            this.dateTime = dateTime;
         }
 
         public void Save(IEvent @event)
@@ -29,7 +32,7 @@ namespace Journey.Messaging.Logging
                 // first lets check if is not a duplicated command message;
                 var duplicatedMessage = context.Set<MessageLogEntity>()
                     .Where(m => m.SourceId.ToUpper() == @event.SourceId.ToString().ToUpper()
-                            && m.Version == ((ITraceableVersionedEvent)@event).Version.ToString())
+                            && m.Version == ((IVersionedEvent)@event).Version.ToString())
                     .FirstOrDefault();
 
                 if (duplicatedMessage != null)
@@ -49,7 +52,7 @@ namespace Journey.Messaging.Logging
                     Namespace = metadata.TryGetValue(StandardMetadata.Namespace),
                     TypeName = metadata.TryGetValue(StandardMetadata.TypeName),
                     SourceType = metadata.TryGetValue(StandardMetadata.SourceType),
-                    CreationDate = DateTime.Now.ToString("o"),
+                    CreationDate = this.dateTime.Now.ToString("o"),
                     Payload = serializer.Serialize(@event),
                 });
                 context.SaveChanges();
@@ -82,7 +85,7 @@ namespace Journey.Messaging.Logging
                     Namespace = metadata.TryGetValue(StandardMetadata.Namespace),
                     TypeName = metadata.TryGetValue(StandardMetadata.TypeName),
                     SourceType = metadata.TryGetValue(StandardMetadata.SourceType),
-                    CreationDate = DateTime.Now.ToString("o"),
+                    CreationDate = this.dateTime.Now.ToString("o"),
                     Payload = serializer.Serialize(command),
                 });
                 context.SaveChanges();

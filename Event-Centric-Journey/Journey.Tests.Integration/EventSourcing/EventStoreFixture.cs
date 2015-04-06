@@ -2,6 +2,7 @@
 using Journey.EventSourcing;
 using Journey.Messaging;
 using Journey.Serialization;
+using Journey.Utils.SystemDateTime;
 using Journey.Worker;
 using Moq;
 using System;
@@ -49,7 +50,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 Assert.Throws<InvalidCastException>(() => this.sut =
                     new EventStore<FakePretendingEventSourcedAggregate>(eventBusMock.Object, commandBusMock.Object, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), cacheMock.Object, new ConsoleWorkerTracer()));
+                        () => (new EventStoreDbContext(this.connectionString)), cacheMock.Object, new ConsoleWorkerRoleTracer(), new LocalDateTime()));
             }
 
             private static ITextSerializer CreateSerializer()
@@ -100,7 +101,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 Assert.Throws<InvalidCastException>(() => this.sut =
                     new EventStore<FakePretendingEventSourcedMementoAggregate>(eventBusMock.Object, commandBusMock.Object, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), cacheMock.Object, new ConsoleWorkerTracer()));
+                        () => (new EventStoreDbContext(this.connectionString)), cacheMock.Object, new ConsoleWorkerRoleTracer(), new LocalDateTime()));
             }
 
             private static ITextSerializer CreateSerializer()
@@ -158,7 +159,7 @@ namespace Journey.Tests.Integration.EventSourcing
 
                 this.sut =
                     new EventStore<FakeItemsAggregate>(this.eventBus, this.commandBus, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), cacheMock.Object, new ConsoleWorkerTracer());
+                        () => (new EventStoreDbContext(this.connectionString)), cacheMock.Object, new ConsoleWorkerRoleTracer(), new LocalDateTime());
             }
 
             [Fact]
@@ -319,7 +320,7 @@ DROP DATABASE [{0}]
 
                 this.sut =
                     new EventStore<FakeItemsSaga>(this.eventBus, this.commandBus, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), cacheMock.Object, new ConsoleWorkerTracer());
+                        () => (new EventStoreDbContext(this.connectionString)), cacheMock.Object, new ConsoleWorkerRoleTracer(), new LocalDateTime());
             }
 
             [Fact]
@@ -502,7 +503,7 @@ DROP DATABASE [{0}]
                 base.RehydratesFrom<ItemReserved>(this.OnItemReserved);
             }
 
-            public FakeItemsSaga(Guid id, IEnumerable<ITraceableVersionedEvent> history)
+            public FakeItemsSaga(Guid id, IEnumerable<IVersionedEvent> history)
                 : this(id)
             {
                 this.LoadFrom(history);
@@ -572,7 +573,7 @@ DROP DATABASE [{0}]
                 base.RehydratesFrom<ItemRemoved>(this.OnItemRemoved);
             }
 
-            public FakeItemsAggregate(Guid id, IEnumerable<ITraceableVersionedEvent> history)
+            public FakeItemsAggregate(Guid id, IEnumerable<IVersionedEvent> history)
                 : this(id)
             {
                 this.LoadFrom(history);
@@ -621,7 +622,7 @@ DROP DATABASE [{0}]
             public string Name { get; set; }
         }
 
-        public class ItemAdded : TraceableVersionedEvent
+        public class ItemAdded : VersionedEvent
         {
             public ItemAdded()
             { }
@@ -631,7 +632,7 @@ DROP DATABASE [{0}]
             public int Quantity { get; set; }
         }
 
-        public class ItemRemoved : TraceableVersionedEvent
+        public class ItemRemoved : VersionedEvent
         {
             public ItemRemoved()
             { }
@@ -640,7 +641,7 @@ DROP DATABASE [{0}]
             public int Quantity { get; set; }
         }
 
-        public class ItemReserved : TraceableVersionedEvent
+        public class ItemReserved : VersionedEvent
         {
             public ItemReserved()
             { }
@@ -679,7 +680,7 @@ DROP DATABASE [{0}]
                 get { throw new NotImplementedException(); }
             }
 
-            public IEnumerable<ITraceableVersionedEvent> Events
+            public IEnumerable<IVersionedEvent> Events
             {
                 get { throw new NotImplementedException(); }
             }
@@ -698,7 +699,7 @@ DROP DATABASE [{0}]
                 get { throw new NotImplementedException(); }
             }
 
-            public IEnumerable<ITraceableVersionedEvent> Events
+            public IEnumerable<IVersionedEvent> Events
             {
                 get { throw new NotImplementedException(); }
             }

@@ -2,6 +2,7 @@
 using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
+using Journey.Utils.SystemDateTime;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -68,7 +69,7 @@ namespace Journey.Tests.Integration.Messaging.MessageLogFixture
                 });
 
             this.metadata = Mock.Get(metadata);
-            this.sut = new MessageLog(this.dbName, new JsonTextSerializer(), metadata);
+            this.sut = new MessageLog(this.dbName, new JsonTextSerializer(), metadata, new LocalDateTime());
             this.sut.Save(eventA);
             this.sut.Save(eventB);
             this.sut.Save(eventC);
@@ -248,7 +249,7 @@ namespace Journey.Tests.Integration.Messaging.MessageLogFixture
             Assert.Equal(1, events.Count);
         }
 
-        public class EventA : TraceableVersionedEvent
+        public class EventA : VersionedEvent
         {
             public EventA()
             {
@@ -292,7 +293,7 @@ DROP DATABASE [{0}]
 
         }
 
-        public class EventB : TraceableVersionedEvent
+        public class EventB : VersionedEvent
         {
             public EventB()
             {
@@ -300,7 +301,7 @@ DROP DATABASE [{0}]
             }
         }
 
-        public class EventC : TraceableVersionedEvent
+        public class EventC : VersionedEvent
         {
             public EventC()
             {
@@ -354,7 +355,7 @@ DROP DATABASE [{0}]
                 });
 
             this.metadata = Mock.Get(metadata);
-            this.sut = new MessageLog(this.dbName, new JsonTextSerializer(), metadata);
+            this.sut = new MessageLog(this.dbName, new JsonTextSerializer(), metadata, new LocalDateTime());
             this.sut.Save(eventA);
             this.sut.Save(eventB);
         }
@@ -367,7 +368,7 @@ DROP DATABASE [{0}]
             Assert.Equal(2, events.Count);
         }
 
-        public class EventA : TraceableVersionedEvent
+        public class EventA : VersionedEvent
         {
             public EventA()
             {
@@ -411,7 +412,7 @@ DROP DATABASE [{0}]
 
         }
 
-        public class EventB : TraceableVersionedEvent
+        public class EventB : VersionedEvent
         {
             public EventB()
             {

@@ -1,4 +1,5 @@
 ﻿using Journey.Messaging;
+using Journey.Utils.SystemDateTime;
 using System;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
@@ -267,7 +268,7 @@ DROP DATABASE [{0}]
     public class TestableMessageReceiver : MessageReceiver
     {
         public TestableMessageReceiver(System.Data.Entity.Infrastructure.IDbConnectionFactory connectionFactory)
-            : base(connectionFactory, "TestSqlMessaging", "Test.Events", TimeSpan.FromSeconds(1), 1)
+            : base(connectionFactory, "TestSqlMessaging", "Test.Events", TimeSpan.FromSeconds(1), 1, new LocalDateTime())
         {
         }
 

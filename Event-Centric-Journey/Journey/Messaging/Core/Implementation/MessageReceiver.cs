@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Journey.Utils.SystemDateTime;
+using System;
 using System.Data;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
@@ -21,13 +22,15 @@ namespace Journey.Messaging
         private readonly object lockObject = new object();
         private CancellationTokenSource cancellationSource;
         private Action delegateMessageReceiving;
+        private readonly ISystemDateTime dateTime;
 
-        public MessageReceiver(IDbConnectionFactory connectionFactory, string connectionString, string tableName, TimeSpan busPollDelay, int numberOfThreads)
+        public MessageReceiver(IDbConnectionFactory connectionFactory, string connectionString, string tableName, TimeSpan busPollDelay, int numberOfThreads, ISystemDateTime dateTime)
         {
             this.connectionFactory = connectionFactory;
             this.connectionString = connectionString;
             this.pollDelay = busPollDelay;
             this.numberOfThreads = numberOfThreads;
+            this.dateTime = dateTime;
 
             this.readQuery =
                 string.Format(
@@ -209,11 +212,11 @@ namespace Journey.Messaging
 
         /// <summary>
         /// Esto parece que es para que funcione los mensajes que tienen Delay, como los que son por 
-        /// tiempo. Toma el tiempo independientemente de la región (UTC)
+        /// tiempo. 
         /// </summary>
         protected virtual DateTime GetCurrentDate()
         {
-            return DateTime.Now;
+            return this.dateTime.Now;
         }
 
         public void Dispose()

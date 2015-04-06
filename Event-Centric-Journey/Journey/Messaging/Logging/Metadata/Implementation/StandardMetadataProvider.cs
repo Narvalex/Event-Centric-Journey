@@ -34,7 +34,7 @@ namespace Journey.Messaging.Logging.Metadata
                 metadata[StandardMetadata.SourceId] = e.SourceId.ToString();
                 metadata[StandardMetadata.Kind] = StandardMetadata.EventKind;
 
-                var te = payload as ITraceableVersionedEvent;
+                var te = payload as IVersionedEvent;
                 if (te != null)
                 {
                     metadata[StandardMetadata.SourceType] = te.AggregateType;

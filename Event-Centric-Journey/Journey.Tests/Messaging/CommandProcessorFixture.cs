@@ -16,7 +16,7 @@ namespace Journey.Tests.Messaging.CommandProcessorFixture
 
         public GIVEN_command_processor()
         {
-            this.processor = new CommandProcessor(this.receiverMock.Object, CreateSerializer(), new ConsoleWorkerTracer(), new FakeFaultDetector());
+            this.processor = new CommandProcessor(this.receiverMock.Object, CreateSerializer(), new ConsoleWorkerRoleTracer(), new FakeFaultDetector());
         }
 
         [Fact]

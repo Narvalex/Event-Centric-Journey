@@ -25,6 +25,12 @@ namespace Journey.Worker.Config
             get { return this[connectionString] as string; }
         }
 
+        [ConfigurationProperty(connectionString, IsRequired = true)]
+        public string ReadModelConnectionString
+        {
+            get { return this[connectionString] as string; }
+        }
+
         [ConfigurationProperty(numberOfProcessorThreads, IsRequired = true)]
         public int NumberOfProcessorsThreads
         {

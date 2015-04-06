@@ -25,7 +25,7 @@ namespace Journey.Tests.Integration.Utils.Database.SqlCommandWrapperFixture
         [Fact]
         private void THEN_can_create_and_drop_database()
         {
-            this.sut.CreateDatabase();
+            this.sut.IsExistsDeleteAndCreateDatabase();
             this.sut.DropDatabase();
         }
     }
@@ -34,7 +34,7 @@ namespace Journey.Tests.Integration.Utils.Database.SqlCommandWrapperFixture
     {
         public GIVEN_db()
         {
-            this.sut.CreateDatabase();
+            this.sut.IsExistsDeleteAndCreateDatabase();
         }
 
         public void Dispose()

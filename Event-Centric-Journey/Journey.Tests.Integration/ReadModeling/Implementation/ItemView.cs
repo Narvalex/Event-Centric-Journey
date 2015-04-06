@@ -1,8 +1,8 @@
 ﻿using Journey.EventSourcing;
 
-namespace Journey.Tests.Integration.ReadModeling.Implementation
+namespace Journey.Tests.Integration.ReadModeling
 {
-    public class ItemView : TraceableEventSourcedEntity
+    public class ItemView
     {
         public int ItemId { get; set; }
         public string Name { get; set; }

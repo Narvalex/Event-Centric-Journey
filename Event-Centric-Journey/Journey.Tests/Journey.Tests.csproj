@@ -67,10 +67,11 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Guids\SequentialGuidGeneratorFixture.cs" />
     <Compile Include="Testing\EnumerableCommandsExtensions.cs" />
     <Compile Include="Testing\EnumerableEventsExtensions.cs" />
     <Compile Include="Testing\EventSourcingTestHelper.cs" />
-    <Compile Include="EventSourcing\DaoFixture.cs" />
+    <Compile Include="EventSourcing\FuncFixture.cs" />
     <Compile Include="EventSourcing\EventSourcedAggregateFixture.cs" />
     <Compile Include="EventSourcing\SnapshotCacheFixture.cs" />
     <Compile Include="Instrumentation\ConsoleWorkerRoleTracerFixture.cs" />

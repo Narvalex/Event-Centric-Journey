@@ -13,7 +13,7 @@ namespace Journey.Tests.Messaging.MessageDispatcherFixture
 
         public GIVEN_empty_dispatcher()
         {
-            this.sut = new AsynchronousEventDispatcher(new ConsoleWorkerTracer());
+            this.sut = new AsynchronousEventDispatcher(new ConsoleWorkerRoleTracer());
         }
 
         [Fact]
@@ -26,7 +26,7 @@ namespace Journey.Tests.Messaging.MessageDispatcherFixture
 
     public class GIVEN_dispatcher_with_handler
     {
-        private AsynchronousEventDispatcher sut = new AsynchronousEventDispatcher(new ConsoleWorkerTracer());
+        private AsynchronousEventDispatcher sut = new AsynchronousEventDispatcher(new ConsoleWorkerRoleTracer());
         private Mock<IEventHandler> handlerMock = new Mock<IEventHandler>();
 
         public GIVEN_dispatcher_with_handler()
@@ -58,7 +58,7 @@ namespace Journey.Tests.Messaging.MessageDispatcherFixture
 
     public class GIVEN_dispatcher_with_multiple_handlers
     {
-        private AsynchronousEventDispatcher sut = new AsynchronousEventDispatcher(new ConsoleWorkerTracer());
+        private AsynchronousEventDispatcher sut = new AsynchronousEventDispatcher(new ConsoleWorkerRoleTracer());
         private Mock<IEventHandler> handler1Mock = new Mock<IEventHandler>();
         private Mock<IEventHandler> handler2Mock = new Mock<IEventHandler>();
 

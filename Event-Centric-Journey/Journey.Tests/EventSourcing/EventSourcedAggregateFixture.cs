@@ -56,7 +56,7 @@ namespace Journey.Tests.EventSourcing.EventSourcedAggregateFixture
             base.RehydratesFrom<Event1ForCommand1>(this.OnEvent1ForCommand1);
         }
 
-        public TestableAggregate(Guid id, IEnumerable<ITraceableVersionedEvent> history)
+        public TestableAggregate(Guid id, IEnumerable<IVersionedEvent> history)
             : this(id)
         {
             base.LoadFrom(history);
@@ -80,7 +80,7 @@ namespace Journey.Tests.EventSourcing.EventSourcedAggregateFixture
         { }
     }
 
-    public class Event1ForCommand1 : TraceableVersionedEvent
+    public class Event1ForCommand1 : VersionedEvent
     {
     }
 }

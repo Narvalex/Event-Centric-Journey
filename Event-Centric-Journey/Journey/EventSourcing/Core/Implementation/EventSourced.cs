@@ -13,8 +13,8 @@ namespace Journey.EventSourcing
     /// </remarks>
     public abstract class EventSourced : IEventSourced
     {
-        private readonly Dictionary<Type, Action<ITraceableVersionedEvent>> rehydrators = new Dictionary<Type, Action<ITraceableVersionedEvent>>();
-        private readonly List<ITraceableVersionedEvent> pendingEvents = new List<ITraceableVersionedEvent>();
+        private readonly Dictionary<Type, Action<IVersionedEvent>> rehydrators = new Dictionary<Type, Action<IVersionedEvent>>();
+        private readonly List<IVersionedEvent> pendingEvents = new List<IVersionedEvent>();
 
         private readonly Guid id;
         //private int version = -1;
@@ -42,7 +42,7 @@ namespace Journey.EventSourcing
         /// <summary>
         /// Gets the collection of new events since the entity was loaded, as a consequence of command handling.
         /// </summary>
-        public IEnumerable<ITraceableVersionedEvent> Events
+        public IEnumerable<IVersionedEvent> Events
         {
             get { return this.pendingEvents; }
         }
@@ -56,7 +56,7 @@ namespace Journey.EventSourcing
             this.rehydrators.Add(typeof(TEvent), @event => handler((TEvent)@event));
         }
 
-        protected void LoadFrom(IEnumerable<ITraceableVersionedEvent> pastEvents)
+        protected void LoadFrom(IEnumerable<IVersionedEvent> pastEvents)
         {
             foreach (var e in pastEvents)
             {
@@ -65,7 +65,7 @@ namespace Journey.EventSourcing
             }
         }
 
-        protected void Update(TraceableVersionedEvent e)
+        protected void Update(VersionedEvent e)
         {
             e.SourceId = this.Id;
             e.Version = this.version + 1;

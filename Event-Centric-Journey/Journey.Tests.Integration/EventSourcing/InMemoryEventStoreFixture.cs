@@ -50,7 +50,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
-                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.serializer, context, this.cacheMock.Object, new ConsoleWorkerTracer());
+                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.serializer, context, this.cacheMock.Object, new ConsoleWorkerRoleTracer());
 
                     this.aggregateId = Guid.NewGuid();
 
@@ -73,7 +73,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
-                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.serializer, context, this.cacheMock.Object, new ConsoleWorkerTracer());
+                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.serializer, context, this.cacheMock.Object, new ConsoleWorkerRoleTracer());
                     
                     this.aggregateId = Guid.NewGuid();
 
@@ -103,7 +103,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
-                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.serializer, context, this.cacheMock.Object, new ConsoleWorkerTracer());
+                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.serializer, context, this.cacheMock.Object, new ConsoleWorkerRoleTracer());
                     this.aggregateId = Guid.NewGuid();
 
                     var item = new Item { Id = 1, Name = "item1" };
@@ -187,7 +187,7 @@ DROP DATABASE [{0}]
                 base.RehydratesFrom<ItemRemoved>(this.OnItemRemoved);
             }
 
-            public FakeItemsAggregate(Guid id, IEnumerable<ITraceableVersionedEvent> history)
+            public FakeItemsAggregate(Guid id, IEnumerable<IVersionedEvent> history)
                 : this(id)
             {
                 this.LoadFrom(history);
@@ -236,7 +236,7 @@ DROP DATABASE [{0}]
             public string Name { get; set; }
         }
 
-        public class ItemAdded : TraceableVersionedEvent
+        public class ItemAdded : VersionedEvent
         {
             public ItemAdded()
             { }
@@ -246,7 +246,7 @@ DROP DATABASE [{0}]
             public int Quantity { get; set; }
         }
 
-        public class ItemRemoved : TraceableVersionedEvent
+        public class ItemRemoved : VersionedEvent
         {
             public ItemRemoved()
             { }
@@ -255,7 +255,7 @@ DROP DATABASE [{0}]
             public int Quantity { get; set; }
         }
 
-        public class ItemReserved : TraceableVersionedEvent
+        public class ItemReserved : VersionedEvent
         {
             public ItemReserved()
             { }

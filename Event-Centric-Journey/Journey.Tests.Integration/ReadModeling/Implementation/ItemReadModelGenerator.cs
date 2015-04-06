@@ -27,7 +27,6 @@ namespace Journey.Tests.Integration.ReadModeling.Implementation
                     repository.Set<ItemView>().Add(
                         new ItemView
                         {
-                            TaskCommandId = @event.TaskCommandId,
                             ItemId = @event.ItemId,
                             Name = @event.Name
                         });

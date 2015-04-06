@@ -12,6 +12,8 @@ namespace Journey.Worker.Config
 
         string MessageLogConnectionString { get; }
 
+        string ReadModelConnectionString { get; }
+
         int NumberOfProcessorsThreads { get; }
 
         TimeSpan BusPollDelay { get; }

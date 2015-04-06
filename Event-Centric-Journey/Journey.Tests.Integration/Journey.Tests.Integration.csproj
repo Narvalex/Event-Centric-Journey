@@ -80,6 +80,8 @@
     <Compile Include="EventSourcing\EventStoreFixture.cs" />
     <Compile Include="EventSourcing\EventStoreRebuilderFixture.cs" />
     <Compile Include="EventSourcing\InMemoryEventStoreFixture.cs" />
+    <Compile Include="EventSourcing\ReadModeling\ItemReadModelDbContext.cs" />
+    <Compile Include="EventSourcing\ReadModeling\ReadModelGeneratorFixture.cs" />
     <Compile Include="Messaging\EventSubscriptionFixture.cs" />
     <Compile Include="Messaging\MessageLogFixture.cs" />
     <Compile Include="Messaging\MessageReceiverFixture.cs" />

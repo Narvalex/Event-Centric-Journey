@@ -6,11 +6,13 @@ namespace Journey.EventSourcing
     /// <summary>
     /// Represents an event message that belongs to an ordered event stream.
     /// </summary>
-    public interface ITraceableVersionedEvent : IEvent
+    public interface IVersionedEvent : IEvent
     {
-        // Representa el command id que esta correlacionado con el evento. El comando que se origino desde la interfaz, no desde un
-        // saga.
-        Guid TaskCommandId { get; set; } 
+        /// <summary>
+        /// Gets the version or order of the event in the stream.
+        /// </summary>
+        int Version { get; }
+
 
         /// <summary>
         /// El aggregate al que pertenece el evento.
@@ -18,8 +20,11 @@ namespace Journey.EventSourcing
         string AggregateType { get; }
 
         /// <summary>
-        /// Gets the version or order of the event in the stream.
+        /// Representa el command id que esta correlacionado con el evento.
         /// </summary>
-        int Version { get; }
+        Guid CorrelationId { get; set; } 
+
+
+
     }
 }

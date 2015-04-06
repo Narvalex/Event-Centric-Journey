@@ -8,9 +8,9 @@ namespace Journey.EventSourcing
     /// A Saga aggregate that publishes commands to the bus.
     /// </summary>
     /// <remarks>
-    /// <para>Feels ankward and possibly disrupting to store POCOs (Plane Old CLR Objects) in the <see cref="ISaga"/> aggregate 
+    /// Feels ankward and possibly disrupting to store POCOs (Plane Old CLR Objects) in the <see cref="ISaga"/> aggregate 
     /// implementor. Maybe it would be better if instead of using current sate values (properties in C# and columns in the SQL Database),
-    /// we use event sourcing.</para>
+    /// we use event sourcing.
     /// </remarks>
     public abstract class Saga : EventSourced, ISaga
     {

@@ -25,12 +25,12 @@ namespace Journey.EventSourcing
         private static readonly string _sourceType = typeof(T).Name;
         private readonly ITextSerializer serializer;
         private readonly EventStoreDbContext context;
-        private readonly Func<Guid, IEnumerable<ITraceableVersionedEvent>, T> entityFactory;
+        private readonly Func<Guid, IEnumerable<IVersionedEvent>, T> entityFactory;
         private readonly Action<T> cacheMementoIfApplicable;
         private readonly ISnapshotCache cache;
         private readonly Func<Guid, Tuple<IMemento, DateTime?>> getMementoFromCache;
         private readonly Action<Guid> markCacheAsStale;
-        private readonly Func<Guid, IMemento, IEnumerable<ITraceableVersionedEvent>, T> originatorEntityFactory;
+        private readonly Func<Guid, IMemento, IEnumerable<IVersionedEvent>, T> originatorEntityFactory;
 
         public InMemoryEventStore(ITextSerializer serializer, EventStoreDbContext context, ISnapshotCache cache, IWorkerRoleTracer tracer)
         {
@@ -39,7 +39,7 @@ namespace Journey.EventSourcing
             this.cache = cache;
 
             // TODO: could be replaced with a compiled lambda
-            var constructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IEnumerable<ITraceableVersionedEvent>) });
+            var constructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IEnumerable<IVersionedEvent>) });
             if (constructor == null)
             {
                 throw new InvalidCastException("Type T must have a constructor with the following signature: .ctor(Guid, IEnumerable<IVersionedEvent>)");
@@ -49,7 +49,7 @@ namespace Journey.EventSourcing
             if (typeof(IMementoOriginator).IsAssignableFrom(typeof(T)) && this.cache != null)
             {
                 // TODO: could be replaced with a compiled lambda to make it more performant
-                var mementoConstructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IMemento), typeof(IEnumerable<ITraceableVersionedEvent>) });
+                var mementoConstructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IMemento), typeof(IEnumerable<IVersionedEvent>) });
                 if (mementoConstructor == null)
                     throw new InvalidCastException(
                         "Type T must have a constructor with the following signature: .ctor(Guid, IMemento, IEnumerable<IVersionedEvent>)");
@@ -98,7 +98,7 @@ namespace Journey.EventSourcing
             {
                 // NOTE: if we had a guarantee that this is running in a single process, there is
                 // no need to check if there are new events after the cached version.
-                IEnumerable<ITraceableVersionedEvent> deserialized;
+                IEnumerable<IVersionedEvent> deserialized;
                 if (!cachedMemento.Item2.HasValue || cachedMemento.Item2.Value < DateTime.Now.AddSeconds(-1))
                 {
 
@@ -121,7 +121,7 @@ namespace Journey.EventSourcing
                     // getting the new events from the EventStore since the last memento was created. In the low probable case
                     // where we get an exception on save, then we mark the cache item as stale so when the command gets
                     // reprocessed, this time we get the new events from the EventStore.
-                    deserialized = Enumerable.Empty<ITraceableVersionedEvent>();
+                    deserialized = Enumerable.Empty<IVersionedEvent>();
                 }
 
                 return this.originatorEntityFactory.Invoke(id, cachedMemento.Item1, deserialized);
@@ -179,8 +179,8 @@ namespace Journey.EventSourcing
                             foreach (var e in events)
                             {
                                 // le pasamos el command id para que se serialice
-                                e.TaskCommandId = correlationId;
-                                eventsSet.Add(this.Serialize(e, correlationId));
+                                e.CorrelationId = correlationId;
+                                eventsSet.Add(this.Serialize(e));
                             }
 
                         }
@@ -205,7 +205,7 @@ namespace Journey.EventSourcing
             this.cacheMementoIfApplicable.Invoke(eventSourced);
         }
 
-        private Event Serialize(ITraceableVersionedEvent e, Guid correlationId)
+        private Event Serialize(IVersionedEvent e)
         {
             Event serialized;
             using (var writer = new StringWriter())
@@ -217,8 +217,7 @@ namespace Journey.EventSourcing
                     AggregateType = _sourceType,
                     Version = e.Version,
                     Payload = writer.ToString(),
-                    CorrelationId = correlationId.ToString(),
-                    TaskCommandId = correlationId,
+                    CorrelationId = e.CorrelationId,
                     EventType = e.GetType().Name,
                     CreationDate = DateTime.Now
                 };
@@ -226,11 +225,11 @@ namespace Journey.EventSourcing
             return serialized;
         }
 
-        private ITraceableVersionedEvent Deserialize(Event @event)
+        private IVersionedEvent Deserialize(Event @event)
         {
             using (var reader = new StringReader(@event.Payload))
             {
-                return (ITraceableVersionedEvent)this.serializer.Deserialize(reader);
+                return (IVersionedEvent)this.serializer.Deserialize(reader);
             }
         }
 

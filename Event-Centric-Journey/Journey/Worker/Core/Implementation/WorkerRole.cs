@@ -5,6 +5,7 @@ using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
+using Journey.Utils.SystemDateTime;
 using Microsoft.Practices.Unity;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -53,6 +54,7 @@ namespace Journey.Worker
             container.RegisterInstance<IDomainContainer>(domainContainer);
 
             // Infrastructure
+            container.RegisterInstance<ISystemDateTime>(new LocalDateTime());
             container.RegisterInstance<ITextSerializer>(new JsonTextSerializer());
             container.RegisterInstance<IMetadataProvider>(new StandardMetadataProvider());
             container.RegisterInstance<IWorkerRoleTracer>(_tracer);
@@ -62,12 +64,13 @@ namespace Journey.Worker
             var serializer = container.Resolve<ITextSerializer>();
             var metadata = container.Resolve<IMetadataProvider>();
             var tracer = container.Resolve<IWorkerRoleTracer>();
+            var dateTime = container.Resolve<ISystemDateTime>();
 
             var commandBus = new CommandBus(new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Commands"), serializer);
             var eventBus = new EventBus(new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Events"), serializer);
 
-            var commandProcessor = new CommandProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Commands", config.BusPollDelay, config.NumberOfProcessorsThreads), serializer, tracer, new BusTransientFaultDetector(config.EventStoreConnectionString));
-            var eventProcessor = new EventProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Events", config.BusPollDelay, config.NumberOfProcessorsThreads), serializer, tracer);
+            var commandProcessor = new CommandProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Commands", config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer, new BusTransientFaultDetector(config.EventStoreConnectionString));
+            var eventProcessor = new EventProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Events", config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer);
 
             var inMemorySnapshotCache = new InMemorySnapshotCache("EventStoreCache");
 
@@ -80,7 +83,7 @@ namespace Journey.Worker
             container.RegisterInstance<IMessageProcessor>("EventProcessor", eventProcessor);
 
             // Event log database and handler
-            this.RegisterMessageLogger(container, serializer, metadata, eventProcessor, config.MessageLogConnectionString);
+            this.RegisterMessageLogger(container, serializer, metadata, eventProcessor, config.MessageLogConnectionString, dateTime);
 
             // Event Store
             this.RegisterEventStore(container, config.EventStoreConnectionString);
@@ -97,10 +100,10 @@ namespace Journey.Worker
             return container;
         }
 
-        private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString)
+        private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString, ISystemDateTime dateTime)
         {
             //Database.SetInitializer<MessageLogDbContext>(null);
-            container.RegisterType<MessageLog>(new InjectionConstructor(connectionString, serializer, metadata));
+            container.RegisterType<MessageLog>(new InjectionConstructor(connectionString, serializer, metadata, dateTime));
             container.RegisterType<IEventHandler, MessageLogHandler>("MessageLogHandler");
             container.RegisterType<ICommandHandler, MessageLogHandler>("MessageLogHandler");
             eventProcessor.Register(container.Resolve<MessageLogHandler>());

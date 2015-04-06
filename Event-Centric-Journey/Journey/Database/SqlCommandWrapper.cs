@@ -17,7 +17,7 @@ namespace Journey.Database
             this.connectionString = connectionString;
         }
 
-        public void CreateDatabase()
+        public void IsExistsDeleteAndCreateDatabase()
         {
             var builder = new SqlConnectionStringBuilder(this.connectionString);
             var databaseName = builder.InitialCatalog;
@@ -49,6 +49,36 @@ IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'{0}') CREATE DATABA
         }
 
         public void DropDatabase()
+        {
+            var builder = new SqlConnectionStringBuilder(connectionString);
+            var databaseName = builder.InitialCatalog;
+            builder.InitialCatalog = "master";
+            builder.AttachDBFilename = string.Empty;
+
+            using (var connection = new SqlConnection(builder.ConnectionString))
+            {
+                connection.Open();
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText =
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            @"
+USE master
+IF EXISTS (SELECT name FROM sys.databases WHERE name = N'{0}') 
+ALTER DATABASE {0} SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+IF EXISTS (SELECT name FROM sys.databases WHERE name = N'{0}') 
+DROP DATABASE [{0}];
+",
+                            databaseName);
+
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public static void DropDatabase(string connectionString)
         {
             var builder = new SqlConnectionStringBuilder(connectionString);
             var databaseName = builder.InitialCatalog;

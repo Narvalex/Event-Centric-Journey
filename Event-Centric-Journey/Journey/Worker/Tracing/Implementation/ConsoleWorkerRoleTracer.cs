@@ -2,7 +2,7 @@
 
 namespace Journey.Worker
 {
-    public class ConsoleWorkerTracer : IWorkerRoleTracer
+    public class ConsoleWorkerRoleTracer : IWorkerRoleTracer
     {
         public void Notify(string info)
         {

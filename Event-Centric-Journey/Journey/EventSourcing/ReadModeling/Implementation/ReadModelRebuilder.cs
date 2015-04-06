@@ -11,14 +11,18 @@ using System.Linq;
 
 namespace Journey.EventSourcing.ReadModeling
 {
-    public abstract class ReadModelBuilder
+    /// <summary>
+    /// El Read Model Builder construye todo el read model, 
+    /// desde el primer hasta el ultimo evento.
+    /// </summary>
+    public abstract class ReadModelRebuilder
     {
         protected readonly string connectionString;
         protected readonly IWorkerRoleTracer tracer;
         private readonly ITextSerializer serializer;
         protected readonly IEventDispatcher eventDispatcher;
 
-        public ReadModelBuilder(string connectionString, IWorkerRoleTracer tracer)
+        public ReadModelRebuilder(string connectionString, IWorkerRoleTracer tracer)
         {
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
             this.connectionString = connectionString;
@@ -110,11 +114,11 @@ namespace Journey.EventSourcing.ReadModeling
         /// <returns>The number of objects written to the underlying database</returns>
         protected abstract int Commit();
 
-        private ITraceableVersionedEvent Deserialize(Event @event)
+        private IVersionedEvent Deserialize(Event @event)
         {
             using (var reader = new StringReader(@event.Payload))
             {
-                return (ITraceableVersionedEvent)this.serializer.Deserialize(reader);
+                return (IVersionedEvent)this.serializer.Deserialize(reader);
             }
         }
 

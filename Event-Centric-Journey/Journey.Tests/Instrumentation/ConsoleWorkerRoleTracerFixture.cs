@@ -5,11 +5,11 @@ namespace Journey.Tests.Instrumentation.ConsoleWorkerRoleTracerFixture
 {
     public class GIVEN_tracer
     {
-        private ConsoleWorkerTracer sut;
+        private ConsoleWorkerRoleTracer sut;
 
         public GIVEN_tracer()
         {
-            this.sut = new ConsoleWorkerTracer();
+            this.sut = new ConsoleWorkerRoleTracer();
         }
 
         [Fact]

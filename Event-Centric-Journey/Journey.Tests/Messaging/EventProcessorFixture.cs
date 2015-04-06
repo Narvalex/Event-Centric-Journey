@@ -18,7 +18,7 @@ namespace Journey.Tests.Messaging.EventProcessorFixture
         public GIVEN_event_processor()
         {
             Trace.Listeners.Clear();
-            this.processor = new EventProcessor(this.receiverMock.Object, CreateSerializer(), new ConsoleWorkerTracer());
+            this.processor = new EventProcessor(this.receiverMock.Object, CreateSerializer(), new ConsoleWorkerRoleTracer());
         }
 
 

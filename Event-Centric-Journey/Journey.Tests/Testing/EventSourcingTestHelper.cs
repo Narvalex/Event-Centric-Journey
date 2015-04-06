@@ -16,7 +16,7 @@ namespace Journey.Tests.Testing
 
         public EventSourcingTestHelper()
         {
-            this.Events = new List<ITraceableVersionedEvent>();
+            this.Events = new List<IVersionedEvent>();
             this.store =
                 new EventStoreStub((eventSourced, correlationId) =>
             {
@@ -27,7 +27,7 @@ namespace Journey.Tests.Testing
             });
         }
 
-        public List<ITraceableVersionedEvent> Events { get; private set; }
+        public List<IVersionedEvent> Events { get; private set; }
 
         public IEventStore<T> Store { get { return this.store; } }
 
@@ -36,7 +36,7 @@ namespace Journey.Tests.Testing
             this.handler = handler;
         }
 
-        public void Given(params ITraceableVersionedEvent[] history)
+        public void Given(params IVersionedEvent[] history)
         {
             this.store.History.AddRange(history);
         }
@@ -53,12 +53,12 @@ namespace Journey.Tests.Testing
             ((dynamic)this.handler).Handle((dynamic)@event);
         }
 
-        public bool ThenContains<TEvent>() where TEvent : ITraceableVersionedEvent
+        public bool ThenContains<TEvent>() where TEvent : IVersionedEvent
         {
             return this.Events.Any(x => x.GetType() == typeof(TEvent));
         }
 
-        public TEvent ThenHasSingle<TEvent>() where TEvent : ITraceableVersionedEvent
+        public TEvent ThenHasSingle<TEvent>() where TEvent : IVersionedEvent
         {
             Assert.Equal(1, this.Events.Count);
             var @event = this.Events.Single();
@@ -66,7 +66,7 @@ namespace Journey.Tests.Testing
             return (TEvent)@event;
         }
 
-        public TEvent ThenHasOne<TEvent>() where TEvent : ITraceableVersionedEvent
+        public TEvent ThenHasOne<TEvent>() where TEvent : IVersionedEvent
         {
             Assert.Equal(1, this.Events.OfType<TEvent>().Count());
             var @event = this.Events.OfType<TEvent>().Single();
@@ -75,14 +75,14 @@ namespace Journey.Tests.Testing
 
         private class EventStoreStub : IEventStore<T>
         {
-            public readonly List<ITraceableVersionedEvent> History = new List<ITraceableVersionedEvent>();
+            public readonly List<IVersionedEvent> History = new List<IVersionedEvent>();
             private readonly Action<T, string> onSave;
-            private readonly Func<Guid, IEnumerable<ITraceableVersionedEvent>, T> entityFactory;
+            private readonly Func<Guid, IEnumerable<IVersionedEvent>, T> entityFactory;
 
             internal EventStoreStub(Action<T, string> onSave)
             {
                 this.onSave = onSave;
-                var constructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IEnumerable<ITraceableVersionedEvent>) });
+                var constructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IEnumerable<IVersionedEvent>) });
                 if (constructor == null)
                 {
                     throw new InvalidCastException(

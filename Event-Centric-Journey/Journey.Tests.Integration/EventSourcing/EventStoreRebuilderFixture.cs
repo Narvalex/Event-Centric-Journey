@@ -7,6 +7,7 @@ using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
+using Journey.Utils.SystemDateTime;
 using Journey.Worker;
 using Microsoft.Practices.Unity;
 using System;
@@ -34,7 +35,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
 
             this.serializer = new JsonTextSerializer();
-            this.tracer = new ConsoleWorkerTracer();
+            this.tracer = new ConsoleWorkerRoleTracer();
             
 
             // Event Store
@@ -62,7 +63,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
                 new MessageLog(
                     this.messageLogDbName,
                     this.serializer,
-                    new StandardMetadataProvider()));
+                    new StandardMetadataProvider(), new LocalDateTime()));
         }
 
         [Fact]
@@ -80,7 +81,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             {
                 Id = item.Id,
                 AggregateType = typeof(FakeItemsSaga).Name,
-                TaskCommandId = aggregateId,
+                CorrelationId = aggregateId,
                 Name = item.Name,
                 Quantity = 2,
                 SourceId = aggregateId,
@@ -93,7 +94,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             {
                 Id = item.Id,
                 AggregateType = typeof(FakeItemsSaga).Name,
-                TaskCommandId = Guid.NewGuid(),
+                CorrelationId = Guid.NewGuid(),
                 Name = item.Name,
                 Quantity = 1,
                 SourceId = aggregateId,
@@ -162,7 +163,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
                 base.RehydratesFrom<ItemAdded>(this.OnItemAdded);
             }
 
-            public FakeItemsSaga(Guid id, IEnumerable<ITraceableVersionedEvent> history)
+            public FakeItemsSaga(Guid id, IEnumerable<IVersionedEvent> history)
                 : this(id)
             {
                 this.LoadFrom(history);
@@ -198,7 +199,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             public string Name { get; set; }
         }
 
-        public class ItemAdded : TraceableVersionedEvent
+        public class ItemAdded : VersionedEvent
         {
             public ItemAdded()
             { }

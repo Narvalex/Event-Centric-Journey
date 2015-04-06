@@ -7,13 +7,8 @@ namespace Journey.EventSourcing
     /// por un implementador que se utiliza para persitir eventos versionados 
     /// en el Depósito de Eventos (Event Store).
     /// </summary>
-    public abstract class TraceableVersionedEvent : ITraceableVersionedEvent
+    public abstract class VersionedEvent : IVersionedEvent
     {
-        /// <summary>
-        /// El identificador del command que inició la tarea. Es últil para rastrear la materialización del aggregate.
-        /// </summary>
-        public Guid TaskCommandId { get; set; }
-
         /// <summary>
         /// El identificador de la fuente. Típicamente el identificador del 
         /// <see cref="EventSourced"/>.
@@ -21,13 +16,19 @@ namespace Journey.EventSourcing
         public Guid SourceId { get; set; }
 
         /// <summary>
+        /// El número de versión del evento.
+        /// </summary>
+        public int Version { get; set; }
+
+        /// <summary>
         /// El aggregate al que pertenece el evento.
         /// </summary>
         public string AggregateType { get; set; }
 
         /// <summary>
-        /// El número de versión del evento.
+        /// El identificador del command que inició la tarea. Es últil para rastrear la materialización del aggregate.
+        /// Esto se agrega en el motor del event store, antes de impactarlo en la tabla.
         /// </summary>
-        public int Version { get; set; }
+        public Guid CorrelationId { get; set; }
     }
 }
