@@ -79,6 +79,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Client\Implementation\Application.cs" />
+    <Compile Include="Client\IApplication.cs" />
     <Compile Include="Database\ServiceConfigurationSettingConnectionFactory.cs" />
     <Compile Include="Database\SqlCommandWrapper.cs" />
     <Compile Include="Database\SqlDataReaderExtensions.cs" />

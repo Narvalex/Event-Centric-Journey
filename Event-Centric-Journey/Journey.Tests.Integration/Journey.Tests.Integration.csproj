@@ -77,6 +77,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Client\ApplicationFixture.cs" />
+    <Compile Include="Client\FakeBus.cs" />
+    <Compile Include="Client\ItemApplication.cs" />
     <Compile Include="EventSourcing\EventStoreFixture.cs" />
     <Compile Include="EventSourcing\EventStoreRebuilderFixture.cs" />
     <Compile Include="EventSourcing\InMemoryEventStoreFixture.cs" />
@@ -87,10 +90,6 @@
     <Compile Include="Messaging\MessageReceiverFixture.cs" />
     <Compile Include="Messaging\MessageSenderFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReadModeling\Implementation\ItemReadModelGenerator.cs" />
-    <Compile Include="ReadModeling\Implementation\ItemsDbContext.cs" />
-    <Compile Include="ReadModeling\Implementation\ItemView.cs" />
-    <Compile Include="ReadModeling\ReadModelGeneratorFixture.cs" />
     <Compile Include="Utils\Database\SqlCommandWrapperFixture.cs" />
   </ItemGroup>
   <ItemGroup>
