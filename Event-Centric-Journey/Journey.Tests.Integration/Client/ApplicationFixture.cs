@@ -1,4 +1,5 @@
-﻿using Journey.Database;
+﻿using Journey.Client;
+using Journey.Database;
 using Journey.Messaging;
 using Journey.Tests.Integration.EventSourcing.ReadModeling;
 using System;
@@ -57,7 +58,9 @@ namespace Journey.Tests.Integration.Client.ApplicationFixture
 
         public GIVEN_application()
         {
-            this.sut = new ItemApplication();
+            // TODO: Definir el ReadModelDb, generico, para poder testearlo. Que haga un insert en el command.
+            //var app = new Application(new FakeBus(), "https://www.google.com.py/#q=");
+            //this.sut = new ItemApplication(app);
         }
 
         [Fact]

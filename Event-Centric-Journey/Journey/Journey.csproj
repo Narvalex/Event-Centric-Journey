@@ -69,6 +69,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
@@ -79,7 +80,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\Implementation\Application.cs" />
+    <Compile Include="Client\Application.cs" />
     <Compile Include="Client\IApplication.cs" />
     <Compile Include="Database\ServiceConfigurationSettingConnectionFactory.cs" />
     <Compile Include="Database\SqlCommandWrapper.cs" />
