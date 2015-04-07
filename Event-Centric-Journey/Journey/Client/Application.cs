@@ -87,7 +87,7 @@ namespace Journey.Client
         /// and polls the read model to check the success or failure
         /// of the process, asynchronously.
         /// </summary>
-        public void SendCommand(ICommand command)
+        public void Send(ICommand command)
         {
             var tasks = new HashSet<Task>();
 

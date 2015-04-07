@@ -20,13 +20,13 @@ namespace Journey.Tests.Integration.Client
         public void AddItem(string name)
         {
             var command = new AddItem(SequentialGuid.GenerateNewGuid());
-            this.app.SendCommand(command);
+            this.app.Send(command);
         }
 
         public void AddItemBuggyProcess(string name)
         {
             var command = new AddItem(SequentialGuid.GenerateNewGuid());
-            this.buggyApp.SendCommand(command);
+            this.buggyApp.Send(command);
         }
 
         private class BuggyCommandBus : ICommandBus

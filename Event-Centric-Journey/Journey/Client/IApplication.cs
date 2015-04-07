@@ -4,6 +4,6 @@ namespace Journey.Client
 {
     public interface IApplication
     {
-        void SendCommand(ICommand command);
+        void Send(ICommand command);
     }
 }

@@ -1,15 +1,24 @@
-﻿namespace SimpleInventario.Application
+﻿using Journey.Client;
+using Journey.Utils.Guids;
+using SimpleInventario.Commands;
+namespace SimpleInventario.Application
 {
     public class InventarioApp : IInventarioApp
     {
-        public InventarioApp()
-        {
+        private readonly IApplication app;
+        private readonly IGuidGenerator guid;
 
+        public InventarioApp(IApplication app, IGuidGenerator guid)
+        {
+            this.app = app;
+            this.guid = guid;
         }
 
-        public void DefinirNuevoTipoDeArticulo(string nombre)
+        public void DefinirNuevoTipoDeArticulo(ArticuloDto articulo)
         {
-            throw new System.NotImplementedException();
+            var idArticulo = this.guid.NewGuid();
+            var command = new DefinirNuevoTipoDeArticulo(idArticulo, idArticulo, articulo.Nombre);
+            this.app.Send(command);
         }
     }
 }

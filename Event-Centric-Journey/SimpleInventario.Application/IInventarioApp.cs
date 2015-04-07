@@ -2,6 +2,6 @@
 {
     public interface IInventarioApp
     {
-        void DefinirNuevoTipoDeArticulo(string nombre);
+        void DefinirNuevoTipoDeArticulo(ArticuloDto articulo);
     }
 }

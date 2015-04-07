@@ -42,7 +42,17 @@
     <Compile Include="IInventarioApp.cs" />
     <Compile Include="Implementation\InventarioApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SampleDto.cs" />
+    <Compile Include="ArticuloDto.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Journey\Journey.csproj">
+      <Project>{96b26dbf-0e5c-4677-84fc-37985ee1d2d0}</Project>
+      <Name>Journey</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInventario.Commands\SimpleInventario.Commands.csproj">
+      <Project>{66413d24-2fba-44e4-ab37-2991a2771f2e}</Project>
+      <Name>SimpleInventario.Commands</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
