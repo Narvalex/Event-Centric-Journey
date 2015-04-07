@@ -1,5 +1,4 @@
-﻿using Journey.Client;
-using Journey.Database;
+﻿using Journey.Database;
 using Journey.Messaging;
 using Journey.Tests.Integration.EventSourcing.ReadModeling;
 using System;
@@ -35,8 +34,8 @@ namespace Journey.Tests.Integration.Client.ApplicationFixture
                 context.Database.Create();
             }
 
-            this.commandBus = new FakeBus();
-            this.eventBus = new FakeBus();
+            this.commandBus = new FakeBus(this.contextFactory);
+            this.eventBus = new FakeBus(this.contextFactory);
         }
 
         [Fact]
@@ -58,15 +57,19 @@ namespace Journey.Tests.Integration.Client.ApplicationFixture
 
         public GIVEN_application()
         {
-            // TODO: Definir el ReadModelDb, generico, para poder testearlo. Que haga un insert en el command.
-            //var app = new Application(new FakeBus(), "https://www.google.com.py/#q=");
-            //this.sut = new ItemApplication(app);
+            this.sut = new ItemApplication(this.commandBus, "https://www.google.com.py/#q=", this.contextFactory);
         }
 
         [Fact]
         public void WHEN_making_a_command_request_THEN_process_request_successfully()
         {
             this.sut.AddItem("silla");
+        }
+
+        [Fact]
+        public void WHEN_making_a_bad_command_request_THEN_trows()
+        {
+            Assert.Throws<AggregateException>(() => this.sut.AddItemBuggyProcess("silla"));
         }
 
         [Fact]

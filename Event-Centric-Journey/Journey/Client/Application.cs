@@ -16,11 +16,12 @@ namespace Journey.Client
         private readonly Func<string, Task> pingTheWorkerRole;
         private readonly Func<Guid, Task> waitEventualConsistencyDelay;
         private readonly Func<ReadModelDbContext> readModelContextFactory;
+        private readonly int eventualConsistencyCheckRetryPolicy;
 
-        public Application(ICommandBus commandBus, string workerRoleStatusUrl, Func<ReadModelDbContext> readModelContextFactory)
+        public Application(ICommandBus commandBus, string workerRoleStatusUrl, Func<ReadModelDbContext> readModelContextFactory, int eventualConsistencyCheckRetryPolicy)
         {
+            this.eventualConsistencyCheckRetryPolicy = eventualConsistencyCheckRetryPolicy;
             this.commandBus = commandBus;
-
             this.readModelContextFactory = readModelContextFactory;
 
             this.sendCommandAsync = async (command) =>

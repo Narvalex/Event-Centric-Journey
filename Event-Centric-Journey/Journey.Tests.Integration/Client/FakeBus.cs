@@ -1,4 +1,5 @@
-﻿using Journey.Messaging;
+﻿using Journey.EventSourcing.ReadModeling;
+using Journey.Messaging;
 using System;
 using System.Collections.Generic;
 
@@ -6,6 +7,13 @@ namespace Journey.Tests.Integration.Client
 {
     public class FakeBus : ICommandBus, IEventBus
     {
+        private Func<ReadModelDbContext> contextFactory;
+
+        public FakeBus(Func<ReadModelDbContext> contextFactory)
+        {
+            this.contextFactory = contextFactory;
+        }
+
         public void Publish(Envelope<IEvent> @event)
         {
             
@@ -23,7 +31,20 @@ namespace Journey.Tests.Integration.Client
 
         public void Send(Envelope<ICommand> command)
         {
-            
+            using (var context = this.contextFactory.Invoke())
+            {
+                context
+                    .ProcessedEvents
+                    .Add(new ProcessedEvent
+                    {
+                        AggregateId = Guid.Empty, 
+                        AggregateType = "Items",
+                        Version = 1,
+                        CorrelationId = command.Body.Id
+                    });
+
+                context.SaveChanges();
+            }
         }
 
         public void Send(IEnumerable<Envelope<ICommand>> commands)
