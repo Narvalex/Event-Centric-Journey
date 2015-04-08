@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SimpleInventario.ReadModel
+namespace SimpleInventario.Reporting
 {
     public class Class1
     {

@@ -1,6 +1,7 @@
 ﻿using Journey.Client;
 using Journey.Utils.Guids;
 using SimpleInventario.Commands;
+
 namespace SimpleInventario.Application
 {
     public class InventarioApp : IInventarioApp
