@@ -1,0 +1,36 @@
+﻿<div ng-controller="agregarAnimalesController">
+
+    <form name="form"
+          class="form-horizontal"
+          role="form"
+          ng-submit="agregarAnimales()"
+          novalidate>
+        <fieldset>
+            <legend class="text-primary">
+                Agregar animales
+            </legend>
+
+            <div class="form-group">
+                <label for="animal"
+                       class="col-sm-3 control-label">
+                    Animal:
+                </label>
+                <div class="col-sm-4">
+                    <select name="animal"
+                            ng-model="dto.animal"
+                            class="form-control"
+                            required>
+                        <option></option>
+                        <option ng-repeat="item in animales">{{item}}</option>
+                    </select>
+                    <span class="error text-danger"
+                          ng-show="form.animal.$error.required">
+                        <span class="glyphicon glyphicon-exclamation-sign"></span>
+                        Seleccione un animal.
+                    </span>
+                </div>
+            </div>
+
+        </fieldset>
+    </form>
+</div>
