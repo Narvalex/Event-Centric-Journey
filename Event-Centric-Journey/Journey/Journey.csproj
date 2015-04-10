@@ -80,8 +80,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\Application.cs" />
-    <Compile Include="Client\IApplication.cs" />
+    <Compile Include="Client\Implementation\DefaultClientApplicationConfigProvider.cs" />
+    <Compile Include="Client\IClientApplicationConfig.cs" />
+    <Compile Include="Client\Implementation\ClientApplication.cs" />
+    <Compile Include="Client\IClientApplication.cs" />
     <Compile Include="Database\ServiceConfigurationSettingConnectionFactory.cs" />
     <Compile Include="Database\SqlCommandWrapper.cs" />
     <Compile Include="Database\SqlDataReaderExtensions.cs" />
@@ -100,6 +102,7 @@
     <Compile Include="EventSourcing\Core\Implementation\InMemorySnapshotCache.cs" />
     <Compile Include="EventSourcing\Core\Implementation\Saga.cs" />
     <Compile Include="EventSourcing\Core\Implementation\VersionedEvent.cs" />
+    <Compile Include="EventSourcing\Core\IRehydratesFrom.cs" />
     <Compile Include="EventSourcing\Core\ISaga.cs" />
     <Compile Include="EventSourcing\Core\ISnapshotCache.cs" />
     <Compile Include="EventSourcing\Core\IVersionedEvent.cs" />
@@ -175,9 +178,9 @@
     <Compile Include="Utils\SystemDateTime\Implementation\LocalDateTime.cs" />
     <Compile Include="Utils\SystemDateTime\Implementation\UtcDateTime.cs" />
     <Compile Include="Worker\Config\IWorkerRoleConfig.cs" />
-    <Compile Include="Worker\Config\Implementation\DefaultConfigProvider.cs" />
-    <Compile Include="Worker\Core\Implementation\DomainContainer.cs" />
-    <Compile Include="Worker\Core\IDomainContainer.cs" />
+    <Compile Include="Worker\Config\Implementation\DefaultWorkerRoleConfigProvider.cs" />
+    <Compile Include="Worker\Core\Implementation\DomainComponents.cs" />
+    <Compile Include="Worker\Core\IDomainComponents.cs" />
     <Compile Include="Worker\Core\IWorkerRolePortal.cs" />
     <Compile Include="Worker\Tracing\Implementation\ConsoleWorkerRoleTracer.cs" />
     <Compile Include="Worker\Tracing\Implementation\PortalHub.cs" />

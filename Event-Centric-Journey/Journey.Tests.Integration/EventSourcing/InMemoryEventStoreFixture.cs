@@ -183,8 +183,8 @@ DROP DATABASE [{0}]
             public FakeItemsAggregate(Guid id)
                 : base(id)
             {
-                base.RehydratesFrom<ItemAdded>(this.OnItemAdded);
-                base.RehydratesFrom<ItemRemoved>(this.OnItemRemoved);
+                //base.RehydratesFrom<ItemAdded>(this.OnItemAdded);
+                //base.RehydratesFrom<ItemRemoved>(this.OnItemRemoved);
             }
 
             public FakeItemsAggregate(Guid id, IEnumerable<IVersionedEvent> history)

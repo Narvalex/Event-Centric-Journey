@@ -1,5 +1,4 @@
-﻿using Journey.Messaging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Journey.EventSourcing
@@ -13,7 +12,6 @@ namespace Journey.EventSourcing
     /// </remarks>
     public abstract class EventSourced : IEventSourced
     {
-        private readonly Dictionary<Type, Action<IVersionedEvent>> rehydrators = new Dictionary<Type, Action<IVersionedEvent>>();
         private readonly List<IVersionedEvent> pendingEvents = new List<IVersionedEvent>();
 
         private readonly Guid id;
@@ -47,20 +45,11 @@ namespace Journey.EventSourcing
             get { return this.pendingEvents; }
         }
 
-        /// <summary>
-        /// Configures a handler for an event. [Handles}
-        /// </summary>
-        protected void RehydratesFrom<TEvent>(Action<TEvent> handler)
-            where TEvent : IEvent
-        {
-            this.rehydrators.Add(typeof(TEvent), @event => handler((TEvent)@event));
-        }
-
         protected void LoadFrom(IEnumerable<IVersionedEvent> pastEvents)
         {
             foreach (var e in pastEvents)
             {
-                this.rehydrators[e.GetType()].Invoke(e);
+                ((dynamic)this).Rehydrate((dynamic)e);
                 this.version = e.Version;
             }
         }
@@ -70,7 +59,7 @@ namespace Journey.EventSourcing
             e.SourceId = this.Id;
             e.Version = this.version + 1;
             e.AggregateType = this.GetType().Name;
-            this.rehydrators[e.GetType()].Invoke(e);
+            ((dynamic)this).Rehydrate((dynamic)e);
             this.version = e.Version;
             this.pendingEvents.Add(e);
         }

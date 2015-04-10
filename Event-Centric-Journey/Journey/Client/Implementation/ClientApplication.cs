@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Journey.Client
 {
-    public class Application : IApplication
+    public class ClientApplication : IClientApplication
     {
         private readonly ICommandBus commandBus;
         private readonly Func<ICommand, Task> sendCommandAsync;
@@ -18,7 +18,7 @@ namespace Journey.Client
         private readonly Func<ReadModelDbContext> readModelContextFactory;
         private readonly int eventualConsistencyCheckRetryPolicy;
 
-        public Application(ICommandBus commandBus, string workerRoleStatusUrl, Func<ReadModelDbContext> readModelContextFactory, int eventualConsistencyCheckRetryPolicy)
+        public ClientApplication(ICommandBus commandBus, string workerRoleStatusUrl, Func<ReadModelDbContext> readModelContextFactory, int eventualConsistencyCheckRetryPolicy)
         {
             this.eventualConsistencyCheckRetryPolicy = eventualConsistencyCheckRetryPolicy;
             this.commandBus = commandBus;
@@ -46,7 +46,7 @@ namespace Journey.Client
                                 Thread.Sleep(100 * retries);
 
                             workerResponse = await httpClient.GetStringAsync(
-                                string.Format("{0}/?requester=COMMAND_{1}", workerRoleStatusUrl, commandTypeName));
+                                string.Format("{0}/Portal/WorkerRoleStatus/?requester=COMMAND_{1}", workerRoleStatusUrl, commandTypeName));
                             ++retries;
                         }
                     }

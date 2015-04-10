@@ -1,7 +1,8 @@
-﻿namespace SimpleInventario.Application
+﻿using SimpleInventario.Application.DTOs;
+namespace SimpleInventario.Application
 {
     public interface IInventarioApp
     {
-        void DefinirNuevoTipoDeArticulo(ArticuloDto articulo);
+        void AgregarAnimales(AgregarAnimalesDto dto);
     }
 }

@@ -8,7 +8,7 @@ namespace Journey.Web.App_Start
         static partial void Start()
         {            
             // Implement Here you Own Domain Container.
-            var worker = new WorkerRole(new DomainContainer(), new WebWorkerRoleTracer());
+            var worker = new WorkerRole(new DomainComponents(), new WebWorkerRoleTracer());
 
             WorkerRoleWebPortal.CreateNew(worker).StartWorking();
         }

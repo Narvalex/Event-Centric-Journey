@@ -3,15 +3,23 @@ using System.Configuration;
 
 namespace Journey.Worker.Config
 {
-    public class DefaultConfigProvider : ConfigurationSection, IWorkerRoleConfig
+    /// <summary>
+    /// El Default Config entiende que sólo se utiliza una única base de datos.
+    /// </summary>
+    public class DefaultWorkerRoleConfigProvider : ConfigurationSection, IWorkerRoleConfig
     {
         private const string sectionName = "workerConfig";
         private const string connectionString = "connectionString";
         private const string busPollDelay = "busPollDelay";
         private const string numberOfProcessorThreads = "numberOfProcessorThreads";
 
-        private DefaultConfigProvider()
+        private DefaultWorkerRoleConfigProvider()
         { }
+
+        public static IWorkerRoleConfig Configuration
+        {
+            get { return ConfigurationManager.GetSection(sectionName) as DefaultWorkerRoleConfigProvider; }
+        }
 
         [ConfigurationProperty(connectionString, IsRequired = true)]
         public string EventStoreConnectionString
@@ -43,15 +51,20 @@ namespace Journey.Worker.Config
             get { return Convert.ToInt32(this[busPollDelay]); }
         }
 
-        public static IWorkerRoleConfig Configuration 
-        {
-            get { return ConfigurationManager.GetSection(sectionName) as DefaultConfigProvider; }
-        }
-
-
         public TimeSpan BusPollDelay
         {
             get { return new TimeSpan(0, 0, 0, 0, this.BusPollDelaySetting); }
+        }
+
+
+        public string CommandBusTableName
+        {
+            get { return "Bus.Commands"; }
+        }
+
+        public string EventBusTableName
+        {
+            get { return "Bus.Events"; }
         }
     }
 }

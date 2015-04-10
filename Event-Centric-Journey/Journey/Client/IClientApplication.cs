@@ -2,7 +2,7 @@
 
 namespace Journey.Client
 {
-    public interface IApplication
+    public interface IClientApplication
     {
         void Send(ICommand command);
     }

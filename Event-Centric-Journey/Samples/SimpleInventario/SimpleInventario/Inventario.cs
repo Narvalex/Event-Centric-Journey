@@ -8,22 +8,21 @@ using System.Collections.Generic;
 namespace SimpleInventario
 {
     public class Inventario : EventSourced, IMementoOriginator,
-        IHandlerOf<DefinirNuevoTipoDeArticulo>
+        IHandlerOf<AgregarAnimales>,
+        IRehydratesFrom<SeAgregaronAnimalesAlInventario>
     {
         public Inventario(Guid id)
             : base(id)
-        {
-            base.RehydratesFrom<NuevoTipoDeArticuloDefinido>(this.OnNuevoTipoDeArticuloDefinido);
-        }
+        { }
 
         public Inventario(Guid id, IEnumerable<IVersionedEvent> history)
-            : this(id)
+            : base(id)
         {
             base.LoadFrom(history);
         }
 
         public Inventario(Guid id, IMemento memento, IEnumerable<IVersionedEvent> history)
-            : this(id)
+            : base(id)
         {
             var state = memento as Memento;
             base.Version = state.Version;
@@ -33,16 +32,19 @@ namespace SimpleInventario
             this.LoadFrom(history);
         }
 
-        public void Handle(DefinirNuevoTipoDeArticulo c)
+        public void Handle(AgregarAnimales c)
         {
-            base.Update(new NuevoTipoDeArticuloDefinido
+            base.Update(new SeAgregaronAnimalesAlInventario
                 {
-                    IdArticulo = c.IdArticulo,
-                    Nombre = c.Nombre
+                    IdEmpresa = c.IdEmpresa,
+                    Animal = c.Animal,
+                    Sucursal = c.Sucursal,
+                    Cantidad = c.Cantidad,
+                    Periodo = c.Periodo
                 });
         }
 
-        private void OnNuevoTipoDeArticuloDefinido(NuevoTipoDeArticuloDefinido e)
+        public void Rehydrate(SeAgregaronAnimalesAlInventario e)
         { }
 
         public IMemento SaveToMemento()

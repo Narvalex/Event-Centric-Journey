@@ -31,6 +31,74 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <label for="sucursal"
+                       class="col-sm-3 control-label">
+                    Sucursal:
+                </label>
+                <div class="col-sm-4">
+                    <select name="sucursal"
+                            ng-model="dto.sucursal"
+                            class="form-control"
+                            required>
+                        <option></option>
+                        <option ng-repeat="item in sucursales">{{item}}</option>
+                    </select>
+                    <span class="error text-danger"
+                          ng-show="form.sucursal.$error.required">
+                        <span class="glyphicon glyphicon-exclamation-sign"></span>
+                        Seleccione una sucursal.
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="cantidad"
+                       class="col-sm-3 control-label">
+                    Cantidad:
+                </label>
+                <div class="col-sm-4">
+                    <input name="cantidad"
+                           type="number"
+                           class="form-control"
+                           ng-model="dto.cantidad"
+                           required />
+                    <span class="error text-danger"
+                          ng-show="form.cantidad.$error.required">
+                        <span class="glyphicon glyphicon-exclamation-sign"></span>
+                        Introduzca la cantidad de animales que se agregan al inventario.
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="periodo"
+                       class="col-sm-3 control-label">
+                    Período:
+                </label>
+                <div class="col-sm-4">
+                    <select name="periodo"
+                            ng-model="dto.periodo"
+                            class="form-control"
+                            required>
+                        <option></option>
+                        <option ng-repeat="item in periodos">{{item}}</option>
+                    </select>
+                    <span class="error text-danger"
+                          ng-show="form.periodo.$error.required">
+                        <span class="glyphicon glyphicon-exclamation-sign"></span>
+                        Seleccione un período.
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="submit"
+                       class="btn btn-primary btn-lg col-sm-offset-3"
+                       value="Agregar al inventario"
+                       ng-disabled="form.$invalid"/>
+            </div>
+
         </fieldset>
     </form>
 </div>

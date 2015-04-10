@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SimpleInventario.Query
+namespace SimpleInventario.Querying
 {
     public class Class1
     {

@@ -27,9 +27,17 @@ namespace Journey.Tests.Testing
             });
         }
 
+        /// <summary>
+        /// Los eventos que se han levantado desde que procesó comandos.
+        /// </summary>
         public List<IVersionedEvent> Events { get; private set; }
 
         public IEventStore<T> Store { get { return this.store; } }
+
+        /// <summary>
+        /// El historial de eventos que estaba persistido antes de que se procesaran comandos.
+        /// </summary>
+        public List<IVersionedEvent> History { get { return this.store.History; } }
 
         public void Setup(ICommandHandler handler)
         {

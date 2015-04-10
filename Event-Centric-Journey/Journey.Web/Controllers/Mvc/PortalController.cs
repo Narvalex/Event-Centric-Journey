@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Journey.Worker;
 using System.Web.Mvc;
 
 namespace Journey.Web.Controllers
@@ -12,6 +9,13 @@ namespace Journey.Web.Controllers
         public ActionResult Index()
         {
             return View();
+        }
+
+        public ActionResult WorkerRoleStatus(string requester)
+        {
+            WorkerRoleWebPortal.Instance.WorkerRole.Tracer.Notify("========== INCOMING STATUS CHECK BY: " + requester + " ==========");
+
+            return Content("Online");
         }
     }
 }

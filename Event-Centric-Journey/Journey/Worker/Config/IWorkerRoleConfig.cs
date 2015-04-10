@@ -16,6 +16,10 @@ namespace Journey.Worker.Config
 
         int NumberOfProcessorsThreads { get; }
 
+        string CommandBusTableName { get; }
+
+        string EventBusTableName { get; }
+
         TimeSpan BusPollDelay { get; }
     }
 }

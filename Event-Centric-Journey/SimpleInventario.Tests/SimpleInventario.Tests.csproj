@@ -62,8 +62,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="InventarioAppFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UsuarioDelInventarioStory.cs" />
+    <Compile Include="InventarioStories.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Journey.Tests\Journey.Tests.csproj">
@@ -77,6 +78,10 @@
     <ProjectReference Include="..\Samples\SimpleInventario\SimpleInventario\SimpleInventario.csproj">
       <Project>{370c0a50-1ee2-4f28-9b7b-f2ccc7455c5f}</Project>
       <Name>SimpleInventario</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInventario.Application\SimpleInventario.Application.csproj">
+      <Project>{8bdee51c-30ed-40cb-9a67-bf4a6f06e836}</Project>
+      <Name>SimpleInventario.Application</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimpleInventario.Commands\SimpleInventario.Commands.csproj">
       <Project>{66413d24-2fba-44e4-ab37-2991a2771f2e}</Project>

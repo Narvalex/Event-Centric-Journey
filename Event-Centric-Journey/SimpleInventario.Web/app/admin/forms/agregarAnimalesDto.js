@@ -9,6 +9,7 @@
         
         return {
             animal: '',
+            sucursal: '',
             cantidad: '',
             periodo: ''
         };

@@ -6,15 +6,15 @@ using System.Collections.Generic;
 
 namespace Journey.Worker
 {
-    public class DomainContainer : IDomainContainer
+    public class DomainComponents : IDomainComponents
     {
         private readonly List<Action<IUnityContainer, IEventHandlerRegistry>> domainRegistrationList;
         private readonly IWorkerRoleConfig workerRoleConfig;
 
-        public DomainContainer()
+        public DomainComponents()
         {
             this.domainRegistrationList = new List<Action<IUnityContainer, IEventHandlerRegistry>>();
-            this.workerRoleConfig = DefaultConfigProvider.Configuration;
+            this.workerRoleConfig = DefaultWorkerRoleConfigProvider.Configuration;
         }
 
         public List<Action<IUnityContainer, IEventHandlerRegistry>> DomainRegistrationList

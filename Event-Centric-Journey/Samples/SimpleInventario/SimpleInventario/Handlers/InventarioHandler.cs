@@ -4,8 +4,8 @@ using SimpleInventario.Commands;
 
 namespace SimpleInventario.Handlers
 {
-    public class InventarioHandler : 
-        ICommandHandler<DefinirNuevoTipoDeArticulo>
+    public class InventarioHandler :
+        ICommandHandler<AgregarAnimales>
     {
         private readonly IEventStore<Inventario> store;
 
@@ -14,11 +14,14 @@ namespace SimpleInventario.Handlers
             this.store = store;
         }
 
-        public void Handle(DefinirNuevoTipoDeArticulo command)
+        public void Handle(AgregarAnimales command)
         {
-            var aggregate = new Inventario(command.IdArticulo);
-            aggregate.Handle(command);
-            this.store.Save(aggregate, command.Id);
+            var actor = this.store.Find(command.IdEmpresa);
+            if (actor == null)
+                actor = new Inventario(command.IdEmpresa);
+
+            actor.Handle(command);
+            this.store.Save(actor, command.Id);
         }
     }
 }

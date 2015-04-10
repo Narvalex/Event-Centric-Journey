@@ -24,7 +24,7 @@ namespace Journey.Worker
         /// <summary>
         /// Acepta aparte del dominio un tracer, que puede ser de consola o web, hasta el momento.
         /// </summary>
-        public WorkerRole(IDomainContainer domainContainer, IWorkerRoleTracer tracer)
+        public WorkerRole(IDomainComponents domainContainer, IWorkerRoleTracer tracer)
         {
             _tracer = tracer;
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
@@ -47,11 +47,11 @@ namespace Journey.Worker
             this.container.Resolve<IWorkerRoleTracer>().Notify("=== Worker Stopped ===");
         }
 
-        private IUnityContainer CreateContainer(IDomainContainer domainContainer)
+        private IUnityContainer CreateContainer(IDomainComponents domainContainer)
         {
             var container = new UnityContainer();
 
-            container.RegisterInstance<IDomainContainer>(domainContainer);
+            container.RegisterInstance<IDomainComponents>(domainContainer);
 
             // Infrastructure
             container.RegisterInstance<ISystemDateTime>(new LocalDateTime());
@@ -59,18 +59,24 @@ namespace Journey.Worker
             container.RegisterInstance<IMetadataProvider>(new StandardMetadataProvider());
             container.RegisterInstance<IWorkerRoleTracer>(_tracer);
 
-            var config = container.Resolve<IDomainContainer>().WorkerRoleConfig;
+            var config = container.Resolve<IDomainComponents>().WorkerRoleConfig;
 
             var serializer = container.Resolve<ITextSerializer>();
             var metadata = container.Resolve<IMetadataProvider>();
             var tracer = container.Resolve<IWorkerRoleTracer>();
             var dateTime = container.Resolve<ISystemDateTime>();
 
-            var commandBus = new CommandBus(new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Commands"), serializer);
-            var eventBus = new EventBus(new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Events"), serializer);
+            var commandBus = new CommandBus(
+                new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.CommandBusTableName), serializer);
 
-            var commandProcessor = new CommandProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Commands", config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer, new BusTransientFaultDetector(config.EventStoreConnectionString));
-            var eventProcessor = new EventProcessor(new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, "Bus.Events", config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer);
+            var eventBus = new EventBus(
+                new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.EventBusTableName), serializer);
+
+            var commandProcessor = new CommandProcessor(
+                new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.CommandBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer, new BusTransientFaultDetector(config.EventStoreConnectionString));
+
+            var eventProcessor = new EventProcessor(
+                new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.EventBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer);
 
             var inMemorySnapshotCache = new InMemorySnapshotCache("EventStoreCache");
 

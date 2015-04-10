@@ -8,13 +8,13 @@ namespace Journey.Tests.Integration.Client
 {
     public class ItemApplication
     {
-        private readonly IApplication app;
-        private readonly IApplication buggyApp;
+        private readonly IClientApplication app;
+        private readonly IClientApplication buggyApp;
 
         public ItemApplication(ICommandBus commandBus, string workerRoleStatusUrl, Func<ReadModelDbContext> readModelContextFactory)
         {
-            this.app = new Application(commandBus, workerRoleStatusUrl, readModelContextFactory, 10);
-            this.buggyApp = new Application(new BuggyCommandBus(), workerRoleStatusUrl, readModelContextFactory, 1);
+            this.app = new ClientApplication(commandBus, workerRoleStatusUrl, readModelContextFactory, 10);
+            this.buggyApp = new ClientApplication(new BuggyCommandBus(), workerRoleStatusUrl, readModelContextFactory, 1);
         }
 
         public void AddItem(string name)
