@@ -179,8 +179,8 @@
     <Compile Include="Utils\SystemDateTime\Implementation\UtcDateTime.cs" />
     <Compile Include="Worker\Config\IWorkerRoleConfig.cs" />
     <Compile Include="Worker\Config\Implementation\DefaultWorkerRoleConfigProvider.cs" />
-    <Compile Include="Worker\Core\Implementation\DomainComponents.cs" />
-    <Compile Include="Worker\Core\IDomainComponents.cs" />
+    <Compile Include="Worker\Core\Implementation\DomainWorker.cs" />
+    <Compile Include="Worker\Core\IDomainWorker.cs" />
     <Compile Include="Worker\Core\IWorkerRolePortal.cs" />
     <Compile Include="Worker\Tracing\Implementation\ConsoleWorkerRoleTracer.cs" />
     <Compile Include="Worker\Tracing\Implementation\PortalHub.cs" />

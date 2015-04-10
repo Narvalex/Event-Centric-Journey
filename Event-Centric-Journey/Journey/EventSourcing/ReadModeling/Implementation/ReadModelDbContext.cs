@@ -14,6 +14,10 @@ namespace Journey.EventSourcing.ReadModeling
             : base(nameOrConnectionString)
         { }
 
+        public ReadModelDbContext()
+            : base("Name=defaultConnection")
+        { }
+
         public IQueryable<T> Query<T>() where T : class
         {
             return this.Set<T>();

@@ -24,7 +24,7 @@ namespace Journey.Worker
         /// <summary>
         /// Acepta aparte del dominio un tracer, que puede ser de consola o web, hasta el momento.
         /// </summary>
-        public WorkerRole(IDomainComponents domainContainer, IWorkerRoleTracer tracer)
+        public WorkerRole(IDomainWorker domainContainer, IWorkerRoleTracer tracer)
         {
             _tracer = tracer;
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
@@ -47,11 +47,11 @@ namespace Journey.Worker
             this.container.Resolve<IWorkerRoleTracer>().Notify("=== Worker Stopped ===");
         }
 
-        private IUnityContainer CreateContainer(IDomainComponents domainContainer)
+        private IUnityContainer CreateContainer(IDomainWorker domainContainer)
         {
             var container = new UnityContainer();
 
-            container.RegisterInstance<IDomainComponents>(domainContainer);
+            container.RegisterInstance<IDomainWorker>(domainContainer);
 
             // Infrastructure
             container.RegisterInstance<ISystemDateTime>(new LocalDateTime());
@@ -59,7 +59,7 @@ namespace Journey.Worker
             container.RegisterInstance<IMetadataProvider>(new StandardMetadataProvider());
             container.RegisterInstance<IWorkerRoleTracer>(_tracer);
 
-            var config = container.Resolve<IDomainComponents>().WorkerRoleConfig;
+            var config = container.Resolve<IDomainWorker>().WorkerRoleConfig;
 
             var serializer = container.Resolve<ITextSerializer>();
             var metadata = container.Resolve<IMetadataProvider>();
