@@ -5,9 +5,9 @@ using SimpleInventario.Handlers;
 
 namespace SimpleInventario.Worker
 {
-    public class SimpleInventarioWorker : DomainWorkerRegistry
+    public class SimpleInventarioWorkerRegistry : DomainWorkerRegistry
     {
-        public SimpleInventarioWorker()
+        public SimpleInventarioWorkerRegistry()
         {
             this.boundedContextFactoryList.Add(this.RegistrarUnicoBoundedContext);
         }
