@@ -7,11 +7,11 @@ namespace Journey.Tests.EventSourcing.SnapshotCacheFixture
 {
     public class GIVEN_empty_cache
     {
-        protected ISnapshotCache sut;
+        protected IInMemoryRollingSnapshot sut;
 
         public GIVEN_empty_cache()
         {
-            this.sut = new InMemorySnapshotCache("Test");
+            this.sut = new InMemoryRollingSnapshot("Test");
         }
 
         [Fact]

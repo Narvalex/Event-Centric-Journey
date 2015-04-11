@@ -24,7 +24,7 @@ namespace Journey.Worker
         /// <summary>
         /// Acepta aparte del dominio un tracer, que puede ser de consola o web, hasta el momento.
         /// </summary>
-        public WorkerRole(IDomainWorker domainContainer, IWorkerRoleTracer tracer)
+        public WorkerRole(IDomainWorkerRegistry domainContainer, IWorkerRoleTracer tracer)
         {
             _tracer = tracer;
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
@@ -47,11 +47,11 @@ namespace Journey.Worker
             this.container.Resolve<IWorkerRoleTracer>().Notify("=== Worker Stopped ===");
         }
 
-        private IUnityContainer CreateContainer(IDomainWorker domainContainer)
+        private IUnityContainer CreateContainer(IDomainWorkerRegistry domainContainer)
         {
             var container = new UnityContainer();
 
-            container.RegisterInstance<IDomainWorker>(domainContainer);
+            container.RegisterInstance<IDomainWorkerRegistry>(domainContainer);
 
             // Infrastructure
             container.RegisterInstance<ISystemDateTime>(new LocalDateTime());
@@ -59,7 +59,7 @@ namespace Journey.Worker
             container.RegisterInstance<IMetadataProvider>(new StandardMetadataProvider());
             container.RegisterInstance<IWorkerRoleTracer>(_tracer);
 
-            var config = container.Resolve<IDomainWorker>().WorkerRoleConfig;
+            var config = container.Resolve<IDomainWorkerRegistry>().WorkerRoleConfig;
 
             var serializer = container.Resolve<ITextSerializer>();
             var metadata = container.Resolve<IMetadataProvider>();
@@ -78,9 +78,9 @@ namespace Journey.Worker
             var eventProcessor = new EventProcessor(
                 new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.EventBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer);
 
-            var inMemorySnapshotCache = new InMemorySnapshotCache("EventStoreCache");
+            var inMemorySnapshotCache = new InMemoryRollingSnapshot("EventStoreCache");
 
-            container.RegisterInstance<ISnapshotCache>(inMemorySnapshotCache);
+            container.RegisterInstance<IInMemoryRollingSnapshot>(inMemorySnapshotCache);
             container.RegisterInstance<ICommandBus>(commandBus);
             container.RegisterInstance<IEventBus>(eventBus);
             container.RegisterInstance<ICommandHandlerRegistry>(commandProcessor);

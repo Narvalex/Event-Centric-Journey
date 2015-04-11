@@ -99,12 +99,12 @@
     <Compile Include="EventSourcing\Core\Implementation\EventStore.cs" />
     <Compile Include="EventSourcing\Core\Implementation\EventStoreConcurrencyException.cs" />
     <Compile Include="EventSourcing\Core\Implementation\InMemoryEventStore.cs" />
-    <Compile Include="EventSourcing\Core\Implementation\InMemorySnapshotCache.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\InMemoryRollingSnapshot.cs" />
     <Compile Include="EventSourcing\Core\Implementation\Saga.cs" />
     <Compile Include="EventSourcing\Core\Implementation\VersionedEvent.cs" />
     <Compile Include="EventSourcing\Core\IRehydratesFrom.cs" />
     <Compile Include="EventSourcing\Core\ISaga.cs" />
-    <Compile Include="EventSourcing\Core\ISnapshotCache.cs" />
+    <Compile Include="EventSourcing\Core\IInMemoryRollingSnapshot.cs" />
     <Compile Include="EventSourcing\Core\IVersionedEvent.cs" />
     <Compile Include="EventSourcing\Handling\IDomainService.cs" />
     <Compile Include="EventSourcing\Handling\IHandlerOf.cs" />
@@ -179,8 +179,8 @@
     <Compile Include="Utils\SystemDateTime\Implementation\UtcDateTime.cs" />
     <Compile Include="Worker\Config\IWorkerRoleConfig.cs" />
     <Compile Include="Worker\Config\Implementation\DefaultWorkerRoleConfigProvider.cs" />
-    <Compile Include="Worker\Core\Implementation\DomainWorker.cs" />
-    <Compile Include="Worker\Core\IDomainWorker.cs" />
+    <Compile Include="Worker\Core\Implementation\DomainWorkerRegistry.cs" />
+    <Compile Include="Worker\Core\IDomainWorkerRegistry.cs" />
     <Compile Include="Worker\Core\IWorkerRolePortal.cs" />
     <Compile Include="Worker\Tracing\Implementation\ConsoleWorkerRoleTracer.cs" />
     <Compile Include="Worker\Tracing\Implementation\PortalHub.cs" />

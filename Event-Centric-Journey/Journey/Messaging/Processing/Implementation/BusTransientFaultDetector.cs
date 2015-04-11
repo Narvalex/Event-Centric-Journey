@@ -16,7 +16,7 @@ namespace Journey.Messaging.Processing
         public bool CommandWasAlreadyProcessed(object payload)
         {
             return this.sql.ExecuteReader(@"
-            select count(*) from  EventStore.Events where TaskCommandId = @CommandId
+            select count(*) from  EventStore.Events where CorrelationId = @CommandId
             ", r => r.SafeGetInt32(0) > 0 ? true : false,
                 new SqlParameter("@CommandId", ((dynamic)payload).Id)).FirstOrDefault();
         }

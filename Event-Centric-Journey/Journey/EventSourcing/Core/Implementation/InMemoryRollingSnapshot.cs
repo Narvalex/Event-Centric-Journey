@@ -3,7 +3,7 @@ using System.Runtime.Caching;
 
 namespace Journey.EventSourcing
 {
-    public class InMemorySnapshotCache : MemoryCache, ISnapshotCache
+    public class InMemoryRollingSnapshot : MemoryCache, IInMemoryRollingSnapshot
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="System.Runtime.Caching.MemoryCache"/> class.
@@ -30,7 +30,7 @@ namespace Journey.EventSourcing
         /// property.</exception>
         /// <exception cref="System.Configuration.ConfigurationException">A value in the config collection is invalid.name is null.</exception>
         /// <exception cref="System.ArgumentException">A name or value in the config parameter could not be parsed.</exception>
-        public InMemorySnapshotCache(string name, NameValueCollection config = null)
+        public InMemoryRollingSnapshot(string name, NameValueCollection config = null)
             : base(name, config)
         { }
     }

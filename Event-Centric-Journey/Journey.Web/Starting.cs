@@ -8,7 +8,9 @@ namespace Journey.Web.App_Start
         static partial void Start()
         {            
             // Implement Here you Own Domain Components.
-            var worker = new WorkerRole(new FakeDomainWorker(), new WebWorkerRoleTracer());
+            //var worker = new WorkerRole(new FakeDomainWorker(), new WebWorkerRoleTracer());
+
+            var worker = new WorkerRole(new SimpleInventario.Worker.SimpleInventarioWorker(), new WebWorkerRoleTracer());
 
             WorkerRoleWebPortal.CreateNew(worker).StartWorking();
         }
@@ -17,7 +19,7 @@ namespace Journey.Web.App_Start
     /// <summary>
     /// A fake domain worker
     /// </summary>
-    public class FakeDomainWorker : DomainWorker
+    public class FakeDomainWorker : DomainWorkerRegistry
     { }
 }
 

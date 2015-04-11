@@ -6,12 +6,12 @@ using System.Collections.Generic;
 
 namespace Journey.Worker
 {
-    public abstract class DomainWorker : IDomainWorker
+    public abstract class DomainWorkerRegistry : IDomainWorkerRegistry
     {
         protected readonly List<Action<IUnityContainer, IEventHandlerRegistry>> boundedContextFactoryList;
         private readonly IWorkerRoleConfig workerRoleConfig;
 
-        public DomainWorker()
+        public DomainWorkerRegistry()
         {
             this.boundedContextFactoryList = new List<Action<IUnityContainer, IEventHandlerRegistry>>();
             this.workerRoleConfig = DefaultWorkerRoleConfigProvider.Configuration;

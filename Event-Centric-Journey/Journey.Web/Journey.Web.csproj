@@ -254,6 +254,10 @@
       <Project>{96b26dbf-0e5c-4677-84fc-37985ee1d2d0}</Project>
       <Name>Journey</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SimpleInventario.Worker\SimpleInventario.Worker.csproj">
+      <Project>{32cc8657-e194-445a-bffc-9517ae4a56ff}</Project>
+      <Name>SimpleInventario.Worker</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

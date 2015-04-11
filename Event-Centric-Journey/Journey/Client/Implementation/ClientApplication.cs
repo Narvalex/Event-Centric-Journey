@@ -12,9 +12,8 @@ namespace Journey.Client
     public class ClientApplication : IClientApplication
     {
         private readonly ICommandBus commandBus;
-        private readonly Func<ICommand, Task> sendCommandAsync;
-        private readonly Func<string, Task> pingTheWorkerRole;
-        private readonly Func<Guid, Task> waitEventualConsistencyDelay;
+        private readonly Func<string, Task> pingWorkerRoleAsync;
+        private readonly Action<Guid> waitEventualConsistencyDelay;
         private readonly Func<ReadModelDbContext> readModelContextFactory;
         private readonly int eventualConsistencyCheckRetryPolicy;
 
@@ -24,15 +23,7 @@ namespace Journey.Client
             this.commandBus = commandBus;
             this.readModelContextFactory = readModelContextFactory;
 
-            this.sendCommandAsync = async (command) =>
-            {
-                await Task.Factory.StartNew(() =>
-                {
-                    this.commandBus.Send(command);
-                });
-            };
-
-            this.pingTheWorkerRole = async (commandTypeName) =>
+            this.pingWorkerRoleAsync = async (commandTypeName) =>
             {
                 await Task.Factory.StartNew(async () =>
                 {
@@ -46,17 +37,15 @@ namespace Journey.Client
                                 Thread.Sleep(100 * retries);
 
                             workerResponse = await httpClient.GetStringAsync(
-                                string.Format("{0}/Portal/WorkerRoleStatus/?requester=COMMAND_{1}", workerRoleStatusUrl, commandTypeName));
+                                string.Format("{0}/?requester=COMMAND_{1}", workerRoleStatusUrl, commandTypeName));
                             ++retries;
                         }
                     }
                 });
             };
 
-            this.waitEventualConsistencyDelay = async (correlationId) =>
+            this.waitEventualConsistencyDelay = (correlationId) =>
             {
-                await Task.Factory.StartNew(() =>
-                {
                     var retries = 0;
                     var isConsistent = false;
 
@@ -71,14 +60,15 @@ namespace Journey.Client
                             if (isConsistent)
                                 break;
 
-                            ++retries;
-                            Thread.Sleep(100 * retries);
+                           
                         }
+
+                        ++retries;
+                        Thread.Sleep(100 * retries);
                     }
 
                     if (isConsistent == false)
                         throw new TimeoutException("No se pudo verificar la consistencia eventual. Espere unos minutos más");
-                });
             };
         }
 
@@ -89,13 +79,10 @@ namespace Journey.Client
         /// </summary>
         public void Send(ICommand command)
         {
-            var tasks = new HashSet<Task>();
+            this.pingWorkerRoleAsync(command.GetType().Name);
+            this.commandBus.Send(command);
+            this.waitEventualConsistencyDelay(command.Id);
 
-            tasks.Add(this.pingTheWorkerRole(command.GetType().Name));
-            tasks.Add(this.sendCommandAsync(command));
-            tasks.Add(this.waitEventualConsistencyDelay(command.Id));
-
-            Task.WaitAll(tasks.ToArray());
         }
 
         private ReadModelDbContext CreateReadOnlyDbContext()

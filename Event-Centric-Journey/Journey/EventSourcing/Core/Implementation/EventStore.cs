@@ -34,12 +34,12 @@ namespace Journey.EventSourcing
         private readonly Func<EventStoreDbContext> contextFactory;
         private readonly Func<Guid, IEnumerable<IVersionedEvent>, T> entityFactory;
         private readonly Action<T> cacheMementoIfApplicable;
-        private readonly ISnapshotCache cache;
+        private readonly IInMemoryRollingSnapshot cache;
         private readonly Func<Guid, Tuple<IMemento, DateTime?>> getMementoFromCache;
         private readonly Action<Guid> markCacheAsStale;
         private readonly Func<Guid, IMemento, IEnumerable<IVersionedEvent>, T> originatorEntityFactory;
 
-        public EventStore(IEventBus eventBus, ICommandBus commandBus, ITextSerializer serializer, Func<EventStoreDbContext> contextFactory, ISnapshotCache cache, IWorkerRoleTracer tracer, ISystemDateTime dateTime)
+        public EventStore(IEventBus eventBus, ICommandBus commandBus, ITextSerializer serializer, Func<EventStoreDbContext> contextFactory, IInMemoryRollingSnapshot cache, IWorkerRoleTracer tracer, ISystemDateTime dateTime)
         {
             this.eventBus = eventBus;
             this.commandBus = commandBus;

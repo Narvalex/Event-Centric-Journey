@@ -1,4 +1,5 @@
 using Journey.Client;
+using Journey.Database;
 using Journey.EventSourcing.ReadModeling;
 using Journey.Messaging;
 using Journey.Serialization;
@@ -37,6 +38,8 @@ namespace SimpleInventario.Web.App_Start
         /// change the defaults), as Unity allows resolving a concrete type even if it was not previously registered.</remarks>
         public static void RegisterTypes(IUnityContainer container)
         {
+            DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
+
             var serializer = new JsonTextSerializer();
             var config = DefaultClientApplicationConfigProvider.Configuration;
 
@@ -56,14 +59,15 @@ namespace SimpleInventario.Web.App_Start
                 new InjectionConstructor(
                     new ResolvedParameter<IMessageSender>("CommandBus"), serializer));
 
-            container.RegisterType<ReadModelDbContext>(new TransientLifetimeManager(), new InjectionConstructor(config.ReadModelConnectionString));
+           
+            Func<ReadModelDbContext> readModelContextFactory = () => new ReadModelDbContext(config.ReadModelConnectionString);
 
             container.RegisterType<IClientApplication, ClientApplication>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     container.Resolve<ICommandBus>(),
                     config.WorkerRoleStatusUrl,
-                    container.Resolve<Func<ReadModelDbContext>>(),
+                    readModelContextFactory,
                     config.EventualConsistencyCheckRetryPolicy));
 
             container.RegisterType<IInventarioApp, InventarioApp>();

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Journey.Worker
 {
-    public interface IDomainWorker
+    public interface IDomainWorkerRegistry
     {
         List<Action<IUnityContainer, IEventHandlerRegistry>> DomainRegistrationList { get; }
 
