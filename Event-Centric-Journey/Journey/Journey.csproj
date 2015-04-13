@@ -109,11 +109,10 @@
     <Compile Include="EventSourcing\Handling\IDomainService.cs" />
     <Compile Include="EventSourcing\Handling\IHandlerOf.cs" />
     <Compile Include="EventSourcing\Handling\ISubscribedTo.cs" />
-    <Compile Include="EventSourcing\ReadModeling\Implementation\Dao.cs" />
-    <Compile Include="EventSourcing\ReadModeling\IDao.cs" />
+    <Compile Include="EventSourcing\ReadModeling\Implementation\ProjectedEvent.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ReadModelRebuilder.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ReadModelDbContext.cs" />
-    <Compile Include="EventSourcing\ReadModeling\Implementation\ProcessedEvent.cs" />
+    <Compile Include="EventSourcing\ReadModeling\IProcessedEvent.cs" />
     <Compile Include="EventSourcing\ReadModeling\IReadModelGenerator.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ReadModelGenerator.cs" />
     <Compile Include="EventSourcing\Rebuilding\EventStoreRebuilder.cs" />

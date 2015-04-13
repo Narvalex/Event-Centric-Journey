@@ -1,7 +1,6 @@
 ﻿using Journey.EventSourcing.ReadModeling;
 using Journey.Messaging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -49,12 +48,12 @@ namespace Journey.Client
                     var retries = 0;
                     var isConsistent = false;
 
-                    while (retries < 20)
+                    while (retries < this.eventualConsistencyCheckRetryPolicy)
                     {
                         using (var context = this.CreateReadOnlyDbContext())
                         {
                             isConsistent = context
-                                            .ProcessedEvents
+                                            .ProjectedEvents
                                             .Where(e => e.CorrelationId == correlationId).Any();
 
                             if (isConsistent)
@@ -64,7 +63,11 @@ namespace Journey.Client
                         }
 
                         ++retries;
-                        Thread.Sleep(100 * retries);
+                        // el primer retry: 0,2 seguntos
+                        // segundo retry: 0,4 seguntos
+                        // retry 19: 100 * 19 * 2 = 1900 * 2 = 3,8 segundos.
+                        // el retry 20: 100 * 20 * 2 = 2000 * 2 = 4 segundos.
+                        Thread.Sleep(100 * retries * 2);
                     }
 
                     if (isConsistent == false)

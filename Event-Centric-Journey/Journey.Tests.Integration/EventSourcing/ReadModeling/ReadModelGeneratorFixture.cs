@@ -80,7 +80,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
             using (var context = this.contextFactory.Invoke())
             {
                 var item = context.Items.Where(i => i.UnidentifiableId == 1).FirstOrDefault();
-                var log = context.ProcessedEvents.Where(l => l.AggregateId == Guid.Empty && l.Version == 1).FirstOrDefault();
+                var log = context.ProjectedEvents.Where(l => l.AggregateId == Guid.Empty && l.Version == 1).FirstOrDefault();
 
                 Assert.Equal("Silla", item.Name);
                 Assert.True(log != null);
@@ -115,7 +115,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
             using (var context = this.contextFactory.Invoke())
             {
                 var item = context.Items.Where(i => i.UnidentifiableId == 1).ToList();
-                var log = context.ProcessedEvents.Where(l => l.AggregateId == Guid.Empty && l.Version == 1).ToList();
+                var log = context.ProjectedEvents.Where(l => l.AggregateId == Guid.Empty && l.Version == 1).ToList();
 
                 Assert.True(item.Count() == 1);
                 Assert.True(log.Count() == 1);
@@ -157,7 +157,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
                 using (var context = this.contextFactory.Invoke())
                 {
                     var item = context.Items.Where(i => i.UnidentifiableId == 1).ToList();
-                    var log = context.ProcessedEvents.Where(l => l.AggregateId == Guid.Empty && l.Version == 1).ToList();
+                    var log = context.ProjectedEvents.Where(l => l.AggregateId == Guid.Empty && l.Version == 1).ToList();
 
                     Assert.True(item.Count() == 1);
                     Assert.True(log.Count() == 1);
@@ -165,6 +165,59 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
             }
 
 
+        }
+
+        [Fact]
+        public void WHEN_receive_event_once_THEN_consumes()
+        {
+            var commandId = SequentialGuid.GenerateNewGuid();
+            var e = new ItemAdded
+            {
+                AggregateType = "DomainAggregate",
+                CorrelationId = commandId,
+                SourceId = Guid.Empty,
+                Id = 1,
+                Name = "Silla",
+                Version = 1
+            };
+
+            var mailSent = 0;
+            this.sut.Consume<MailingSubscription>(e, () =>
+            {
+                ++mailSent;
+                Console.WriteLine("Mail sent once!");
+            });
+
+            Assert.Equal(1, mailSent);
+        }
+
+        [Fact]
+        public void WHEN_receiving_message_twice_THEN_consumes_only_once()
+        {
+            var commandId = SequentialGuid.GenerateNewGuid();
+            var e = new ItemAdded
+            {
+                AggregateType = "DomainAggregate",
+                CorrelationId = commandId,
+                SourceId = Guid.Empty,
+                Id = 1,
+                Name = "Silla",
+                Version = 1
+            };
+
+            var mailSent = 0;
+            this.sut.Consume<MailingSubscription>(e, () =>
+            {
+                ++mailSent;
+                Console.WriteLine("Mail sent once!");
+            });
+            this.sut.Consume<MailingSubscription>(e, () =>
+            {
+                ++mailSent;
+                Console.WriteLine("Mail sent twice! this not good....");
+            });
+
+            Assert.Equal(1, mailSent);
         }
     }
 

@@ -34,8 +34,8 @@ namespace Journey.Tests.Integration.Client
             using (var context = this.contextFactory.Invoke())
             {
                 context
-                    .ProcessedEvents
-                    .Add(new ProcessedEvent
+                    .ProjectedEvents
+                    .Add(new ProjectedEvent
                     {
                         AggregateId = Guid.Empty, 
                         AggregateType = "Items",

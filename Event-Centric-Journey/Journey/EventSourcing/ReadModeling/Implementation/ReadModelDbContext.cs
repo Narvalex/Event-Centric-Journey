@@ -35,11 +35,11 @@ namespace Journey.EventSourcing.ReadModeling
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ProcessedEvent>()
-                .ToTable("ProcessedEvents", "SubscriptionLog")
+            modelBuilder.Entity<ProjectedEvent>()
+                .ToTable("ReadModeling", "SubscriptionLog")
                 .HasKey(l => new { l.AggregateId, l.Version, l.AggregateType });
         }
 
-        public IDbSet<ProcessedEvent> ProcessedEvents { get; set; }
+        public IDbSet<ProjectedEvent> ProjectedEvents { get; set; }
     }
 }
