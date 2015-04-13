@@ -65,6 +65,7 @@
     <Compile Include="InventarioAppFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="InventarioStories.cs" />
+    <Compile Include="Reporting\AnimalesDeTodosLosPeriodosFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Journey.Tests\Journey.Tests.csproj">
@@ -91,11 +92,16 @@
       <Project>{93cbd690-8bbf-49cb-8bf1-62b99c471d2e}</Project>
       <Name>SimpleInventario.Events</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SimpleInventario.Reporting\SimpleInventario.Reporting.csproj">
+      <Project>{84186d22-4417-4270-acc4-ef7f2c93caa3}</Project>
+      <Name>SimpleInventario.Reporting</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

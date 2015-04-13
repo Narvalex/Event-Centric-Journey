@@ -39,8 +39,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="AnimalesDeTodosLosPeriodos.cs" />
+    <Compile Include="AnimalesDeTodosLosPeriodosHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Journey\Journey.csproj">
+      <Project>{96b26dbf-0e5c-4677-84fc-37985ee1d2d0}</Project>
+      <Name>Journey</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInventario.Events\SimpleInventario.Events.csproj">
+      <Project>{93cbd690-8bbf-49cb-8bf1-62b99c471d2e}</Project>
+      <Name>SimpleInventario.Events</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

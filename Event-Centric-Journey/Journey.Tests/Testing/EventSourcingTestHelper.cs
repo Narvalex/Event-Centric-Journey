@@ -11,6 +11,7 @@ namespace Journey.Tests.Testing
     public class EventSourcingTestHelper<T> where T : IEventSourced
     {
         private ICommandHandler handler;
+        private IEventHandler eventHandler;
         private readonly EventStoreStub store;
         private string expectedCorrelationId;
 
@@ -44,6 +45,11 @@ namespace Journey.Tests.Testing
             this.handler = handler;
         }
 
+        public void Setup(IEventHandler handler)
+        {
+            this.eventHandler = handler;
+        }
+
         public void Given(params IVersionedEvent[] history)
         {
             this.store.History.AddRange(history);
@@ -58,7 +64,10 @@ namespace Journey.Tests.Testing
 
         public void When(IEvent @event)
         {
-            ((dynamic)this.handler).Handle((dynamic)@event);
+            if (this.handler != null)
+                ((dynamic)this.handler).Handle((dynamic)@event);
+            else
+                ((dynamic)this.eventHandler).Handle((dynamic)@event);
         }
 
         public bool ThenContains<TEvent>() where TEvent : IVersionedEvent
