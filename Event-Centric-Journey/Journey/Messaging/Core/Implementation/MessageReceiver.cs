@@ -1,6 +1,7 @@
 ﻿using Journey.Utils.SystemDateTime;
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
@@ -108,104 +109,105 @@ namespace Journey.Messaging
 
         private void ReceiveMessages(CancellationToken cancellationToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
-                if (!this.ReceiveMessage())
-                    Thread.Sleep(this.pollDelay);
-                else
-                    break;
+            using (var connection = this.connectionFactory.CreateConnection(this.connectionString))
+            {
+                connection.Open();
+
+                using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+                {
+                    while (!cancellationToken.IsCancellationRequested)
+                        if (!this.ReceiveMessage(connection, transaction))
+                            Thread.Sleep(this.pollDelay);
+                        else
+                            break;
+                }
+            }
         }
 
         [SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Does not contain user input.")]
-        protected bool ReceiveMessage()
+        protected bool ReceiveMessage(DbConnection connection, DbTransaction transaction)
         {
-            using (var connection = this.connectionFactory.CreateConnection(this.connectionString))
+            var currentDate = this.GetCurrentDate();
+
+            long messageId = -1;
+            Message message = null;
+
+            try
             {
-                var currentDate = this.GetCurrentDate();
-
-                connection.Open();
-                using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var command = connection.CreateCommand())
                 {
-                    long messageId = -1;
-                    Message message = null;
+                    command.Transaction = transaction;
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = this.readQuery;
+                    ((SqlCommand)command).Parameters.Add("@CurrentDate", SqlDbType.DateTime).Value = currentDate;
 
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                        {
+                            return false;
+                        }
+
+                        var body = (string)reader["Body"];
+                        var deliveryDateValue = reader["DeliveryDate"];
+                        var deliveryDate = deliveryDateValue == DBNull.Value ? (DateTime?)null : new DateTime?((DateTime)deliveryDateValue);
+                        var correlationIdValue = reader["CorrelationId"];
+                        var correlationId = (string)(correlationIdValue == DBNull.Value ? null : correlationIdValue);
+
+                        message = new Message(body, correlationId, deliveryDate);
+                        messageId = (long)reader["Id"];
+                    }
+                }
+
+                this.delegateMessageReceiving.Invoke();
+                this.MessageReceived(this, new MessageReceivedEventArgs(message));
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = this.deleteQuery;
+                    ((SqlCommand)command).Parameters.Add("@Id", SqlDbType.BigInt).Value = messageId;
+
+                    command.ExecuteNonQuery();
+                }
+
+                transaction.Commit();
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    // Dead Lettering
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.Transaction = transaction;
+                        command.CommandType = CommandType.Text;
+                        command.CommandText = this.setDeadLetterQuery;
+                        ((SqlCommand)command).Parameters.Add("@Id", SqlDbType.BigInt).Value = messageId;
+                        ((SqlCommand)command).Parameters.Add("@TraceInfo", SqlDbType.NVarChar).Value =
+                            string.Format("Exception Type: {0}. Exception Message: {1} Inner Exception Message: {2} StackTrace: {3}", e.GetType().Name, e.Message, e.InnerException, e.StackTrace);
+
+                        command.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
                     try
                     {
-                        using (var command = connection.CreateCommand())
-                        {
-                            command.Transaction = transaction;
-                            command.CommandType = CommandType.Text;
-                            command.CommandText = this.readQuery;
-                            ((SqlCommand)command).Parameters.Add("@CurrentDate", SqlDbType.DateTime).Value = currentDate;
-
-                            using (var reader = command.ExecuteReader())
-                            {
-                                if (!reader.Read())
-                                {
-                                    return false;
-                                }
-
-                                var body = (string)reader["Body"];
-                                var deliveryDateValue = reader["DeliveryDate"];
-                                var deliveryDate = deliveryDateValue == DBNull.Value ? (DateTime?)null : new DateTime?((DateTime)deliveryDateValue);
-                                var correlationIdValue = reader["CorrelationId"];
-                                var correlationId = (string)(correlationIdValue == DBNull.Value ? null : correlationIdValue);
-
-                                message = new Message(body, correlationId, deliveryDate);
-                                messageId = (long)reader["Id"];
-                            }
-                        }
-
-                        this.delegateMessageReceiving.Invoke();
-                        this.MessageReceived(this, new MessageReceivedEventArgs(message));
-
-                        using (var command = connection.CreateCommand())
-                        {
-                            command.Transaction = transaction;
-                            command.CommandType = CommandType.Text;
-                            command.CommandText = this.deleteQuery;
-                            ((SqlCommand)command).Parameters.Add("@Id", SqlDbType.BigInt).Value = messageId;
-
-                            command.ExecuteNonQuery();
-                        }
-
-
-
-                        transaction.Commit();
+                        transaction.Rollback();
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
-                        try
-                        {
-                            // Dead Lettering
-                            using (var command = connection.CreateCommand())
-                            {
-                                command.Transaction = transaction;
-                                command.CommandType = CommandType.Text;
-                                command.CommandText = this.setDeadLetterQuery;
-                                ((SqlCommand)command).Parameters.Add("@Id", SqlDbType.BigInt).Value = messageId;
-                                ((SqlCommand)command).Parameters.Add("@TraceInfo", SqlDbType.NVarChar).Value =
-                                    string.Format("Exception Type: {0}. Exception Message: {1} Inner Exception Message: {2} StackTrace: {3}", e.GetType().Name, e.Message, e.InnerException, e.StackTrace);
-
-                                command.ExecuteNonQuery();
-                            }
-
-                            transaction.Commit();
-                        }
-                        catch (Exception)
-                        {
-                            try
-                            {
-                                transaction.Rollback();
-                            }
-                            catch (Exception)
-                            {
-                                // NOTE: we catch ANY exceptions. This implementation 
-                                // supports retries and dead-lettering.
-                            }
-                        }
+                        // NOTE: we catch ANY exceptions. This implementation 
+                        // supports retries and dead-lettering.
                     }
                 }
             }
+
+
 
             return true;
         }
