@@ -1,5 +1,4 @@
 ﻿using Journey.Tests.Testing.Fakes;
-using Journey.Utils.Guids;
 using SimpleInventario.Application;
 using SimpleInventario.Application.DTOs;
 using SimpleInventario.Commands;
@@ -37,10 +36,8 @@ namespace SimpleInventario.Tests.InventarioAppFixture
 
             var command = this.app.Commands.FirstOrDefault() as AgregarAnimales;
             Assert.Equal(Guid.Empty, command.IdEmpresa);
-            Assert.Equal(dto.Animal, command.Animal);
             Assert.Equal(dto.Cantidad, command.Cantidad);
             Assert.Equal(dto.Periodo, command.Periodo);
-            Assert.Equal(dto.Sucursal, command.Sucursal);
         }
     }
 }
