@@ -207,8 +207,6 @@ namespace Journey.Messaging
                 }
             }
 
-
-
             return true;
         }
 
