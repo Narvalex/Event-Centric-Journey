@@ -7,6 +7,6 @@ namespace Journey.EventSourcing
     public interface ISubscribedTo<T> : ISubscribedTo
         where T : IEvent
     {
-        void BeNotifiedOf(T e);
+        void Consume(T e);
     }
 }

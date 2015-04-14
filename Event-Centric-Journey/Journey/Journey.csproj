@@ -115,8 +115,8 @@
     <Compile Include="EventSourcing\ReadModeling\IProcessedEvent.cs" />
     <Compile Include="EventSourcing\ReadModeling\IReadModelGenerator.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ReadModelGenerator.cs" />
-    <Compile Include="EventSourcing\Rebuilding\EventStoreRebuilder.cs" />
-    <Compile Include="EventSourcing\Rebuilding\IEventStoreRebuilder.cs" />
+    <Compile Include="EventSourcing\StoreRebuilding\EventStoreRebuilder.cs" />
+    <Compile Include="EventSourcing\StoreRebuilding\IEventStoreRebuilder.cs" />
     <Compile Include="Messaging\Core\Envelope.cs" />
     <Compile Include="Messaging\Core\ICommand.cs" />
     <Compile Include="Messaging\Core\ICommandBus.cs" />
@@ -168,6 +168,7 @@
     <Compile Include="Serialization\Implementation\TextSerializerExtensions.cs" />
     <Compile Include="Serialization\ITextSerializer.cs" />
     <Compile Include="Utils\CacheAnyEnumerableExtensions.cs" />
+    <Compile Include="Utils\CollectionExtensions.cs" />
     <Compile Include="Utils\DictionaryExtensions.cs" />
     <Compile Include="Utils\ExpressionCombiner.cs" />
     <Compile Include="Utils\Guids\IGuid.cs" />

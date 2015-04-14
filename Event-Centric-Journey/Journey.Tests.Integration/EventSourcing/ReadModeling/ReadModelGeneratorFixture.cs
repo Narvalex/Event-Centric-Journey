@@ -49,17 +49,17 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
         }
     }
 
-    public class GIVEN_generator : GIVEN_read_model_db_context
+    public class GIVEN_live_generator : GIVEN_read_model_db_context
     {
         protected IReadModelGenerator<ItemReadModelDbContext> sut;
 
-        public GIVEN_generator()
+        public GIVEN_live_generator()
         {
-            this.sut = new ReadModelGenerator<ItemReadModelDbContext>(this.contextFactory, new ConsoleWorkerRoleTracer());
+            this.sut = new ReadModelGenerator<ItemReadModelDbContext>(() => new ItemReadModelDbContext(connectionString), new ConsoleWorkerRoleTracer());
         }
 
         [Fact]
-        public void WHEN_receiving_message_once_THEN_proyects()
+        public void WHEN_receiving_message_once_THEN_proyects_in_proc()
         {
             var commandId = SequentialGuid.GenerateNewGuid();
             var e = new ItemAdded
@@ -75,7 +75,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
             this.sut.Project(e, (context) =>
             {
                 context.Items.Add(new Item { UnidentifiableId = e.Id, Name = e.Name });
-            });
+            }, () => { });
 
             using (var context = this.contextFactory.Invoke())
             {
@@ -105,12 +105,12 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
             this.sut.Project(e, (context) =>
             {
                 context.Items.Add(new Item { UnidentifiableId = e.Id, Name = e.Name });
-            });
+            }, () => { });
 
             this.sut.Project(e, (context) =>
             {
                 context.Items.Add(new Item { UnidentifiableId = e.Id, Name = e.Name });
-            });
+            }, () => { });
 
             using (var context = this.contextFactory.Invoke())
             {
@@ -146,8 +146,8 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
                         this.sut.Project(e, (otherContextInstance) =>
                         {
                             otherContextInstance.Items.Add(new Item { UnidentifiableId = e.Id, Name = e.Name });
-                        });
-                    });
+                        }, () => { });
+                    }, () => { });
 
                 // Should have thrown an error.
                 Assert.True(false);

@@ -13,8 +13,8 @@ namespace Journey.Messaging
 {
     public class MessageReceiver : IMessageReceiver, IDisposable
     {
-        private readonly IDbConnectionFactory connectionFactory;
-        private readonly string connectionString;
+        protected readonly IDbConnectionFactory connectionFactory;
+        protected readonly string connectionString;
         private readonly string readQuery;
         private readonly string deleteQuery;
         private readonly string setDeadLetterQuery;

@@ -92,6 +92,10 @@
       <Project>{93cbd690-8bbf-49cb-8bf1-62b99c471d2e}</Project>
       <Name>SimpleInventario.Events</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SimpleInventario.Reporting.Events\SimpleInventario.Reporting.Events.csproj">
+      <Project>{2752fe02-f9c5-4468-b9ea-61a5ecfaaa5c}</Project>
+      <Name>SimpleInventario.Reporting.Events</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SimpleInventario.Reporting\SimpleInventario.Reporting.csproj">
       <Project>{84186d22-4417-4270-acc4-ef7f2c93caa3}</Project>
       <Name>SimpleInventario.Reporting</Name>

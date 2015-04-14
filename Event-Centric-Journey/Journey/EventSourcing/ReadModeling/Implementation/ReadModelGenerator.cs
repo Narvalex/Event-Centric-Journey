@@ -6,22 +6,38 @@ namespace Journey.EventSourcing.ReadModeling
 {
     public class ReadModelGenerator<T> : IReadModelGenerator<T> where T : ReadModelDbContext
     {
-        protected readonly Func<ReadModelDbContext> contextFactory;
-        protected readonly IWorkerRoleTracer tracer;
+        private readonly Func<T> liveContextFactory;
+        private readonly ReadModelDbContext rebuildContext;
+        private readonly IWorkerRoleTracer tracer;
+        private readonly bool isLiveProjection;
 
-        public ReadModelGenerator(Func<ReadModelDbContext> contextFactory, IWorkerRoleTracer tracer)
+        public ReadModelGenerator(Func<T> liveContextFactory, IWorkerRoleTracer tracer)
+            : this(tracer)
         {
-            this.contextFactory = contextFactory;
+            this.isLiveProjection = true;
+            this.liveContextFactory = liveContextFactory;
+        }
+
+        public ReadModelGenerator(ReadModelDbContext context, IWorkerRoleTracer tracer)
+            : this(tracer)
+        {
+            this.isLiveProjection = false;
+            this.rebuildContext = context;
+        }
+
+        private ReadModelGenerator(IWorkerRoleTracer tracer)
+        {
             this.tracer = tracer;
         }
 
-        public void Project(IVersionedEvent e, Action<T> doProjection, bool isLiveProjection = true) 
+        
+
+        public void Project(IVersionedEvent e, Action<T> doLiveProjection, Action doRebuildProjection) 
         {
-            using (var context = this.contextFactory.Invoke())
+            if (isLiveProjection)
             {
-                if (isLiveProjection)
+                using (var context = this.liveContextFactory.Invoke())
                 {
-                    // If read model is up to date, then no-op.
                     if (context
                         .ProjectedEvents
                         .Where(log =>
@@ -33,69 +49,86 @@ namespace Journey.EventSourcing.ReadModeling
 
                         tracer.Notify("Read model is up to date for event type: " + e.GetType().ToString());
                         return;
-                    } 
-                }
+                    }
 
-                doProjection(context as T);
+                    doLiveProjection(context);
 
-                // Mark as projected in the the subscription log
-                context.ProjectedEvents.Add(
-                    new ProjectedEvent
-                    {
-                        AggregateId = e.SourceId,
-                        AggregateType = e.AggregateType,
-                        Version = e.Version,
-                        EventType = e.GetType().Name,
-                        CorrelationId = e.CorrelationId
-                    });
+                    // Mark as projected in the the subscription log
+                    context.ProjectedEvents.Add(this.BuildProjectedEventEntity(e));
 
-                if (isLiveProjection)
                     context.SaveChanges();
+                }
             }
+            else
+            {
+                doRebuildProjection();
+
+                this.rebuildContext.AddToUnitOfWork<ProjectedEvent>(this.BuildProjectedEventEntity(e));
+            }            
         }
 
 
-        public void Consume<Log>(IVersionedEvent e, Action doConsume, bool isLiveConsuming = true)
+        public void Consume<Log>(IVersionedEvent e, Action doConsume)
             where Log : class, IProcessedEvent, new()
         {
-            using (var context = this.contextFactory.Invoke())
+            if (isLiveProjection)
             {
-                // Si ya se consumio correctamente, entonces no-op
-                if (isLiveConsuming)
+                using (var context = this.liveContextFactory.Invoke())
                 {
-                    if (context.Set<Log>()
-                        .Where(l =>
-                            l.AggregateId == e.SourceId &&
-                            l.AggregateType == e.AggregateType &&
-                            l.Version >= e.Version)
-                        .Any())
-                    {
-                        tracer.Notify(string.Format("Event {0} was already consumed by {1}", e.GetType().Name, typeof(Log).Name));
-                        return;
-                    }
-                }
+                        if (context.Set<Log>()
+                            .Where(l =>
+                                l.AggregateId == e.SourceId &&
+                                l.AggregateType == e.AggregateType &&
+                                l.Version >= e.Version)
+                            .Any())
+                        {
+                            tracer.Notify(string.Format("Event {0} was already consumed by {1}", e.GetType().Name, typeof(Log).Name));
+                            return;
+                        }
+                    
 
-                // Si el proceso esta en vivo, entonces se consume. 
-                // Si se esta reconstruyendo el read model, entonces se 
-                // omite la consumision (por ejemplo: evitar que se envíen 
-                // correos cada vez que se reconstruya el read model.
-                if (isLiveConsuming)
+                    // Si el proceso esta en vivo, entonces se consume. 
+                    // Si se esta reconstruyendo el read model, entonces se 
+                    // omite la consumision (por ejemplo: evitar que se envíen 
+                    // correos cada vez que se reconstruya el read model.
                     doConsume();
 
-                // Mark as consumed in the consumers subscription log
-                context.AddToUnitOfWork<Log>(
-                    new Log
-                    {
-                        AggregateId = e.SourceId,
-                        AggregateType = e.AggregateType,
-                        Version = e.Version,
-                        EventType = e.GetType().Name,
-                        CorrelationId = e.CorrelationId
-                    });
+                    // Mark as consumed in the consumers subscription log
+                    context.AddToUnitOfWork<Log>(this.BuildConsumedEventEntity<Log>(e));
 
-                if (isLiveConsuming)
                     context.SaveChanges();
+                }
+
             }
+            else
+            {
+                this.rebuildContext.AddToUnitOfWork<Log>(this.BuildConsumedEventEntity<Log>(e));
+            }
+        }
+
+        private ProjectedEvent BuildProjectedEventEntity(IVersionedEvent e)
+        {
+            return new ProjectedEvent
+            {
+                AggregateId = e.SourceId,
+                AggregateType = e.AggregateType,
+                Version = e.Version,
+                EventType = e.GetType().Name,
+                CorrelationId = e.CorrelationId
+            };
+        }
+
+        private Log BuildConsumedEventEntity<Log>(IVersionedEvent e) 
+            where Log : class, IProcessedEvent, new()
+        {
+            return new Log
+            {
+                AggregateId = e.SourceId,
+                AggregateType = e.AggregateType,
+                Version = e.Version,
+                EventType = e.GetType().Name,
+                CorrelationId = e.CorrelationId
+            };
         }
     }
 }

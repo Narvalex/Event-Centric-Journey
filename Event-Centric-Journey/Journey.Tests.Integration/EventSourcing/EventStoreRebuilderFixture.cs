@@ -1,7 +1,7 @@
 ﻿using Journey.Database;
 using Journey.EventSourcing;
 using Journey.EventSourcing.Handling;
-using Journey.EventSourcing.Rebuilding;
+using Journey.EventSourcing.StoreRebuilding;
 using Journey.Messaging;
 using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;

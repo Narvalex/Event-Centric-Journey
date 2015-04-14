@@ -1,5 +1,6 @@
 ﻿using Journey.EventSourcing;
-namespace SimpleInventario.Events.Reporting
+
+namespace SimpleInventario.Reporting.Events
 {
     public class SeActualizoResumenDeAnimalesPorPeriodo : VersionedEvent
     {

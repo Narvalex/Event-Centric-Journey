@@ -29,7 +29,7 @@ namespace SimpleInventario
             // make a copy of the state values to avoid concurrency problems with reusing references.
             //this.remainingSeats.AddRange(state.RemainingSeats);
             //this.pendingReservations.AddRange(state.PendingReservations);
-            this.LoadFrom(history);
+            base.LoadFrom(history);
         }
 
         public void Handle(AgregarAnimales c)

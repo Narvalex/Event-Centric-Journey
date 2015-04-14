@@ -1,5 +1,5 @@
 ﻿
-namespace Journey.EventSourcing.Rebuilding
+namespace Journey.EventSourcing.StoreRebuilding
 {
     public interface IEventStoreRebuilder
     {

@@ -7,9 +7,9 @@ namespace Journey.EventSourcing.ReadModeling
         /// <summary>
         /// Projects an event to tables with ORM
         /// </summary>
-        void Project(IVersionedEvent e, Action<T> doProjection, bool isLiveProjection = true);
+        void Project(IVersionedEvent e, Action<T> doProjection, Action doRebuild);
 
-        void Consume<Log>(IVersionedEvent e, Action doConsume, bool isLiveConsuming = true)
+        void Consume<Log>(IVersionedEvent e, Action doConsume)
             where Log : class, IProcessedEvent, new();
     }
 }

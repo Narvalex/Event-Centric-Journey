@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Journey.EventSourcing.Rebuilding
+namespace Journey.EventSourcing.StoreRebuilding
 {
     public class EventStoreRebuilder : IEventStoreRebuilder
     {

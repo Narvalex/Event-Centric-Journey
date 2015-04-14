@@ -1,6 +1,7 @@
 ﻿using Journey.Messaging;
 using Journey.Utils.SystemDateTime;
 using System;
+using System.Data;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using System.Globalization;
@@ -272,9 +273,17 @@ DROP DATABASE [{0}]
         {
         }
 
-        public new bool ReceiveMessage()
+        public bool ReceiveMessage()
         {
-            return base.ReceiveMessage();
+            using (var connection = this.connectionFactory.CreateConnection(this.connectionString))
+            {
+                connection.Open();
+
+                using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
+                {
+                    return base.ReceiveMessage(connection, transaction);
+                }
+            }
         }
     }
 
