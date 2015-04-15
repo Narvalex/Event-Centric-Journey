@@ -3,6 +3,6 @@ namespace Journey.EventSourcing.StoreRebuilding
 {
     public interface IEventStoreRebuilder
     {
-        void Rebuild(EventStoreDbContext eventStoreDbContext);
+        void Rebuild();
     }
 }

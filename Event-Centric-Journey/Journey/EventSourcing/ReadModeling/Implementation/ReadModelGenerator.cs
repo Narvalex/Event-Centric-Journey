@@ -30,9 +30,9 @@ namespace Journey.EventSourcing.ReadModeling
             this.tracer = tracer;
         }
 
-        
 
-        public void Project(IVersionedEvent e, Action<T> doLiveProjection, Action doRebuildProjection) 
+
+        public void Project(IVersionedEvent e, Action<T> doLiveProjection, Action<T> doRebuildProjection) 
         {
             if (isLiveProjection)
             {
@@ -61,7 +61,7 @@ namespace Journey.EventSourcing.ReadModeling
             }
             else
             {
-                doRebuildProjection();
+                doRebuildProjection(this.rebuildContext as T);
 
                 this.rebuildContext.AddToUnitOfWork<ProjectedEvent>(this.BuildProjectedEventEntity(e));
             }            

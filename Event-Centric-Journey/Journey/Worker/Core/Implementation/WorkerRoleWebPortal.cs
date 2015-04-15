@@ -84,5 +84,17 @@ namespace Journey.Worker
         public IWorkerRole WorkerRole { get { return worker; } }
 
         public bool IsWorking { get { return isWorking; } }
+        
+        public void RebuildReadModel()
+        {
+            this.StopWorking();
+
+            this.StartWorking();
+        }
+
+        public void RebuildEventStore()
+        {
+            
+        }
     }
 }

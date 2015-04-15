@@ -176,7 +176,9 @@ DROP DATABASE [{0}]
 
         #region FakeItemsAggregateAndSaga
 
-        public class FakeItemsAggregate : EventSourced, IEventSourced
+        public class FakeItemsAggregate : EventSourced,
+            IRehydratesFrom<ItemAdded>,
+            IRehydratesFrom<ItemRemoved>
         {
             public Dictionary<int, int> itemsQuantity = new Dictionary<int, int>();
 
@@ -203,7 +205,7 @@ DROP DATABASE [{0}]
                 base.Update(new ItemRemoved { SourceId = Guid.NewGuid(), Id = id, Quantity = quantity });
             }
 
-            private void OnItemAdded(ItemAdded e)
+            public void Rehydrate(ItemAdded e)
             {
                 var incomingItemInfo = new Item { Id = e.Id, Name = e.Name };
                 var newQuantityValue = e.Quantity;
@@ -216,7 +218,7 @@ DROP DATABASE [{0}]
                 this.itemsQuantity[incomingItemInfo.Id] = newQuantityValue;
             }
 
-            private void OnItemRemoved(ItemRemoved e)
+            public void Rehydrate(ItemRemoved e)
             {
                 var incomingItemInfo = new Item { Id = e.Id };
                 var newQuantityValue = e.Quantity * -1;

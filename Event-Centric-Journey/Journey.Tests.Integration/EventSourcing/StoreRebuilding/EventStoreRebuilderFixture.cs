@@ -110,7 +110,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             // WHEN replaying
 
             var rebuilder = container.Resolve<IEventStoreRebuilder>();
-            rebuilder.Rebuild(container.Resolve<EventStoreDbContext>());
+            rebuilder.Rebuild();
 
             // THEN rebuilds event store
             /*** Checked by debug info ****/
@@ -153,7 +153,8 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
         #region Fake Domain
 
         public class FakeItemsSaga : Saga,
-            IHandlerOf<AddItem>
+            IHandlerOf<AddItem>,
+            IRehydratesFrom<ItemAdded>
         {
             public Dictionary<int, int> itemsQuantity = new Dictionary<int, int>();
 
@@ -178,7 +179,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
                 });
             }
 
-            private void OnItemAdded(ItemAdded e)
+            public void Rehydrate(ItemAdded e)
             {
                 var incomingItemInfo = new Item { Id = e.Id, Name = e.Name };
                 var newQuantityValue = e.Quantity;

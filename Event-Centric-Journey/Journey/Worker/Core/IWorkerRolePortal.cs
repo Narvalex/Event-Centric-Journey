@@ -7,6 +7,10 @@ namespace Journey.Worker
 
         void StopWorking();
 
+        void RebuildReadModel();
+
+        void RebuildEventStore();
+
         bool IsWorking { get; }
 
         IWorkerRole WorkerRole { get; }

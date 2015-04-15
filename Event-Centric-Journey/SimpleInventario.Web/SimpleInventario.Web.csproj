@@ -242,9 +242,21 @@
       <Project>{8bdee51c-30ed-40cb-9a67-bf4a6f06e836}</Project>
       <Name>SimpleInventario.Application</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SimpleInventario.Querying\SimpleInventario.Querying.csproj">
+      <Project>{f1f16d78-2065-42d4-9c6c-711dc2d5c38f}</Project>
+      <Name>SimpleInventario.Querying</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInventario.ReadModel\SimpleInventario.ReadModel.csproj">
+      <Project>{15cb378c-d6a3-4c38-88e3-de495121fd63}</Project>
+      <Name>SimpleInventario.ReadModel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SimpleInventario.Web.Comanding\SimpleInventario.Web.Comanding.csproj">
       <Project>{8692b6cb-4e4f-4b09-b0fe-f98a3ec8c6e4}</Project>
       <Name>SimpleInventario.Web.Comanding</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleInventario.Web.Querying\SimpleInventario.Web.Querying.csproj">
+      <Project>{964baf64-1b8a-4ad6-8ea9-3168b62f1b40}</Project>
+      <Name>SimpleInventario.Web.Querying</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

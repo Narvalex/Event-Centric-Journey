@@ -1,10 +1,11 @@
 using Journey.Client;
 using Journey.Database;
-using Journey.EventSourcing.ReadModeling;
 using Journey.Messaging;
 using Journey.Serialization;
 using Microsoft.Practices.Unity;
 using SimpleInventario.Application;
+using SimpleInventario.Querying;
+using SimpleInventario.ReadModel;
 using System;
 using System.Data.Entity;
 
@@ -59,8 +60,8 @@ namespace SimpleInventario.Web.App_Start
                 new InjectionConstructor(
                     new ResolvedParameter<IMessageSender>("CommandBus"), serializer));
 
-           
-            Func<ReadModelDbContext> readModelContextFactory = () => new ReadModelDbContext(config.ReadModelConnectionString);
+
+            Func<SimpleInventarioDbContext> readModelContextFactory = () => new SimpleInventarioDbContext(config.ReadModelConnectionString);
 
             container.RegisterType<IClientApplication, ClientApplication>(
                 new ContainerControlledLifetimeManager(),
@@ -71,6 +72,10 @@ namespace SimpleInventario.Web.App_Start
                     config.EventualConsistencyCheckRetryPolicy));
 
             container.RegisterType<IInventarioApp, InventarioApp>();
+
+            container.RegisterType<ISimpleInventarioDao, SimpleInventarioDao>(
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(readModelContextFactory));
         }
     }
 }

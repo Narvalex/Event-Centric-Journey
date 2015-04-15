@@ -75,7 +75,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
             this.sut.Project(e, (context) =>
             {
                 context.Items.Add(new Item { UnidentifiableId = e.Id, Name = e.Name });
-            }, () => { });
+            }, (context) => { });
 
             using (var context = this.contextFactory.Invoke())
             {
@@ -105,12 +105,12 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
             this.sut.Project(e, (context) =>
             {
                 context.Items.Add(new Item { UnidentifiableId = e.Id, Name = e.Name });
-            }, () => { });
+            }, (context) => { });
 
             this.sut.Project(e, (context) =>
             {
                 context.Items.Add(new Item { UnidentifiableId = e.Id, Name = e.Name });
-            }, () => { });
+            }, (context) => { });
 
             using (var context = this.contextFactory.Invoke())
             {
@@ -146,8 +146,8 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
                         this.sut.Project(e, (otherContextInstance) =>
                         {
                             otherContextInstance.Items.Add(new Item { UnidentifiableId = e.Id, Name = e.Name });
-                        }, () => { });
-                    }, () => { });
+                        }, (otherContextInstance) => { });
+                    }, (context) => { });
 
                 // Should have thrown an error.
                 Assert.True(false);

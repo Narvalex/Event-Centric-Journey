@@ -12,21 +12,23 @@ namespace Journey.EventSourcing.StoreRebuilding
 {
     public class EventStoreRebuilder : IEventStoreRebuilder
     {
+        private readonly EventStoreDbContext eventStoreDbContext;
         private readonly Func<MessageLogDbContext> messageLogDbContextFactory;
         ITextSerializer serializer;
 
         private readonly IEventDispatcher eventDispatcher;
         private readonly ICommandProcessor commandProcessor;
 
-        public EventStoreRebuilder(ICommandProcessor commandProcessor, IEventDispatcher eventDispatcher, ITextSerializer serializer, Func<MessageLogDbContext> messageLogDbContextFactory)
+        public EventStoreRebuilder(ICommandProcessor commandProcessor, IEventDispatcher eventDispatcher, ITextSerializer serializer, Func<MessageLogDbContext> messageLogDbContextFactory, EventStoreDbContext eventStoreDbContext)
         {
+            this.eventStoreDbContext = eventStoreDbContext;
             this.serializer = serializer;
             this.eventDispatcher = eventDispatcher;
             this.commandProcessor = commandProcessor;
             this.messageLogDbContextFactory = messageLogDbContextFactory;
         }
 
-        public void Rebuild(EventStoreDbContext eventStoreDbContext)
+        public void Rebuild()
         {
             using (var context = this.messageLogDbContextFactory.Invoke())
             {
@@ -39,7 +41,7 @@ namespace Journey.EventSourcing.StoreRebuilding
                 this.ProcessMessages(messages);
             }
 
-            eventStoreDbContext.SaveChanges();
+            this.eventStoreDbContext.SaveChanges();
         }
 
         private void ProcessMessages(IEnumerable<Message> messages)
