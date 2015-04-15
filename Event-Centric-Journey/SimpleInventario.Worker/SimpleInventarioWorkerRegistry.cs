@@ -18,7 +18,6 @@ namespace SimpleInventario.Worker
         private void RegistrarUnicoBoundedContext(IUnityContainer container, IEventHandlerRegistry eventProcessor)
         {
             container.RegisterType<ICommandHandler, InventarioHandler>("InventarioHandler");
-
         }
     }
 }
