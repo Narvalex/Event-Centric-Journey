@@ -67,6 +67,41 @@ namespace Journey.EventSourcing.ReadModeling
             }            
         }
 
+        public void Project(IVersionedEvent e, Action<T> doProjectionOrRebuild)
+        {
+            if (isLiveProjection)
+            {
+                using (var context = this.liveContextFactory.Invoke())
+                {
+                    if (context
+                        .ProjectedEvents
+                        .Where(log =>
+                            log.AggregateId == e.SourceId &&
+                            log.AggregateType == e.AggregateType &&
+                            log.Version >= e.Version)
+                        .Any())
+                    {
+
+                        tracer.Notify("Read model is up to date for event type: " + e.GetType().ToString());
+                        return;
+                    }
+
+                    doProjectionOrRebuild(context);
+
+                    // Mark as projected in the the subscription log
+                    context.ProjectedEvents.Add(this.BuildProjectedEventEntity(e));
+
+                    context.SaveChanges();
+                }
+            }
+            else
+            {
+                doProjectionOrRebuild(this.rebuildContext as T);
+
+                this.rebuildContext.AddToUnitOfWork<ProjectedEvent>(this.BuildProjectedEventEntity(e));
+            }            
+        }
+
 
         public void Consume<Log>(IVersionedEvent e, Action doConsume)
             where Log : class, IProcessedEvent, new()

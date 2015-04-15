@@ -144,9 +144,7 @@ namespace Journey.Messaging
                     using (var reader = command.ExecuteReader())
                     {
                         if (!reader.Read())
-                        {
                             return false;
-                        }
 
                         // Delegate message receiving to another process as fast as possible
                         this.delegateMessageReceiving.Invoke();

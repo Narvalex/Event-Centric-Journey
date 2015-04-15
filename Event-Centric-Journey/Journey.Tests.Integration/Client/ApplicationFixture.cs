@@ -9,7 +9,6 @@ namespace Journey.Tests.Integration.Client.ApplicationFixture
 {
     public class GIVEN_bus_and_read_model : IDisposable
     {
-        protected string dbName;
         protected string connectionString;
 
         protected ICommandBus commandBus;
@@ -21,8 +20,8 @@ namespace Journey.Tests.Integration.Client.ApplicationFixture
         {
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
 
-            this.dbName = "ApplicationFixture";
-            this.connectionString = System.Data.Entity.Database.DefaultConnectionFactory.CreateConnection(this.dbName).ConnectionString;
+            var dbName = "ApplicationFixture";
+            this.connectionString = System.Data.Entity.Database.DefaultConnectionFactory.CreateConnection(dbName).ConnectionString;
 
             this.contextFactory = () => new ItemReadModelDbContext(this.connectionString);
 
