@@ -148,6 +148,9 @@ namespace Journey.Messaging
                             return false;
                         }
 
+                        // Delegate message receiving to another process as fast as possible
+                        this.delegateMessageReceiving.Invoke();
+
                         var body = (string)reader["Body"];
                         var deliveryDateValue = reader["DeliveryDate"];
                         var deliveryDate = deliveryDateValue == DBNull.Value ? (DateTime?)null : new DateTime?((DateTime)deliveryDateValue);
@@ -159,7 +162,7 @@ namespace Journey.Messaging
                     }
                 }
 
-                this.delegateMessageReceiving.Invoke();
+                
                 this.MessageReceived(this, new MessageReceivedEventArgs(message));
 
                 using (var command = connection.CreateCommand())
