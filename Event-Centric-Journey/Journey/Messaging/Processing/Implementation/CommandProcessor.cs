@@ -12,7 +12,7 @@ namespace Journey.Messaging.Processing
     public class CommandProcessor : MessageProcessor, ICommandHandlerRegistry, ICommandProcessor
     {
         private Dictionary<Type, ICommandHandler> handlers = new Dictionary<Type, ICommandHandler>();
-        private readonly IBusTransientFaultDetector faultDetector;
+        private readonly ICommandBusTransientFaultDetector faultDetector;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandProcessor"/> class.
@@ -20,7 +20,7 @@ namespace Journey.Messaging.Processing
         /// <param name="receiver">The receiver to use. If the receiver is <see cref="IDisposable"/>, it will be
         ///  disposed.</param>
         /// <param name="serializer">The serializer to use for the message body.</param>
-        public CommandProcessor(IMessageReceiver receiver, ITextSerializer serializer, IWorkerRoleTracer tracer, IBusTransientFaultDetector faultDetector)
+        public CommandProcessor(IMessageReceiver receiver, ITextSerializer serializer, IWorkerRoleTracer tracer, ICommandBusTransientFaultDetector faultDetector)
             : base(receiver, serializer, tracer)
         {
             this.faultDetector = faultDetector;
@@ -55,7 +55,8 @@ namespace Journey.Messaging.Processing
         {
             ICommandHandler handler = null;
 
-            // If command was already processed, then no op
+            // Esto es util por si el comando no se borro todavia, pero se proceso en el event store
+            // If command was already processed, then no op in processing, but maybe we can log it
             if (!this.faultDetector.CommandWasAlreadyProcessed(payload))
             {
                 var commandType = payload.GetType();
@@ -66,6 +67,7 @@ namespace Journey.Messaging.Processing
 
 
             // There can be a generic logging/tracing/auditing handlers
+            // El message log verifica que no existe el comando en el log
             if (this.handlers.TryGetValue(typeof(ICommand), out handler))
             {
                 this.HandleMessage(payload, handler);
@@ -91,13 +93,13 @@ namespace Journey.Messaging.Processing
 
                     this.tracer.Notify(new string('-', 80));
                     this.tracer.Notify(string.Format(
-                        "Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().FullName, e));
+                        "Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().Name, e));
                     this.tracer.Notify(new string('-', 80)); 
                 }
             }
 
             
-            base.tracer.Notify("Handled by " + handler.GetType().FullName);
+            base.tracer.Notify("Command handled by " + handler.GetType().Name);
         }
 
         public void ProcessMessage(object payload)

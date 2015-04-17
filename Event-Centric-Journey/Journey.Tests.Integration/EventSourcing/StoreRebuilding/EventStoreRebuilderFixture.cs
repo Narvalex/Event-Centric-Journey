@@ -63,7 +63,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
                 new MessageLog(
                     this.messageLogDbName,
                     this.serializer,
-                    new StandardMetadataProvider(), new LocalDateTime()));
+                    new StandardMetadataProvider(), new LocalDateTime(), new ConsoleWorkerRoleTracer()));
         }
 
         [Fact]

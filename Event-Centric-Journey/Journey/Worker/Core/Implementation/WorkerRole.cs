@@ -73,7 +73,7 @@ namespace Journey.Worker
                 new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.EventBusTableName), serializer);
 
             var commandProcessor = new CommandProcessor(
-                new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.CommandBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer, new BusTransientFaultDetector(config.EventStoreConnectionString));
+                new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.CommandBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer, new CommandBusTransientFaultDetector(config.EventStoreConnectionString));
 
             var eventProcessor = new EventProcessor(
                 new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.EventBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer);
@@ -90,7 +90,7 @@ namespace Journey.Worker
 
             var indentedSerializer = new IndentedJsonTextSerializer();
             // Event log database and handler
-            this.RegisterMessageLogger(container, indentedSerializer, metadata, eventProcessor, config.MessageLogConnectionString, dateTime);
+            this.RegisterMessageLogger(container, indentedSerializer, metadata, eventProcessor, config.MessageLogConnectionString, dateTime, tracer);
 
             // Event Store
             this.RegisterEventStore(container, config.EventStoreConnectionString);
@@ -107,10 +107,10 @@ namespace Journey.Worker
             return container;
         }
 
-        private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString, ISystemDateTime dateTime)
+        private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString, ISystemDateTime dateTime, IWorkerRoleTracer tracer)
         {
             //Database.SetInitializer<MessageLogDbContext>(null);
-            container.RegisterType<MessageLog>(new InjectionConstructor(connectionString, serializer, metadata, dateTime));
+            container.RegisterType<MessageLog>(new InjectionConstructor(connectionString, serializer, metadata, dateTime, tracer));
             container.RegisterType<IEventHandler, MessageLogHandler>("MessageLogHandler");
             container.RegisterType<ICommandHandler, MessageLogHandler>("MessageLogHandler");
             eventProcessor.Register(container.Resolve<MessageLogHandler>());

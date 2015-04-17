@@ -1,6 +1,6 @@
 ﻿namespace Journey.Messaging.Processing
 {
-    public interface IBusTransientFaultDetector
+    public interface ICommandBusTransientFaultDetector
     {
         bool CommandWasAlreadyProcessed(object payload);
     }

@@ -121,7 +121,7 @@ namespace Journey.Tests.Messaging.CommandProcessorFixture
 
     }
 
-    public class FakeFaultDetector : IBusTransientFaultDetector
+    public class FakeFaultDetector : ICommandBusTransientFaultDetector
     {
         public bool CommandWasAlreadyProcessed(object payload)
         {

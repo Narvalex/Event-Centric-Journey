@@ -3,6 +3,7 @@ using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
 using Journey.Utils.SystemDateTime;
+using Journey.Worker;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -69,7 +70,7 @@ namespace Journey.Tests.Integration.Messaging.MessageLogFixture
                 });
 
             this.metadata = Mock.Get(metadata);
-            this.sut = new MessageLog(this.dbName, new IndentedJsonTextSerializer(), metadata, new LocalDateTime());
+            this.sut = new MessageLog(this.dbName, new IndentedJsonTextSerializer(), metadata, new LocalDateTime(), new ConsoleWorkerRoleTracer());
             this.sut.Save(eventA);
             this.sut.Save(eventB);
             this.sut.Save(eventC);
@@ -355,7 +356,7 @@ DROP DATABASE [{0}]
                 });
 
             this.metadata = Mock.Get(metadata);
-            this.sut = new MessageLog(this.dbName, new IndentedJsonTextSerializer(), metadata, new LocalDateTime());
+            this.sut = new MessageLog(this.dbName, new IndentedJsonTextSerializer(), metadata, new LocalDateTime(), new ConsoleWorkerRoleTracer());
             this.sut.Save(eventA);
             this.sut.Save(eventB);
         }

@@ -142,7 +142,7 @@ namespace Journey.Messaging.Processing
                         await Task.Factory.StartNew(() =>
                         {
                             this.tracer.Notify(string.Format(CultureInfo.InvariantCulture,
-                                "Event {0} routed to handler '{1}' HashCode: {2}.", @event.GetHashCode(), handler.Item1.FullName, handler.GetHashCode()));
+                                "Event {0} routed to handler '{1}' HashCode: {2}.", @event.GetType().Name, handler.Item1.Name, handler.GetHashCode()));
 
 
                             // Litle retry policy
@@ -166,7 +166,7 @@ namespace Journey.Messaging.Processing
                                 }
                             }
 
-                            this.tracer.Notify(string.Format(CultureInfo.InvariantCulture, "Event {0} handled by {1} HashCode: {2}.", @event.GetHashCode(), handler.Item1.FullName, handler.GetHashCode()));
+                            this.tracer.Notify(string.Format(CultureInfo.InvariantCulture, "Event {0} handled by {1} HashCode: {2}.", @event.GetType().Name, handler.Item1.Name, handler.GetHashCode()));
                         }, TaskCreationOptions.LongRunning);
                     };
 

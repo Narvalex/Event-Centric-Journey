@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace Journey.Messaging.Processing
 {
-    public class BusTransientFaultDetector : IBusTransientFaultDetector
+    public class CommandBusTransientFaultDetector : ICommandBusTransientFaultDetector
     {
         private readonly SqlCommandWrapper sql;
 
-        public BusTransientFaultDetector(string connectionString)
+        public CommandBusTransientFaultDetector(string connectionString)
         {
             this.sql = new SqlCommandWrapper(connectionString);
         }

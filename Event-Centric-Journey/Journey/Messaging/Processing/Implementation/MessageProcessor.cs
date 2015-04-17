@@ -100,7 +100,7 @@ namespace Journey.Messaging.Processing
             {
                 var body = this.Deserialize(args.Message.Body);
 
-                this.tracer.Notify(string.Format("Message received!\r\n{0}", this.Serialize(body)));
+                this.tracer.Notify(string.Format("Message received!"));
 
                 this.ProcessMessage(body, args.Message.CorrelationId);
             }
@@ -116,14 +116,14 @@ namespace Journey.Messaging.Processing
 
         protected abstract void ProcessMessage(object payload, string correlationId);
 
-        protected string Serialize(object payload)
-        {
-            using (var writer = new StringWriter())
-            {
-                this.serializer.Serialize(writer, payload);
-                return writer.ToString();
-            }
-        }
+        //protected string Serialize(object payload)
+        //{
+        //    using (var writer = new StringWriter())
+        //    {
+        //        this.serializer.Serialize(writer, payload);
+        //        return writer.ToString();
+        //    }
+        //}
 
         protected object Deserialize(string serializedPayload)
         {

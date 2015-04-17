@@ -1,8 +1,8 @@
-﻿using Journey.EventSourcing;
-using Journey.Messaging.Logging.Metadata;
+﻿using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
 using Journey.Utils;
 using Journey.Utils.SystemDateTime;
+using Journey.Worker;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,32 +16,24 @@ namespace Journey.Messaging.Logging
         private readonly IMetadataProvider metadataProvider;
         private readonly ITextSerializer serializer;
         private readonly ISystemDateTime dateTime;
+        private readonly IWorkerRoleTracer tracer;
 
-        public MessageLog(string connectionString, ITextSerializer serializer, IMetadataProvider metadataProvider, ISystemDateTime dateTime)
+        public MessageLog(string connectionString, ITextSerializer serializer, IMetadataProvider metadataProvider, ISystemDateTime dateTime, IWorkerRoleTracer tracer)
         {
             this.connectionString = connectionString;
             this.serializer = serializer;
             this.metadataProvider = metadataProvider;
             this.dateTime = dateTime;
+            this.tracer = tracer;
         }
 
         public void Save(IEvent @event)
         {
             using (var context = new MessageLogDbContext(this.connectionString))
             {
-                // first lets check if is not a duplicated command message;
-                var duplicatedMessage = context.Set<MessageLogEntity>()
-                    .Where(m => m.SourceId.ToUpper() == @event.SourceId.ToString().ToUpper()
-                            && m.Version == ((IVersionedEvent)@event).Version.ToString())
-                    .FirstOrDefault();
+                var metadata = this.metadataProvider.GetMetadata(@event);                
 
-                if (duplicatedMessage != null)
-                    return;
-
-                // Is not duplicated...
-                var metadata = this.metadataProvider.GetMetadata(@event);
-
-                context.Set<MessageLogEntity>().Add(new MessageLogEntity
+                var message = new MessageLogEntity
                 {
                     //Id = Guid.NewGuid(),
                     SourceId = metadata.TryGetValue(StandardMetadata.SourceId),
@@ -54,7 +46,27 @@ namespace Journey.Messaging.Logging
                     SourceType = metadata.TryGetValue(StandardMetadata.SourceType),
                     CreationDate = this.dateTime.Now.ToString("o"),
                     Payload = serializer.Serialize(@event),
-                });
+                };
+
+
+                // first lets check if is not a duplicated command message;
+                var duplicatedMessage = context.Set<MessageLogEntity>()
+                    .Where(m => m.SourceId.ToUpper() == message.SourceId.ToUpper()
+                            && m.SourceType == message.SourceType
+                            && m.Version == message.Version
+                            && m.TypeName == message.TypeName)
+                    .FirstOrDefault();
+
+                if (duplicatedMessage != null)
+                    return;
+
+                // Is not duplicated...
+
+
+                context.Set<MessageLogEntity>().Add(message);
+
+                this.tracer.Notify(string.Format("Processing Event:\r\n{0}", message.Payload));
+
                 context.SaveChanges();
             }
         }
@@ -63,18 +75,9 @@ namespace Journey.Messaging.Logging
         {
             using (var context = new MessageLogDbContext(this.connectionString))
             {
-                // first lets check if is not a duplicated command message;
-                var duplicatedMessage = context.Set<MessageLogEntity>()
-                    .Where(m => m.SourceId.ToUpper() == command.Id.ToString().ToUpper())
-                    .FirstOrDefault();
+                var metadata = this.metadataProvider.GetMetadata(command);                
 
-                if (duplicatedMessage != null)
-                    return;
-
-                // Is not duplicated...
-                var metadata = this.metadataProvider.GetMetadata(command);
-
-                context.Set<MessageLogEntity>().Add(new MessageLogEntity
+                var message = new MessageLogEntity
                 {
                     //Id = Guid.NewGuid(),
                     SourceId = metadata.TryGetValue(StandardMetadata.SourceId),
@@ -87,7 +90,22 @@ namespace Journey.Messaging.Logging
                     SourceType = metadata.TryGetValue(StandardMetadata.SourceType),
                     CreationDate = this.dateTime.Now.ToString("o"),
                     Payload = serializer.Serialize(command),
-                });
+                };
+
+                // first lets check if is not a duplicated command message;
+                var duplicatedMessage = context.Set<MessageLogEntity>()
+                    .Where(m => m.SourceId.ToUpper() == message.SourceId.ToUpper())
+                    .FirstOrDefault();
+
+                if (duplicatedMessage != null)
+                    return;
+
+                // Is not duplicated...
+
+                context.Set<MessageLogEntity>().Add(message);
+
+                this.tracer.Notify(string.Format("Command processed!\r\n{0}", message.Payload));
+
                 context.SaveChanges();
             }
         }
