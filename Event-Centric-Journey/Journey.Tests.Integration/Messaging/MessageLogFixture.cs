@@ -69,7 +69,7 @@ namespace Journey.Tests.Integration.Messaging.MessageLogFixture
                 });
 
             this.metadata = Mock.Get(metadata);
-            this.sut = new MessageLog(this.dbName, new JsonTextSerializer(), metadata, new LocalDateTime());
+            this.sut = new MessageLog(this.dbName, new IndentedJsonTextSerializer(), metadata, new LocalDateTime());
             this.sut.Save(eventA);
             this.sut.Save(eventB);
             this.sut.Save(eventC);
@@ -355,7 +355,7 @@ DROP DATABASE [{0}]
                 });
 
             this.metadata = Mock.Get(metadata);
-            this.sut = new MessageLog(this.dbName, new JsonTextSerializer(), metadata, new LocalDateTime());
+            this.sut = new MessageLog(this.dbName, new IndentedJsonTextSerializer(), metadata, new LocalDateTime());
             this.sut.Save(eventA);
             this.sut.Save(eventB);
         }

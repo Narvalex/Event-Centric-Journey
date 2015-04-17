@@ -142,7 +142,7 @@ namespace Journey.Tests.Integration.EventSourcing
 
             private static ITextSerializer CreateSerializer()
             {
-                return new JsonTextSerializer();
+                return new IndentedJsonTextSerializer();
             }
 
             public void Dispose()

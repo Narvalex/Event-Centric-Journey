@@ -41,7 +41,7 @@ namespace SimpleInventario.Web.App_Start
         {
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
 
-            var serializer = new JsonTextSerializer();
+            var serializer = new IndentedJsonTextSerializer();
             var config = DefaultClientApplicationConfigProvider.Configuration;
 
             container.RegisterInstance<ITextSerializer>(serializer);

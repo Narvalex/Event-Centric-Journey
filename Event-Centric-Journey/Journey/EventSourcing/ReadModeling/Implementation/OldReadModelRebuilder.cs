@@ -26,7 +26,7 @@ namespace Journey.EventSourcing.ReadModeling
         {
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
             this.connectionString = connectionString;
-            this.serializer = new JsonTextSerializer();
+            this.serializer = new IndentedJsonTextSerializer();
             this.tracer = tracer;
             this.EventsCount = this.GetEventsCount();
             this.eventDispatcher = new SynchronousEventDispatcher(this.tracer);

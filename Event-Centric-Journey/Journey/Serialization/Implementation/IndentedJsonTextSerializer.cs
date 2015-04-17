@@ -4,11 +4,11 @@ using System.Runtime.Serialization;
 
 namespace Journey.Serialization
 {
-    public class JsonTextSerializer : ITextSerializer
+    public class IndentedJsonTextSerializer : ITextSerializer
     {
         private readonly JsonSerializer serializer;
 
-        public JsonTextSerializer()
+        public IndentedJsonTextSerializer()
             : this(JsonSerializer.Create(new JsonSerializerSettings
             {
                 // Allows deserializing to the actual runtime type
@@ -19,7 +19,7 @@ namespace Journey.Serialization
         {
         }
 
-        public JsonTextSerializer(JsonSerializer serializer)
+        public IndentedJsonTextSerializer(JsonSerializer serializer)
         {
             this.serializer = serializer;
         }
@@ -27,6 +27,11 @@ namespace Journey.Serialization
         public void Serialize(TextWriter writer, object graph)
         {
             var jsonWriter = new JsonTextWriter(writer);
+//#if DEBUG
+//            jsonWriter.Formatting = Formatting.Indented;
+//#endif
+
+            jsonWriter.Formatting = Formatting.Indented;
 
             this.serializer.Serialize(jsonWriter, graph);
 

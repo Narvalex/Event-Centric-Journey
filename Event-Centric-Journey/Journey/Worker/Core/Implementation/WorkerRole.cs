@@ -88,8 +88,9 @@ namespace Journey.Worker
             container.RegisterInstance<IEventHandlerRegistry>(eventProcessor);
             container.RegisterInstance<IMessageProcessor>("EventProcessor", eventProcessor);
 
+            var indentedSerializer = new IndentedJsonTextSerializer();
             // Event log database and handler
-            this.RegisterMessageLogger(container, serializer, metadata, eventProcessor, config.MessageLogConnectionString, dateTime);
+            this.RegisterMessageLogger(container, indentedSerializer, metadata, eventProcessor, config.MessageLogConnectionString, dateTime);
 
             // Event Store
             this.RegisterEventStore(container, config.EventStoreConnectionString);
