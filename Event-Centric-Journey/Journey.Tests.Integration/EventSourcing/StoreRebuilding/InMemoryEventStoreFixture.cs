@@ -21,7 +21,7 @@ namespace Journey.Tests.Integration.EventSourcing
             internal readonly string connectionString;
             internal IEventStore<FakeItemsAggregate> sut;
             internal ITextSerializer serializer;
-            internal Mock<IInMemoryRollingSnapshot> cacheMock = new Mock<IInMemoryRollingSnapshot>();
+            internal Mock<IInMemoryRollingSnapshotProvider> cacheMock = new Mock<IInMemoryRollingSnapshotProvider>();
             internal Guid aggregateId;
 
 

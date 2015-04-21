@@ -24,7 +24,7 @@ namespace Journey.Tests.Integration.EventSourcing
             private Mock<IEventBus> eventBusMock = new Mock<IEventBus>();
             private Mock<ICommandBus> commandBusMock = new Mock<ICommandBus>();
             private ITextSerializer serializer;
-            private Mock<IInMemoryRollingSnapshot> cacheMock = new Mock<IInMemoryRollingSnapshot>();
+            private Mock<IInMemoryRollingSnapshotProvider> cacheMock = new Mock<IInMemoryRollingSnapshotProvider>();
 
 
             public GIVEN_a_badly_implemented_aggregate_ctor()
@@ -75,7 +75,7 @@ namespace Journey.Tests.Integration.EventSourcing
             private Mock<IEventBus> eventBusMock = new Mock<IEventBus>();
             private Mock<ICommandBus> commandBusMock = new Mock<ICommandBus>();
             private ITextSerializer serializer;
-            private Mock<IInMemoryRollingSnapshot> cacheMock = new Mock<IInMemoryRollingSnapshot>();
+            private Mock<IInMemoryRollingSnapshotProvider> cacheMock = new Mock<IInMemoryRollingSnapshotProvider>();
 
 
             public GIVEN_an_aggregate_with_a_badly_implemented_memento()
@@ -125,7 +125,7 @@ namespace Journey.Tests.Integration.EventSourcing
             internal readonly string connectionString;
             internal IEventStore<FakeItemsAggregate> sut;
             internal ITextSerializer serializer;
-            internal Mock<IInMemoryRollingSnapshot> cacheMock = new Mock<IInMemoryRollingSnapshot>();
+            internal Mock<IInMemoryRollingSnapshotProvider> cacheMock = new Mock<IInMemoryRollingSnapshotProvider>();
             internal MessageSender messageSender;
             internal EventBus eventBus;
             internal CommandBus commandBus;
@@ -283,7 +283,7 @@ DROP DATABASE [{0}]
             internal readonly string connectionString;
             internal IEventStore<FakeItemsSaga> sut;
             internal ITextSerializer serializer;
-            internal Mock<IInMemoryRollingSnapshot> cacheMock = new Mock<IInMemoryRollingSnapshot>();
+            internal Mock<IInMemoryRollingSnapshotProvider> cacheMock = new Mock<IInMemoryRollingSnapshotProvider>();
             internal MessageSender commandSender;
             internal MessageSender eventSender;
             internal EventBus eventBus;

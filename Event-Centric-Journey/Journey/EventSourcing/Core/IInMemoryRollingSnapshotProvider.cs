@@ -2,7 +2,7 @@
 
 namespace Journey.EventSourcing
 {
-    public interface IInMemoryRollingSnapshot
+    public interface IInMemoryRollingSnapshotProvider
     {
         /// <summary>
         /// Inserts a cache entry into the cache.

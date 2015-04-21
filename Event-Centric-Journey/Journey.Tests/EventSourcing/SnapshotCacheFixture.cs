@@ -7,7 +7,7 @@ namespace Journey.Tests.EventSourcing.SnapshotCacheFixture
 {
     public class GIVEN_empty_cache
     {
-        protected IInMemoryRollingSnapshot sut;
+        protected IInMemoryRollingSnapshotProvider sut;
 
         public GIVEN_empty_cache()
         {

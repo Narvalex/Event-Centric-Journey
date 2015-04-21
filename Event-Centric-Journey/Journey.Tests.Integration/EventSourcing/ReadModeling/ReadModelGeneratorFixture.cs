@@ -1,5 +1,4 @@
 ﻿using Journey.Database;
-using Journey.EventSourcing;
 using Journey.EventSourcing.ReadModeling;
 using Journey.Tests.Integration.EventSourcing.ReadModeling;
 using Journey.Utils.Guids;
@@ -221,13 +220,4 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
         }
     }
 
-    #region Fakes
-
-    public class ItemAdded : VersionedEvent
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-
-    #endregion
 }

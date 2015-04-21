@@ -80,7 +80,7 @@ namespace Journey.Worker
 
             var inMemorySnapshotCache = new InMemoryRollingSnapshot("EventStoreCache");
 
-            container.RegisterInstance<IInMemoryRollingSnapshot>(inMemorySnapshotCache);
+            container.RegisterInstance<IInMemoryRollingSnapshotProvider>(inMemorySnapshotCache);
             container.RegisterInstance<ICommandBus>(commandBus);
             container.RegisterInstance<IEventBus>(eventBus);
             container.RegisterInstance<ICommandHandlerRegistry>(commandProcessor);

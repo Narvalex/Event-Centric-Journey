@@ -104,7 +104,7 @@
     <Compile Include="EventSourcing\Core\Implementation\VersionedEvent.cs" />
     <Compile Include="EventSourcing\Core\IRehydratesFrom.cs" />
     <Compile Include="EventSourcing\Core\ISaga.cs" />
-    <Compile Include="EventSourcing\Core\IInMemoryRollingSnapshot.cs" />
+    <Compile Include="EventSourcing\Core\IInMemoryRollingSnapshotProvider.cs" />
     <Compile Include="EventSourcing\Core\IVersionedEvent.cs" />
     <Compile Include="EventSourcing\Handling\IDomainService.cs" />
     <Compile Include="EventSourcing\Handling\IHandlerOf.cs" />

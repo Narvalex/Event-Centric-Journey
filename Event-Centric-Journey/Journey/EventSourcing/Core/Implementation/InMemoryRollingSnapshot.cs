@@ -3,7 +3,7 @@ using System.Runtime.Caching;
 
 namespace Journey.EventSourcing
 {
-    public class InMemoryRollingSnapshot : MemoryCache, IInMemoryRollingSnapshot
+    public class InMemoryRollingSnapshot : MemoryCache, IInMemoryRollingSnapshotProvider
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="System.Runtime.Caching.MemoryCache"/> class.

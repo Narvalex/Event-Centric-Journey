@@ -27,12 +27,12 @@ namespace Journey.EventSourcing
         private readonly EventStoreDbContext context;
         private readonly Func<Guid, IEnumerable<IVersionedEvent>, T> entityFactory;
         private readonly Action<T> cacheMementoIfApplicable;
-        private readonly IInMemoryRollingSnapshot cache;
+        private readonly IInMemoryRollingSnapshotProvider cache;
         private readonly Func<Guid, Tuple<IMemento, DateTime?>> getMementoFromCache;
         private readonly Action<Guid> markCacheAsStale;
         private readonly Func<Guid, IMemento, IEnumerable<IVersionedEvent>, T> originatorEntityFactory;
 
-        public InMemoryEventStore(ITextSerializer serializer, EventStoreDbContext context, IInMemoryRollingSnapshot cache, IWorkerRoleTracer tracer)
+        public InMemoryEventStore(ITextSerializer serializer, EventStoreDbContext context, IInMemoryRollingSnapshotProvider cache, IWorkerRoleTracer tracer)
         {
             this.serializer = serializer;
             this.context = context;

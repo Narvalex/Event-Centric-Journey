@@ -127,7 +127,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             container.RegisterInstance<ITextSerializer>(new IndentedJsonTextSerializer());
             container.RegisterInstance<IWorkerRoleTracer>(this.tracer);
             var inMemorySnapshotCache = new InMemoryRollingSnapshot("EventStoreCache");
-            container.RegisterInstance<IInMemoryRollingSnapshot>(inMemorySnapshotCache);
+            container.RegisterInstance<IInMemoryRollingSnapshotProvider>(inMemorySnapshotCache);
 
             container.RegisterType<EventStoreDbContext>(new ContainerControlledLifetimeManager(), new InjectionConstructor(this.eventStoreDbName));
             container.RegisterType<MessageLogDbContext>(new ContainerControlledLifetimeManager(), new InjectionConstructor(this.messageLogDbName));
