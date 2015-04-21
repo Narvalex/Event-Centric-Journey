@@ -30,13 +30,13 @@ namespace SimpleInventario.Worker
 
             // ReadModeling
             Func<SimpleInventarioDbContext> contextFactory = () => new SimpleInventarioDbContext(this.WorkerRoleConfig.ReadModelConnectionString);
-            container.RegisterType<IReadModelGenerator<SimpleInventarioDbContext>, ReadModelGenerator<SimpleInventarioDbContext>>(
+            container.RegisterType<IReadModelGeneratorEngine<SimpleInventarioDbContext>, ReadModelGeneratorEngine<SimpleInventarioDbContext>>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     contextFactory,
                     container.Resolve<IWorkerRoleTracer>()));
 
-            eventProcessor.Register(container.Resolve<SimpleInventarioReadModelBuilder>());
+            eventProcessor.Register(container.Resolve<SimpleInventarioReadModelGenerator>());
         }
     }
 }

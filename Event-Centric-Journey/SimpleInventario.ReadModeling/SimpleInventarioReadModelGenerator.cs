@@ -8,12 +8,12 @@ using System.Linq;
 
 namespace SimpleInventario.ReadModeling
 {
-    public class SimpleInventarioReadModelBuilder :
+    public class SimpleInventarioReadModelGenerator :
         IEventHandler<SeActualizoResumenDeAnimalesPorPeriodo>
     {
-        private readonly IReadModelGenerator<SimpleInventarioDbContext> generator;
+        private readonly IReadModelGeneratorEngine<SimpleInventarioDbContext> generator;
 
-        public SimpleInventarioReadModelBuilder(IReadModelGenerator<SimpleInventarioDbContext> generator)
+        public SimpleInventarioReadModelGenerator(IReadModelGeneratorEngine<SimpleInventarioDbContext> generator)
         {
             this.generator = generator;
         }

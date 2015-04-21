@@ -2,7 +2,10 @@
 
 namespace Journey.EventSourcing.ReadModeling
 {
-    public interface IReadModelGenerator<T> where T : ReadModelDbContext
+    public interface IReadModelGeneratorEngine
+    { }
+
+    public interface IReadModelGeneratorEngine<T> where T : ReadModelDbContext
     {
         /// <summary>
         /// Proyecta y hace rebuild con dos lógicas distintas.

@@ -16,7 +16,7 @@ namespace SimpleInventario.Tests.ReadModeling.ReadModelingFixture
     {
         protected string connectionString;
         protected Func<SimpleInventarioDbContext> contextFactory;
-        protected SimpleInventarioReadModelBuilder sut;
+        protected SimpleInventarioReadModelGenerator sut;
 
         public GIVEN_generator_and_read_model()
         {
@@ -25,10 +25,10 @@ namespace SimpleInventario.Tests.ReadModeling.ReadModelingFixture
             this.connectionString = System.Data.Entity.Database.DefaultConnectionFactory.CreateConnection(dbName).ConnectionString;
             this.contextFactory = () => new SimpleInventarioDbContext(this.connectionString);
 
-            var generator = new ReadModelGenerator<SimpleInventarioDbContext>(
+            var generator = new ReadModelGeneratorEngine<SimpleInventarioDbContext>(
                 this.contextFactory, new ConsoleWorkerRoleTracer());
 
-            this.sut = new SimpleInventarioReadModelBuilder(generator);
+            this.sut = new SimpleInventarioReadModelGenerator(generator);
 
             using (var context = this.contextFactory.Invoke())
             {

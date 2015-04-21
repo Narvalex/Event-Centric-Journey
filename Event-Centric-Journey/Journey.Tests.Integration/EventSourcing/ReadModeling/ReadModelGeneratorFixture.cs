@@ -50,11 +50,11 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
 
     public class GIVEN_live_generator : GIVEN_read_model_db_context
     {
-        protected IReadModelGenerator<ItemReadModelDbContext> sut;
+        protected IReadModelGeneratorEngine<ItemReadModelDbContext> sut;
 
         public GIVEN_live_generator()
         {
-            this.sut = new ReadModelGenerator<ItemReadModelDbContext>(() => new ItemReadModelDbContext(connectionString), new ConsoleWorkerRoleTracer());
+            this.sut = new ReadModelGeneratorEngine<ItemReadModelDbContext>(() => new ItemReadModelDbContext(connectionString), new ConsoleWorkerRoleTracer());
         }
 
         [Fact]

@@ -3,12 +3,10 @@ using Journey.Messaging.Processing;
 using Journey.Serialization;
 using Journey.Utils;
 using System;
-using System.Data.Entity.Core.Metadata.Edm;
-using System.Data.Entity.Infrastructure;
 using System.IO;
 using System.Linq;
 
-namespace Journey.EventSourcing.ReadModeling.Implementation
+namespace Journey.EventSourcing.ReadModeling
 {
     public class ReadModelRebuilder<T> : IReadModelRebuilder<T> where T : ReadModelDbContext
     {
@@ -71,25 +69,15 @@ namespace Journey.EventSourcing.ReadModeling.Implementation
         /// </summary>
         private void ClearDatabase()
         {
-            var objectContext = ((IObjectContextAdapter)this.readModelContext).ObjectContext;
-            var entities = 
-                objectContext
-                .MetadataWorkspace
-                .GetEntityContainer(objectContext.DefaultContainerName, DataSpace.CSpace)
-                .BaseEntitySets;
-            var method = objectContext.GetType().GetMethods().First(x => x.Name == "CreateObjectSet");
-            var objectSets =
-                entities
-                .Select(x => method.MakeGenericMethod(Type.GetType(x.ElementType.FullName)))
-                .Select(x => x.Invoke(objectContext, null));
-            var tablesNames =
-                objectSets
-                .Select(objectSet =>
-                    (objectSet.GetType().GetProperty("EntitySet").GetValue(objectSet, null) as EntitySet).Name).ToList();
+//            var script = @"
+//            SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
+//            WHERE TABLE_TYPE = 'BASE TABLE' 
+//            AND TABLE_NAME NOT LIKE '%Migration%'";
 
-            foreach (var tableName in tablesNames)
-                this.readModelContext.Database.ExecuteSqlCommand(
-                    string.Format("DELETE FROM {0}", tableName));
+//            var tableNames = this.readModelContext.Database.SqlQuery<string>(script).ToList();
+//            foreach (var tableName in tableNames)
+//                this.readModelContext.Database.ExecuteSqlCommand(
+//                    string.Format("DELETE FROM {0}", tableName));
         }
     }
 }

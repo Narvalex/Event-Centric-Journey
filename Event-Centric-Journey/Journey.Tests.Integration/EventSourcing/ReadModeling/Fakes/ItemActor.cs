@@ -4,7 +4,8 @@ using System.Collections.Generic;
 
 namespace Journey.Tests.Integration.EventSourcing.ReadModeling
 {
-    public class ItemActor : EventSourced
+    public class ItemActor : EventSourced,
+        IRehydratesFrom<ItemAdded>
     {
         public ItemActor(Guid id)
             : base(id)
@@ -36,5 +37,8 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling
                 Name = "Fork",
             });
         }
+
+        public void Rehydrate(ItemAdded e)
+        { }
     }
 }

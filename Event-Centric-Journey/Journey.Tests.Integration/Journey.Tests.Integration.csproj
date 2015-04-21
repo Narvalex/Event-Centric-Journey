@@ -83,6 +83,7 @@
     <Compile Include="EventSourcing\EventStoreFixture.cs" />
     <Compile Include="EventSourcing\ReadModeling\Fakes\ItemActor.cs" />
     <Compile Include="EventSourcing\ReadModeling\Fakes\ItemAddedEvent.cs" />
+    <Compile Include="EventSourcing\ReadModeling\Fakes\ItemReadModelGenerator.cs" />
     <Compile Include="EventSourcing\ReadModeling\ReadModelRebuilderFixture.cs" />
     <Compile Include="EventSourcing\StoreRebuilding\EventStoreRebuilderFixture.cs" />
     <Compile Include="EventSourcing\StoreRebuilding\InMemoryEventStoreFixture.cs" />
