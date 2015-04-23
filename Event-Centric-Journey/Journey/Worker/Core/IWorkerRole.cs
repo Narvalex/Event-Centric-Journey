@@ -8,6 +8,8 @@ namespace Journey.Worker
 
         void Stop();
 
+        void RebuildReadModel();
+
         IWorkerRoleTracer Tracer { get; }
     }
 }

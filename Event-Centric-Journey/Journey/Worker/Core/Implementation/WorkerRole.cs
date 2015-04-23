@@ -75,22 +75,24 @@ namespace Journey.Worker
             var commandProcessor = new CommandProcessor(
                 new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.CommandBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer, new CommandBusTransientFaultDetector(config.EventStoreConnectionString));
 
-            var eventProcessor = new EventProcessor(
+            var liveEventProcessor = new EventProcessor(
                 new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.EventBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer);
 
             var inMemorySnapshotCache = new InMemoryRollingSnapshot("EventStoreCache");
+
+            var rebuildReadModelEventProcessor = new SynchronousEventDispatcher(tracer);
 
             container.RegisterInstance<IInMemoryRollingSnapshotProvider>(inMemorySnapshotCache);
             container.RegisterInstance<ICommandBus>(commandBus);
             container.RegisterInstance<IEventBus>(eventBus);
             container.RegisterInstance<ICommandHandlerRegistry>(commandProcessor);
             container.RegisterInstance<IMessageProcessor>("CommandProcessor", commandProcessor);
-            container.RegisterInstance<IEventHandlerRegistry>(eventProcessor);
-            container.RegisterInstance<IMessageProcessor>("EventProcessor", eventProcessor);
+            container.RegisterInstance<IEventHandlerRegistry>(liveEventProcessor);
+            container.RegisterInstance<IMessageProcessor>("EventProcessor", liveEventProcessor);
 
             var indentedSerializer = new IndentedJsonTextSerializer();
             // Event log database and handler
-            this.RegisterMessageLogger(container, indentedSerializer, metadata, eventProcessor, config.MessageLogConnectionString, dateTime, tracer);
+            this.RegisterMessageLogger(container, indentedSerializer, metadata, liveEventProcessor, config.MessageLogConnectionString, dateTime, tracer);
 
             // Event Store
             this.RegisterEventStore(container, config.EventStoreConnectionString);
@@ -98,11 +100,11 @@ namespace Journey.Worker
             // Bounded Context Registration
             if (domainContainer.DomainRegistrationList.Any())
                 foreach (var registry in domainContainer.DomainRegistrationList)
-                    registry(container, eventProcessor);
+                    registry(container, liveEventProcessor, rebuildReadModelEventProcessor);
 
             // Handlers
             this.RegisterCommandHandlers(container);
-            this.RegisterAditionalEventHandlers(container, eventProcessor);
+            this.RegisterAditionalEventHandlers(container, liveEventProcessor);
 
             return container;
         }
@@ -148,6 +150,11 @@ namespace Journey.Worker
         public IWorkerRoleTracer Tracer
         {
             get { return _tracer; }
+        }
+
+        public void RebuildReadModel()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

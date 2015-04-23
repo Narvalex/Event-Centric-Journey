@@ -20,13 +20,13 @@ namespace SimpleInventario.Worker
         /// <summary>
         /// Un ejemplo de cómo registrar bounded contexts
         /// </summary>
-        private void RegistrarUnicoBoundedContext(IUnityContainer container, IEventHandlerRegistry eventProcessor)
+        private void RegistrarUnicoBoundedContext(IUnityContainer container, IEventHandlerRegistry liveEventProcessor, IEventHandlerRegistry rebuildReadModelEventProcessor)
         {
             // Commanding
             container.RegisterType<ICommandHandler, InventarioHandler>("InventarioHandler");
             
             // Reporting
-            eventProcessor.Register(container.Resolve<AnimalesDeTodosLosPeriodosHandler>());
+            liveEventProcessor.Register(container.Resolve<AnimalesDeTodosLosPeriodosHandler>());
 
             // ReadModeling
             Func<SimpleInventarioDbContext> contextFactory = () => new SimpleInventarioDbContext(this.WorkerRoleConfig.ReadModelConnectionString);
@@ -36,7 +36,7 @@ namespace SimpleInventario.Worker
                     contextFactory,
                     container.Resolve<IWorkerRoleTracer>()));
 
-            eventProcessor.Register(container.Resolve<SimpleInventarioReadModelGenerator>());
+            liveEventProcessor.Register(container.Resolve<SimpleInventarioReadModelGenerator>());
         }
     }
 }

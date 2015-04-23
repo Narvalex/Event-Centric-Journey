@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Journey.Messaging.Processing
 {
-    public class SynchronousEventDispatcher: IEventDispatcher
+    public class SynchronousEventDispatcher : IEventDispatcher, IEventHandlerRegistry
     {
         private IWorkerRoleTracer tracer;
         private Dictionary<Type, List<Tuple<Type, Action<Envelope>>>> handlersByEventType;

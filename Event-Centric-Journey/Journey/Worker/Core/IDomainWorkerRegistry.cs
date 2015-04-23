@@ -8,7 +8,10 @@ namespace Journey.Worker
 {
     public interface IDomainWorkerRegistry
     {
-        List<Action<IUnityContainer, IEventHandlerRegistry>> DomainRegistrationList { get; }
+        /// <summary>
+        /// El contenedor, los live event processors y los read model rebuilders processors
+        /// </summary>
+        List<Action<IUnityContainer, IEventHandlerRegistry, IEventHandlerRegistry>> DomainRegistrationList { get; }
 
         IWorkerRoleConfig WorkerRoleConfig { get; }
     }

@@ -8,16 +8,16 @@ namespace Journey.Worker
 {
     public abstract class DomainWorkerRegistry : IDomainWorkerRegistry
     {
-        protected readonly List<Action<IUnityContainer, IEventHandlerRegistry>> boundedContextFactoryList;
+        protected readonly List<Action<IUnityContainer, IEventHandlerRegistry, IEventHandlerRegistry>> boundedContextFactoryList;
         private readonly IWorkerRoleConfig workerRoleConfig;
 
         public DomainWorkerRegistry()
         {
-            this.boundedContextFactoryList = new List<Action<IUnityContainer, IEventHandlerRegistry>>();
+            this.boundedContextFactoryList = new List<Action<IUnityContainer, IEventHandlerRegistry, IEventHandlerRegistry>>();
             this.workerRoleConfig = DefaultWorkerRoleConfigProvider.Configuration;
         }
 
-        public List<Action<IUnityContainer, IEventHandlerRegistry>> DomainRegistrationList
+        public List<Action<IUnityContainer, IEventHandlerRegistry, IEventHandlerRegistry>> DomainRegistrationList
         {
             get { return this.boundedContextFactoryList; }
         }
