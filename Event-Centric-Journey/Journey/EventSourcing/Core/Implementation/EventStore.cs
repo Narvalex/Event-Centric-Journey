@@ -214,7 +214,7 @@ namespace Journey.EventSourcing
                             this.eventBus.Publish(events.Select(e => new Envelope<IEvent>(e) { CorrelationId = correlationIdString }), context);
 
                             if (commands != null && commands.Count() > 0)
-                                this.commandBus.Send(commands.Select(c => new Envelope<ICommand>(c) { CorrelationId = correlationIdString }), context);
+                                this.commandBus.Send(commands.Select(c => new Envelope<ICommand>(c) { CorrelationId = correlationIdString }), context);                          
 
                             context.SaveChanges();
 

@@ -1,8 +1,10 @@
-﻿using Journey.Messaging;
+﻿using Journey.Database;
+using Journey.Messaging;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
 using Journey.Utils;
 using System;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 
@@ -34,25 +36,57 @@ namespace Journey.EventSourcing.ReadModeling
 
             using (var context = this.storeContextFactory.Invoke())
             {
-                var events = context.Set<Event>()
-                    .OrderBy(e => e.CreationDate)
-                    .AsEnumerable()
-                    .Select(this.Deserialize)
-                    .AsCachedAnyEnumerable();
-
-                if (events.Any())
+                try
                 {
-                    foreach (var e in events)
+                    TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = true;
+
+                    using (var dbContextTransaction = this.readModelContext.Database.BeginTransaction())
                     {
-                        var @event = (IEvent)e;
-                        this.eventDispatcher.DispatchMessage(@event, null, @event.SourceId.ToString(), "");
+                        try
+                        {
+                            this.ClearDatabase();
+
+                            var events = context.Set<Event>()
+                                .OrderBy(e => e.CreationDate)
+                                .AsEnumerable()
+                                .Select(this.Deserialize)
+                                .AsCachedAnyEnumerable();
+
+                            if (events.Any())
+                            {
+                                foreach (var e in events)
+                                {
+                                    var @event = (IEvent)e;
+                                    this.eventDispatcher.DispatchMessage(@event, null, @event.SourceId.ToString(), "");
+                                }
+                            }
+
+                            this.readModelContext.SaveChanges();
+
+                            dbContextTransaction.Commit();
+                        }
+                        catch (Exception)
+                        {
+                            try
+                            {
+                                dbContextTransaction.Rollback();
+                            }
+                            catch (Exception)
+                            { }
+                            
+                            throw;
+                        }
                     }
                 }
-            }
-
-            this.ClearDatabase();            
-
-            this.readModelContext.SaveChanges();
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = false;
+                }
+            }            
         }
 
         private IVersionedEvent Deserialize(Event @event)
@@ -64,20 +98,28 @@ namespace Journey.EventSourcing.ReadModeling
         }
 
         /// <summary>
-        /// Base on an answer in Stackoverflow:
         /// URL: http://stackoverflow.com/questions/6089403/delete-all-entities-in-entity-framework
         /// </summary>
         private void ClearDatabase()
         {
-//            var script = @"
-//            SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
-//            WHERE TABLE_TYPE = 'BASE TABLE' 
-//            AND TABLE_NAME NOT LIKE '%Migration%'";
+            // cuenta algo
+            var result = 0;
+            foreach (var tableInfo in this.readModelContext.TablesInfo)
+            {
+                result += this.readModelContext.Database
+                       .ExecuteSqlCommand(TransactionalBehavior.EnsureTransaction, string.Format(@"
+                            DELETE FROM [{0}].[{1}]",
+                            tableInfo.Value.SchemaName,
+                            tableInfo.Value.TableName));
 
-//            var tableNames = this.readModelContext.Database.SqlQuery<string>(script).ToList();
-//            foreach (var tableName in tableNames)
-//                this.readModelContext.Database.ExecuteSqlCommand(
-//                    string.Format("DELETE FROM {0}", tableName));
+                if (tableInfo.Value.HasIdentityColumn)
+                {
+                    this.readModelContext.Database
+                        .ExecuteSqlCommand(TransactionalBehavior.EnsureTransaction, string.Format("DBCC CHECKIDENT ('[{0}].[{1}]', RESEED, 0)",
+                        tableInfo.Value.SchemaName,
+                        tableInfo.Value.TableName));
+                }
+            }
         }
     }
 }

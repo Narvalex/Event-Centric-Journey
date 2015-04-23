@@ -1,10 +1,17 @@
-﻿using System.Data.Entity;
+﻿using Journey.Utils;
+using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 
 namespace Journey.EventSourcing.ReadModeling
 {
+    /// <summary>
+    /// Mandatory convention: use the same table name for the propertie of the DbSet in order to have the same info.948576
+    /// </summary>
     public class ReadModelDbContext : DbContext
     {
+        private Dictionary<string, TableInfo> tablesInfo = new Dictionary<string, TableInfo>();
+
         static ReadModelDbContext()
         {
             System.Data.Entity.Database.SetInitializer<ReadModelDbContext>(null);
@@ -12,7 +19,12 @@ namespace Journey.EventSourcing.ReadModeling
 
         public ReadModelDbContext(string nameOrConnectionString)
             : base(nameOrConnectionString)
-        { }
+        {
+            this.RegisterTableInfo(
+                ReadModelDbContextTables.ProjectedEvents,
+                ReadModelDbContextTables.ProjectedEvents,
+                ReadModelDbContextSchemas.SubscriptionLog);
+        }
 
         public ReadModelDbContext()
             : base("Name=defaultConnection")
@@ -35,11 +47,34 @@ namespace Journey.EventSourcing.ReadModeling
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ProjectedEvent>()
-                .ToTable("ReadModeling", "SubscriptionLog")
-                .HasKey(l => new { l.AggregateId, l.Version, l.AggregateType });
+            modelBuilder
+            .Entity<ProjectedEvent>()
+            .HasKey(l => new { l.AggregateId, l.Version, l.AggregateType })
+            .ToTable(
+                this.tablesInfo.TryGetValue(ReadModelDbContextTables.ProjectedEvents).TableName,
+                this.tablesInfo.TryGetValue(ReadModelDbContextTables.ProjectedEvents).SchemaName);
         }
 
         public IDbSet<ProjectedEvent> ProjectedEvents { get; set; }
+
+        public Dictionary<string, TableInfo> TablesInfo 
+        { 
+            get { return this.tablesInfo; }
+        }
+
+        private void RegisterTableInfo(string dbSetName, string tableName, string schemaName)
+        {
+            this.tablesInfo.Add(dbSetName, new TableInfo(tableName, schemaName, false));
+        }
+    }
+
+    public class ReadModelDbContextTables
+    {
+        public const string ProjectedEvents = "ProjectedEvents";
+    }
+
+    public class ReadModelDbContextSchemas
+    {
+        public const string SubscriptionLog = "SubscriptionLog";
     }
 }

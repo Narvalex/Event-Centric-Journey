@@ -113,6 +113,7 @@
     <Compile Include="EventSourcing\ReadModeling\Implementation\OldReadModelRebuilder.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ReadModelDbContext.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ReadModelRebuilder.cs" />
+    <Compile Include="EventSourcing\ReadModeling\Implementation\TableInfo.cs" />
     <Compile Include="EventSourcing\ReadModeling\IProcessedEvent.cs" />
     <Compile Include="EventSourcing\ReadModeling\IReadModelGeneratorEngine.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ReadModelGeneratorEngine.cs" />

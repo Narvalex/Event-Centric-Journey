@@ -88,6 +88,41 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
             var actor = new ItemActor(id);
             actor.HandleCommands();
             this.eventStore.Save(actor, id);
+
+            using (var context = this.readModelContextFactory.Invoke())
+            {
+                context.ProjectedEvents.Add(
+                    new ProjectedEvent
+                    {
+                        AggregateId = Guid.Empty,
+                        CorrelationId = Guid.Empty,
+                        AggregateType = "TestAggregate",
+                        EventType = "TestEvent",
+                        Version = 1
+                    });
+
+                context.ProjectedEvents.Add(
+                    new ProjectedEvent
+                    {
+                        AggregateId = Guid.Empty,
+                        CorrelationId = Guid.Empty,
+                        AggregateType = "TestAggregate",
+                        EventType = "TestEvent",
+                        Version = 2
+                    });
+
+                context.ProjectedEvents.Add(
+                    new ProjectedEvent
+                    {
+                        AggregateId = Guid.Empty,
+                        CorrelationId = Guid.Empty,
+                        AggregateType = "TestAggregate",
+                        EventType = "TestEvent",
+                        Version = 3
+                    });
+
+                context.SaveChanges();
+            }
         }
     }
 

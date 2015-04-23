@@ -34,7 +34,11 @@ namespace Journey.Tests.Integration.EventSourcing
                 this.serializer = CreateSerializer();
 
                 var dbName = typeof(EventStoreFixture).Name;
+                
+                
                 this.connectionString = System.Data.Entity.Database.DefaultConnectionFactory.CreateConnection(dbName).ConnectionString;
+                /** FECOPROD **/
+                this.connectionString = string.Format("server=(local);Database={0};User Id=sa;pwd =123456", dbName);
 
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
@@ -302,6 +306,9 @@ DROP DATABASE [{0}]
                 this.eventSender = new MessageSender(connectionFactory, this.dbName, "Bus.Events");
                 this.connectionString = connectionFactory.CreateConnection(this.dbName).ConnectionString;
 
+                /** FECOPROD **/
+                this.connectionString = string.Format("server=(local);Database={0};User Id=sa;pwd =123456", dbName);
+
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
                     if (context.Database.Exists())
@@ -525,7 +532,7 @@ DROP DATABASE [{0}]
                 base.Update(new ItemReserved { Item = item, Quantity = quantity });
             }
 
-            private void OnItemAdded(ItemAdded e)
+            public void Rehydrate(ItemAdded e)
             {
                 var incomingItemInfo = new Item { Id = e.Id, Name = e.Name };
                 var newQuantityValue = e.Quantity;
@@ -538,12 +545,12 @@ DROP DATABASE [{0}]
                 this.itemsQuantity[incomingItemInfo.Id] = newQuantityValue;
             }
 
-            private void OnItemRemoved(ItemRemoved e)
+            public void Rehydrate(ItemRemoved e)
             {
                 this.RemoveSeats(e.Id, e.Quantity);
             }
 
-            private void OnItemReserved(ItemReserved e)
+            public void Rehydrate(ItemReserved e)
             {
                 this.RemoveSeats(e.Item.Id, e.Quantity);
             }
