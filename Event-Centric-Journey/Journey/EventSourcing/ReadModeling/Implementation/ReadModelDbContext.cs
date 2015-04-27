@@ -58,9 +58,16 @@ namespace Journey.EventSourcing.ReadModeling
             get { return this.tablesInfo; }
         }
 
-        protected void RegisterTableInfo(string dbSetName, string tableName, string schemaName)
+        /// <summary>
+        /// Registra el nombre de una tabla para poder usarlo en la configuracion de las entidades.
+        /// </summary>
+        /// <param name="dbSetName">El nombre del DbSet.</param>
+        /// <param name="tableName">El nombre de la tabla. Es una buena idea que coincida con el DbSet, aunque no es obligatorio.</param>
+        /// <param name="schemaName">El nombre del esquema.</param>
+        /// <param name="hasIdentityColumn">Si tiene columna de identidad, para poder resetear cuando se destruyen los datos de las tablas.</param>
+        protected void RegisterTableInfo(string dbSetName, string tableName, string schemaName, bool hasIdentityColumn = false)
         {
-            this.tablesInfo.Add(dbSetName, new TableInfo(tableName, schemaName, false));
+            this.tablesInfo.Add(dbSetName, new TableInfo(tableName, schemaName, hasIdentityColumn));
         }
 
         protected virtual void OnRegisteringTableInfo()
