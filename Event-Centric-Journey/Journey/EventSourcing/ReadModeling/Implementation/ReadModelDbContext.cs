@@ -21,8 +21,8 @@ namespace Journey.EventSourcing.ReadModeling
             : base(nameOrConnectionString)
         {
             this.RegisterTableInfo(
-                ReadModelDbContextTables.ProjectedEvents,
-                ReadModelDbContextTables.ProjectedEvents,
+                ReadModelDbContextTables.ReadModeling,
+                ReadModelDbContextTables.ReadModeling,
                 ReadModelDbContextSchemas.SubscriptionLog);
         }
 
@@ -51,18 +51,18 @@ namespace Journey.EventSourcing.ReadModeling
             .Entity<ProjectedEvent>()
             .HasKey(l => new { l.AggregateId, l.Version, l.AggregateType })
             .ToTable(
-                this.tablesInfo.TryGetValue(ReadModelDbContextTables.ProjectedEvents).TableName,
-                this.tablesInfo.TryGetValue(ReadModelDbContextTables.ProjectedEvents).SchemaName);
+                this.tablesInfo.TryGetValue(ReadModelDbContextTables.ReadModeling).TableName,
+                this.tablesInfo.TryGetValue(ReadModelDbContextTables.ReadModeling).SchemaName);
         }
 
-        public IDbSet<ProjectedEvent> ProjectedEvents { get; set; }
+        public IDbSet<ProjectedEvent> ReadModeling { get; set; }
 
         public Dictionary<string, TableInfo> TablesInfo 
         { 
             get { return this.tablesInfo; }
         }
 
-        private void RegisterTableInfo(string dbSetName, string tableName, string schemaName)
+        protected void RegisterTableInfo(string dbSetName, string tableName, string schemaName)
         {
             this.tablesInfo.Add(dbSetName, new TableInfo(tableName, schemaName, false));
         }
@@ -70,7 +70,7 @@ namespace Journey.EventSourcing.ReadModeling
 
     public class ReadModelDbContextTables
     {
-        public const string ProjectedEvents = "ProjectedEvents";
+        public const string ReadModeling = "ReadModeling";
     }
 
     public class ReadModelDbContextSchemas

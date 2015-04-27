@@ -4,20 +4,19 @@ using Journey.Messaging.Processing;
 using Journey.Serialization;
 using Journey.Utils;
 using System;
-using System.Data.Entity;
 using System.IO;
 using System.Linq;
 
 namespace Journey.EventSourcing.ReadModeling
 {
-    public class ReadModelRebuilder<T> : IReadModelRebuilder<T> where T : ReadModelDbContext
+    public class ReadModelRebuilderEngine<T> : IReadModelRebuilderEngine<T> where T : ReadModelDbContext
     {
         private readonly ITextSerializer serializer;
         private readonly IEventDispatcher eventDispatcher;
         private readonly Func<EventStoreDbContext> storeContextFactory;
         private readonly T readModelContext;
 
-        public ReadModelRebuilder(Func<EventStoreDbContext> storeContextFactory, ITextSerializer serializer, IEventDispatcher synchronousEventDispatcher, T readModelContext)
+        public ReadModelRebuilderEngine(Func<EventStoreDbContext> storeContextFactory, ITextSerializer serializer, IEventDispatcher synchronousEventDispatcher, T readModelContext)
         {
             this.storeContextFactory = storeContextFactory;
             this.serializer = serializer;
@@ -107,7 +106,7 @@ namespace Journey.EventSourcing.ReadModeling
             foreach (var tableInfo in this.readModelContext.TablesInfo)
             {
                 result += this.readModelContext.Database
-                       .ExecuteSqlCommand(TransactionalBehavior.EnsureTransaction, string.Format(@"
+                       .ExecuteSqlCommand(string.Format(@"
                             DELETE FROM [{0}].[{1}]",
                             tableInfo.Value.SchemaName,
                             tableInfo.Value.TableName));
@@ -115,7 +114,7 @@ namespace Journey.EventSourcing.ReadModeling
                 if (tableInfo.Value.HasIdentityColumn)
                 {
                     this.readModelContext.Database
-                        .ExecuteSqlCommand(TransactionalBehavior.EnsureTransaction, string.Format("DBCC CHECKIDENT ('[{0}].[{1}]', RESEED, 0)",
+                        .ExecuteSqlCommand(string.Format("DBCC CHECKIDENT ('[{0}].[{1}]', RESEED, 0)",
                         tableInfo.Value.SchemaName,
                         tableInfo.Value.TableName));
                 }

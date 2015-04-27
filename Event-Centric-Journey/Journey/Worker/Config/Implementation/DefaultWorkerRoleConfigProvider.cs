@@ -6,7 +6,7 @@ namespace Journey.Worker.Config
     /// <summary>
     /// El Default Config entiende que sólo se utiliza una única base de datos.
     /// </summary>
-    public class DefaultWorkerRoleConfigProvider : ConfigurationSection, IWorkerRoleConfig
+    public class DefaultWorkerRoleConfigProvider : ConfigurationSection, IWorkerRoleConfig, IReadModelRebuilderConfig
     {
         private const string sectionName = "workerConfig";
         private const string connectionString = "connectionString";
@@ -16,7 +16,7 @@ namespace Journey.Worker.Config
         private DefaultWorkerRoleConfigProvider()
         { }
 
-        public static IWorkerRoleConfig Configuration
+        public static DefaultWorkerRoleConfigProvider Configuration
         {
             get { return ConfigurationManager.GetSection(sectionName) as DefaultWorkerRoleConfigProvider; }
         }

@@ -6,7 +6,7 @@ namespace Journey.Web.App_Start
     /// <summary>
     /// Specifies the Unity configuration for the main container.
     /// </summary>
-    partial class UnityConfig
+    partial class SystemContainer
     {
         #region Unity Container
         private static Lazy<IUnityContainer> container = new Lazy<IUnityContainer>(() =>

@@ -11,8 +11,8 @@ namespace Journey.Worker
         /// <summary>
         /// El contenedor, los live event processors y los read model rebuilders processors
         /// </summary>
-        List<Action<IUnityContainer, IEventHandlerRegistry, IEventHandlerRegistry>> DomainRegistrationList { get; }
+        List<Action<IUnityContainer, IEventHandlerRegistry>> RegistrationList { get; }
 
-        IWorkerRoleConfig WorkerRoleConfig { get; }
+        IWorkerRoleConfig Config { get; }
     }
 }

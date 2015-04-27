@@ -3,12 +3,14 @@ using System.Web.Hosting;
 
 namespace Journey.Worker
 {
-    public sealed class WorkerRoleWebPortal : IWorkerRolePortal, IRegisteredObject, IDisposable
+    public sealed class WorkerRoleWebPortal : IRegisteredObject, IDisposable
     {
         private static volatile WorkerRoleWebPortal instance;
         private static volatile IWorkerRole worker;
         private static object lockObject = new object();
         private static volatile bool isWorking;
+
+        private static Action rebuildReadModel;
 
         private WorkerRoleWebPortal() 
         {
@@ -17,13 +19,10 @@ namespace Journey.Worker
 
         public static WorkerRoleWebPortal Instance
         {
-            get
-            {
-                return instance;
-            }
+            get { return instance; }
         }
 
-        public static WorkerRoleWebPortal CreateNew(IWorkerRole workerInstance)
+        public static WorkerRoleWebPortal CreateNew(IWorkerRole workerInstance, Action rebuildReadModel)
         {
             if (instance == null)
             {
@@ -38,6 +37,7 @@ namespace Journey.Worker
                             throw new InvalidOperationException("You should only start one instance!");
 
                         worker = workerInstance;
+                        WorkerRoleWebPortal.rebuildReadModel = rebuildReadModel;
                     }
                 }
             }
@@ -76,6 +76,11 @@ namespace Journey.Worker
             HostingEnvironment.UnregisterObject(this);
         }
 
+        public void RebuildReadModel()
+        {
+            rebuildReadModel.Invoke();
+        }
+
         public void Dispose()
         {
             this.Stop(true);
@@ -84,17 +89,5 @@ namespace Journey.Worker
         public IWorkerRole WorkerRole { get { return worker; } }
 
         public bool IsWorking { get { return isWorking; } }
-        
-        public void RebuildReadModel()
-        {
-            this.StopWorking();
-
-            this.StartWorking();
-        }
-
-        public void RebuildEventStore()
-        {
-            
-        }
     }
 }

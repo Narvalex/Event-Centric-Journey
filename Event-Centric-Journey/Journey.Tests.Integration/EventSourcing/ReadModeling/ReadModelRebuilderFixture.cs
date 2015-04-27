@@ -91,7 +91,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
 
             using (var context = this.readModelContextFactory.Invoke())
             {
-                context.ProjectedEvents.Add(
+                context.ReadModeling.Add(
                     new ProjectedEvent
                     {
                         AggregateId = Guid.Empty,
@@ -101,7 +101,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
                         Version = 1
                     });
 
-                context.ProjectedEvents.Add(
+                context.ReadModeling.Add(
                     new ProjectedEvent
                     {
                         AggregateId = Guid.Empty,
@@ -111,7 +111,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
                         Version = 2
                     });
 
-                context.ProjectedEvents.Add(
+                context.ReadModeling.Add(
                     new ProjectedEvent
                     {
                         AggregateId = Guid.Empty,
@@ -131,7 +131,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
         protected ReadModelGeneratorEngine<ItemReadModelDbContext> generatorEngine;
         protected ItemReadModelGenerator itemGenerator;
         protected SynchronousEventDispatcher eventDispatcher;
-        protected ReadModelRebuilder<ItemReadModelDbContext> sut;
+        protected ReadModelRebuilderEngine<ItemReadModelDbContext> sut;
         protected ItemReadModelDbContext rebuildContext; 
 
         public GIVEN_read_model_rebuilder()
@@ -141,7 +141,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
             this.itemGenerator = new ItemReadModelGenerator(this.generatorEngine);
             this.eventDispatcher = new SynchronousEventDispatcher(this.tracer);
             this.eventDispatcher.Register(itemGenerator);
-            this.sut = new ReadModelRebuilder<ItemReadModelDbContext>(this.eventStoreContextFactory, this.serializer, this.eventDispatcher, rebuildContext);
+            this.sut = new ReadModelRebuilderEngine<ItemReadModelDbContext>(this.eventStoreContextFactory, this.serializer, this.eventDispatcher, rebuildContext);
         }
 
         [Fact]

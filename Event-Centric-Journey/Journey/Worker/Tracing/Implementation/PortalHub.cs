@@ -4,19 +4,19 @@ namespace Journey.Worker.Tracing
 {
     public class PortalHub : Hub
     {
-        private readonly IWorkerRolePortal portal;
+        private readonly IWorkerRoleTracer tracer;
 
         public PortalHub()
         {
-            this.portal = WorkerRoleWebPortal.Instance;
+            this.tracer = WorkerRoleWebPortal.Instance.WorkerRole.Tracer;
         }
 
         public void SendMessage(string message)
         {
             Clients.All.newMessage(message);
 
-            if (this.portal != null)
-                this.portal.WorkerRole.Tracer.Notify(message);
+            if (tracer != null)
+                this.tracer.Notify(message);
         }
     }
 }

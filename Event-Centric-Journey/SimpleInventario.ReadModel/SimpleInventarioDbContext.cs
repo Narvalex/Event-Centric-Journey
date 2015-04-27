@@ -1,4 +1,5 @@
 ﻿using Journey.EventSourcing.ReadModeling;
+using Journey.Utils;
 using SimpleInventario.ReadModel.Entities;
 using System.Data.Entity;
 
@@ -9,8 +10,6 @@ namespace SimpleInventario.ReadModel
     /// </summary>
     public class SimpleInventarioDbContext : ReadModelDbContext
     {
-        private const string SimpleInventarioReportSchema = "sireport";
-
         #region Constructors
         static SimpleInventarioDbContext()
         {
@@ -19,7 +18,9 @@ namespace SimpleInventario.ReadModel
 
         public SimpleInventarioDbContext(string connectionString)
             : base(connectionString)
-        { }
+        {
+            base.RegisterTableInfo(SimpleInventarioDbContextTables.ResumenDeAnimalesDeTodosLosPeriodos, SimpleInventarioDbContextTables.ResumenDeAnimalesDeTodosLosPeriodos, SimpleInventarioDbContextSchemas.Sireport);
+        }
 
         public SimpleInventarioDbContext()
             : base("Name=defaultConnection")
@@ -33,8 +34,22 @@ namespace SimpleInventario.ReadModel
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<CantidadDeAnimalesDeUnPeriodo>()
-                .ToTable("ResumenDeAnimalesDeTodosLosPeriodos", SimpleInventarioReportSchema)
+                .ToTable(this.TablesInfo
+                            .TryGetValue(SimpleInventarioDbContextTables.ResumenDeAnimalesDeTodosLosPeriodos)
+                            .TableName,
+                        this.TablesInfo.TryGetValue(SimpleInventarioDbContextTables.ResumenDeAnimalesDeTodosLosPeriodos)
+                            .SchemaName)
                 .HasKey(x => x.Periodo);
         }
+    }
+
+    public static class SimpleInventarioDbContextTables
+    {
+        public const string ResumenDeAnimalesDeTodosLosPeriodos = "ResumenDeAnimalesDeTodosLosPeriodos";
+    }
+
+    public static class SimpleInventarioDbContextSchemas
+    {
+        public const string Sireport = "Sireport";
     }
 }

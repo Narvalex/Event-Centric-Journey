@@ -24,12 +24,12 @@ namespace Journey.Worker
         /// <summary>
         /// Acepta aparte del dominio un tracer, que puede ser de consola o web, hasta el momento.
         /// </summary>
-        public WorkerRole(IDomainWorkerRegistry domainContainer, IWorkerRoleTracer tracer)
+        public WorkerRole(IDomainWorkerRegistry domainRegistry, IWorkerRoleTracer tracer)
         {
             _tracer = tracer;
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
             this.cancellationTokenSource = new CancellationTokenSource();
-            this.container = this.CreateContainer(domainContainer);
+            this.container = this.CreateContainer(domainRegistry);
             this.processors = this.container.ResolveAll<IMessageProcessor>().ToList();
         }
 
@@ -47,11 +47,11 @@ namespace Journey.Worker
             this.container.Resolve<IWorkerRoleTracer>().Notify("=== Worker Stopped ===");
         }
 
-        private IUnityContainer CreateContainer(IDomainWorkerRegistry domainContainer)
+        private IUnityContainer CreateContainer(IDomainWorkerRegistry domainRegistry)
         {
             var container = new UnityContainer();
 
-            container.RegisterInstance<IDomainWorkerRegistry>(domainContainer);
+            container.RegisterInstance<IDomainWorkerRegistry>(domainRegistry);
 
             // Infrastructure
             container.RegisterInstance<ISystemDateTime>(new LocalDateTime());
@@ -59,7 +59,7 @@ namespace Journey.Worker
             container.RegisterInstance<IMetadataProvider>(new StandardMetadataProvider());
             container.RegisterInstance<IWorkerRoleTracer>(_tracer);
 
-            var config = container.Resolve<IDomainWorkerRegistry>().WorkerRoleConfig;
+            var config = container.Resolve<IDomainWorkerRegistry>().Config;
 
             var serializer = container.Resolve<ITextSerializer>();
             var metadata = container.Resolve<IMetadataProvider>();
@@ -80,8 +80,6 @@ namespace Journey.Worker
 
             var inMemorySnapshotCache = new InMemoryRollingSnapshot("EventStoreCache");
 
-            var rebuildReadModelEventProcessor = new SynchronousEventDispatcher(tracer);
-
             container.RegisterInstance<IInMemoryRollingSnapshotProvider>(inMemorySnapshotCache);
             container.RegisterInstance<ICommandBus>(commandBus);
             container.RegisterInstance<IEventBus>(eventBus);
@@ -98,9 +96,9 @@ namespace Journey.Worker
             this.RegisterEventStore(container, config.EventStoreConnectionString);
 
             // Bounded Context Registration
-            if (domainContainer.DomainRegistrationList.Any())
-                foreach (var registry in domainContainer.DomainRegistrationList)
-                    registry(container, liveEventProcessor, rebuildReadModelEventProcessor);
+            if (domainRegistry.RegistrationList.Any())
+                foreach (var registrationAction in domainRegistry.RegistrationList)
+                    registrationAction(container, liveEventProcessor);
 
             // Handlers
             this.RegisterCommandHandlers(container);

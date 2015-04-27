@@ -42,7 +42,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInventario.Querying",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInventario.Web.Comanding", "SimpleInventario.Web.Comanding\SimpleInventario.Web.Comanding.csproj", "{8692B6CB-4E4F-4B09-B0FE-F98A3EC8C6E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInventario.Worker", "SimpleInventario.Worker\SimpleInventario.Worker.csproj", "{32CC8657-E194-445A-BFFC-9517AE4A56FF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInventario.DomainRegistry", "SimpleInventario.Worker\SimpleInventario.DomainRegistry.csproj", "{32CC8657-E194-445A-BFFC-9517AE4A56FF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInventario.Reporting.Events", "SimpleInventario.Reporting.Events\SimpleInventario.Reporting.Events.csproj", "{2752FE02-F9C5-4468-B9EA-61A5ECFAAA5C}"
 EndProject

@@ -49,7 +49,7 @@ namespace Journey.EventSourcing.ReadModeling
                 using (var context = this.liveContextFactory.Invoke())
                 {
                     if (context
-                        .ProjectedEvents
+                        .ReadModeling
                         .Where(log =>
                             log.AggregateId == e.SourceId &&
                             log.AggregateType == e.AggregateType &&
@@ -64,7 +64,7 @@ namespace Journey.EventSourcing.ReadModeling
                     doLiveProjection(context);
 
                     // Mark as projected in the the subscription log
-                    context.ProjectedEvents.Add(this.BuildProjectedEventEntity(e));
+                    context.ReadModeling.Add(this.BuildProjectedEventEntity(e));
 
                     context.SaveChanges();
                 }
@@ -84,7 +84,7 @@ namespace Journey.EventSourcing.ReadModeling
                 using (var context = this.liveContextFactory.Invoke())
                 {
                     if (context
-                        .ProjectedEvents
+                        .ReadModeling
                         .Where(log =>
                             log.AggregateId == e.SourceId &&
                             log.AggregateType == e.AggregateType &&
@@ -99,7 +99,7 @@ namespace Journey.EventSourcing.ReadModeling
                     doProjectionOrRebuild(context);
 
                     // Mark as projected in the the subscription log
-                    context.ProjectedEvents.Add(this.BuildProjectedEventEntity(e));
+                    context.ReadModeling.Add(this.BuildProjectedEventEntity(e));
 
                     context.SaveChanges();
                 }

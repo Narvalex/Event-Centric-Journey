@@ -10,7 +10,7 @@
 
         vm.start = start;
         vm.stop = stop;
-        vm.rebuild = rebuild;
+        vm.rebuildReadModel = rebuildReadModel;
 
         vm.portalHub = null;
 
@@ -92,25 +92,15 @@
                         });
         }
 
-        function rebuild() {
+        function rebuildReadModel() {
             vm.hideAll = true;
             // stopping...
 
             toastr.warning("Stopping Engine for rebuild...")
-            return $http.get('/api/portal/stop')
+            vm.portalHub.server.sendMessage('===> Stopping worker and starting read model rebuilding process...');
+            return $http.get('/api/portal/rebuildReadModel')
                         .then(function (response) {
-                            toastr.error("Engine stopped! Now start rebuild process")
                             vm.isWorking = response.data;
-
-                            // After stopping, now Reguild
-                            $http.get('/api/portal/reproject')
-                                .then(function (response) {
-                                    vm.hideAll = false;
-
-                                    // After rebuilding start again
-                                    start();
-                                });
-
                         });
 
         }

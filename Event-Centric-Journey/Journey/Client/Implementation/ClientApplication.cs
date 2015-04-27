@@ -53,7 +53,7 @@ namespace Journey.Client
                         using (var context = this.CreateReadOnlyDbContext())
                         {
                             isConsistent = context
-                                            .ProjectedEvents
+                                            .ReadModeling
                                             .Where(e => e.CorrelationId == correlationId).Any();
 
                             if (isConsistent)

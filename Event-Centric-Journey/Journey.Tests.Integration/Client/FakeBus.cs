@@ -34,7 +34,7 @@ namespace Journey.Tests.Integration.Client
             using (var context = this.contextFactory.Invoke())
             {
                 context
-                    .ProjectedEvents
+                    .ReadModeling
                     .Add(new ProjectedEvent
                     {
                         AggregateId = Guid.Empty, 

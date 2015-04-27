@@ -5,7 +5,7 @@ namespace Journey.Web.Controllers.Api
 {
     public class PortalController : ApiController
     {
-        private readonly IWorkerRolePortal portal;
+        private readonly WorkerRoleWebPortal portal;
 
         public PortalController()
         {
@@ -32,6 +32,14 @@ namespace Journey.Web.Controllers.Api
         public IHttpActionResult Stop()
         {
             this.portal.StopWorking();
+            return this.Ok(this.portal.IsWorking);
+        }
+
+        [HttpGet]
+        [Route("api/portal/rebuildReadModel")]
+        public IHttpActionResult RebuildReadModel()
+        {
+            this.portal.RebuildReadModel();
             return this.Ok(this.portal.IsWorking);
         }
     }

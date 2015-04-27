@@ -8,6 +8,10 @@ using System.Linq;
 
 namespace SimpleInventario.Reporting
 {
+    /// <summary>
+    /// No se deberia crear uno que diga reporting. Quizas esto se utilice como logica para otros procesos y 
+    /// no quede simplemente como un modulo netamente de reportes.
+    /// </summary>
     public class AnimalesDeTodosLosPeriodos : EventSourced, IMementoOriginator,
         ISubscribedTo<SeAgregaronAnimalesAlInventario>,
         IRehydratesFrom<SeActualizoResumenDeAnimalesPorPeriodo>

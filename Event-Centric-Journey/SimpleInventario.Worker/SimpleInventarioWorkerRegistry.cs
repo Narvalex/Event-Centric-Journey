@@ -7,20 +7,23 @@ using SimpleInventario.ReadModel;
 using SimpleInventario.ReadModeling;
 using SimpleInventario.Reporting;
 using System;
+using System.Collections.Generic;
 
-namespace SimpleInventario.Worker
+namespace SimpleInventario.DomainRegistry
 {
     public class SimpleInventarioWorkerRegistry : DomainWorkerRegistry
     {
-        public SimpleInventarioWorkerRegistry()
+        protected override List<Action<IUnityContainer, IEventHandlerRegistry>> RegisterComplexEventProcessors()
         {
-            this.boundedContextFactoryList.Add(this.RegistrarUnicoBoundedContext);
+            var registrationList = new List<Action<IUnityContainer, IEventHandlerRegistry>>();
+            registrationList.Add(this.RegistrarUnicoBoundedContext);
+            return registrationList;
         }
 
         /// <summary>
         /// Un ejemplo de cómo registrar bounded contexts
         /// </summary>
-        private void RegistrarUnicoBoundedContext(IUnityContainer container, IEventHandlerRegistry liveEventProcessor, IEventHandlerRegistry rebuildReadModelEventProcessor)
+        private void RegistrarUnicoBoundedContext(IUnityContainer container, IEventHandlerRegistry liveEventProcessor)
         {
             // Commanding
             container.RegisterType<ICommandHandler, InventarioHandler>("InventarioHandler");
@@ -29,7 +32,7 @@ namespace SimpleInventario.Worker
             liveEventProcessor.Register(container.Resolve<AnimalesDeTodosLosPeriodosHandler>());
 
             // ReadModeling
-            Func<SimpleInventarioDbContext> contextFactory = () => new SimpleInventarioDbContext(this.WorkerRoleConfig.ReadModelConnectionString);
+            Func<SimpleInventarioDbContext> contextFactory = () => new SimpleInventarioDbContext(this.Config.ReadModelConnectionString);
             container.RegisterType<IReadModelGeneratorEngine<SimpleInventarioDbContext>, ReadModelGeneratorEngine<SimpleInventarioDbContext>>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
@@ -38,5 +41,7 @@ namespace SimpleInventario.Worker
 
             liveEventProcessor.Register(container.Resolve<SimpleInventarioReadModelGenerator>());
         }
+
+
     }
 }

@@ -79,7 +79,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
             using (var context = this.contextFactory.Invoke())
             {
                 var item = context.Items.Where(i => i.UnidentifiableId == 1).FirstOrDefault();
-                var log = context.ProjectedEvents.Where(l => l.AggregateId == Guid.Empty && l.Version == 1).FirstOrDefault();
+                var log = context.ReadModeling.Where(l => l.AggregateId == Guid.Empty && l.Version == 1).FirstOrDefault();
 
                 Assert.Equal("Silla", item.Name);
                 Assert.True(log != null);
@@ -114,7 +114,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
             using (var context = this.contextFactory.Invoke())
             {
                 var item = context.Items.Where(i => i.UnidentifiableId == 1).ToList();
-                var log = context.ProjectedEvents.Where(l => l.AggregateId == Guid.Empty && l.Version == 1).ToList();
+                var log = context.ReadModeling.Where(l => l.AggregateId == Guid.Empty && l.Version == 1).ToList();
 
                 Assert.True(item.Count() == 1);
                 Assert.True(log.Count() == 1);
@@ -156,7 +156,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
                 using (var context = this.contextFactory.Invoke())
                 {
                     var item = context.Items.Where(i => i.UnidentifiableId == 1).ToList();
-                    var log = context.ProjectedEvents.Where(l => l.AggregateId == Guid.Empty && l.Version == 1).ToList();
+                    var log = context.ReadModeling.Where(l => l.AggregateId == Guid.Empty && l.Version == 1).ToList();
 
                     Assert.True(item.Count() == 1);
                     Assert.True(log.Count() == 1);
