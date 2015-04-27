@@ -51,7 +51,13 @@ namespace Journey.Worker.Rebuilding
                     return;
 
                 isRebuilding = true;
-                rebuilder.Rebuild();
+            }
+
+            rebuilder.Rebuild();
+
+            lock (lockObject)
+            {
+                isRebuilding = false;
             }
         }
 

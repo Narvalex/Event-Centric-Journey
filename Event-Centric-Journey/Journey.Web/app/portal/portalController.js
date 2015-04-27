@@ -14,8 +14,10 @@
 
         vm.portalHub = null;
 
+        // indica si se detuvo el worker o si esta corriendo
         vm.isWorking = true;
 
+        // para esconder todo el muenu de comandos, mientras esta ejecutando un proceso de reconstruccion
         vm.hideAll = false;
 
         activate();
@@ -101,6 +103,7 @@
             return $http.get('/api/portal/rebuildReadModel')
                         .then(function (response) {
                             vm.isWorking = response.data;
+                            vm.hideAll = false;
                         });
 
         }
