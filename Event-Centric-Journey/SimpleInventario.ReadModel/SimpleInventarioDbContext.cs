@@ -18,9 +18,7 @@ namespace SimpleInventario.ReadModel
 
         public SimpleInventarioDbContext(string connectionString)
             : base(connectionString)
-        {
-            base.RegisterTableInfo(SimpleInventarioDbContextTables.ResumenDeAnimalesDeTodosLosPeriodos, SimpleInventarioDbContextTables.ResumenDeAnimalesDeTodosLosPeriodos, SimpleInventarioDbContextSchemas.Sireport);
-        }
+        { }
 
         public SimpleInventarioDbContext()
             : base("Name=defaultConnection")
@@ -35,21 +33,31 @@ namespace SimpleInventario.ReadModel
 
             modelBuilder.Entity<CantidadDeAnimalesDeUnPeriodo>()
                 .ToTable(this.TablesInfo
-                            .TryGetValue(SimpleInventarioDbContextTables.ResumenDeAnimalesDeTodosLosPeriodos)
+                            .TryGetValue(SimpleInventarioTables.ResumenDeAnimalesDeTodosLosPeriodos)
                             .TableName,
-                        this.TablesInfo.TryGetValue(SimpleInventarioDbContextTables.ResumenDeAnimalesDeTodosLosPeriodos)
+                        this.TablesInfo.TryGetValue(SimpleInventarioTables.ResumenDeAnimalesDeTodosLosPeriodos)
                             .SchemaName)
                 .HasKey(x => x.Periodo);
         }
+
+        protected override void OnRegisteringTableInfo()
+        {
+            base.OnRegisteringTableInfo();
+
+            base.RegisterTableInfo(
+                SimpleInventarioTables.ResumenDeAnimalesDeTodosLosPeriodos,
+                SimpleInventarioTables.ResumenDeAnimalesDeTodosLosPeriodos,
+                SimpleInventarioSchemas.ReadModel);
+        }
     }
 
-    public static class SimpleInventarioDbContextTables
+    public static class SimpleInventarioTables
     {
         public const string ResumenDeAnimalesDeTodosLosPeriodos = "ResumenDeAnimalesDeTodosLosPeriodos";
     }
 
-    public static class SimpleInventarioDbContextSchemas
+    public static class SimpleInventarioSchemas
     {
-        public const string Sireport = "Sireport";
+        public const string ReadModel = "ReadModel";
     }
 }

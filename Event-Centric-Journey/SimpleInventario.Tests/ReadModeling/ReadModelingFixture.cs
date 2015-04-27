@@ -73,7 +73,7 @@ namespace SimpleInventario.Tests.ReadModeling.ReadModelingFixture
                 Assert.NotNull(resumen);
                 Assert.Equal(e.CantidadDeAnimales, resumen.Cantidad);
 
-                var log = context.ReadModeling
+                var log = context.ReadModelingEvents
                     .Where(x => x.CorrelationId == correlationId)
                     .FirstOrDefault();
                 Assert.NotNull(log);

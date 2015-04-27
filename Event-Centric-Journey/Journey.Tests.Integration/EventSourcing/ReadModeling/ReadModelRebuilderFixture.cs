@@ -91,7 +91,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
 
             using (var context = this.readModelContextFactory.Invoke())
             {
-                context.ReadModeling.Add(
+                context.ReadModelingEvents.Add(
                     new ProjectedEvent
                     {
                         AggregateId = Guid.Empty,
@@ -101,7 +101,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
                         Version = 1
                     });
 
-                context.ReadModeling.Add(
+                context.ReadModelingEvents.Add(
                     new ProjectedEvent
                     {
                         AggregateId = Guid.Empty,
@@ -111,7 +111,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
                         Version = 2
                     });
 
-                context.ReadModeling.Add(
+                context.ReadModelingEvents.Add(
                     new ProjectedEvent
                     {
                         AggregateId = Guid.Empty,

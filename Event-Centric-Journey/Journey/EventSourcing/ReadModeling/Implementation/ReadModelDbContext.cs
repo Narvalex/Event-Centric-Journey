@@ -5,9 +5,6 @@ using System.Linq;
 
 namespace Journey.EventSourcing.ReadModeling
 {
-    /// <summary>
-    /// Mandatory convention: use the same table name for the propertie of the DbSet in order to have the same info.948576
-    /// </summary>
     public class ReadModelDbContext : DbContext
     {
         private Dictionary<string, TableInfo> tablesInfo = new Dictionary<string, TableInfo>();
@@ -20,15 +17,14 @@ namespace Journey.EventSourcing.ReadModeling
         public ReadModelDbContext(string nameOrConnectionString)
             : base(nameOrConnectionString)
         {
-            this.RegisterTableInfo(
-                ReadModelDbContextTables.ReadModeling,
-                ReadModelDbContextTables.ReadModeling,
-                ReadModelDbContextSchemas.SubscriptionLog);
+            this.OnRegisteringTableInfo();
         }
 
         public ReadModelDbContext()
             : base("Name=defaultConnection")
-        { }
+        {
+            this.OnRegisteringTableInfo();
+        }
 
         public IQueryable<T> Query<T>() where T : class
         {
@@ -51,11 +47,11 @@ namespace Journey.EventSourcing.ReadModeling
             .Entity<ProjectedEvent>()
             .HasKey(l => new { l.AggregateId, l.Version, l.AggregateType })
             .ToTable(
-                this.tablesInfo.TryGetValue(ReadModelDbContextTables.ReadModeling).TableName,
-                this.tablesInfo.TryGetValue(ReadModelDbContextTables.ReadModeling).SchemaName);
+                this.tablesInfo.TryGetValue(ReadModelDbContextTables.ReadModelingEvents).TableName,
+                this.tablesInfo.TryGetValue(ReadModelDbContextTables.ReadModelingEvents).SchemaName);
         }
 
-        public IDbSet<ProjectedEvent> ReadModeling { get; set; }
+        public IDbSet<ProjectedEvent> ReadModelingEvents { get; set; }
 
         public Dictionary<string, TableInfo> TablesInfo 
         { 
@@ -66,11 +62,19 @@ namespace Journey.EventSourcing.ReadModeling
         {
             this.tablesInfo.Add(dbSetName, new TableInfo(tableName, schemaName, false));
         }
+
+        protected virtual void OnRegisteringTableInfo()
+        {
+            this.RegisterTableInfo(
+                ReadModelDbContextTables.ReadModelingEvents,
+                ReadModelDbContextTables.ReadModelingEvents,
+                ReadModelDbContextSchemas.SubscriptionLog);
+        }
     }
 
     public class ReadModelDbContextTables
     {
-        public const string ReadModeling = "ReadModeling";
+        public const string ReadModelingEvents = "ReadModelingEvents";
     }
 
     public class ReadModelDbContextSchemas
