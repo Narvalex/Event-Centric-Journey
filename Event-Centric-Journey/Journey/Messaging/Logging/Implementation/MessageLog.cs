@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace Journey.Messaging.Logging
 {
-    public class MessageLog : IEventLogReader
+    public class MessageLog : IMessageLogger, IEventLogReader
  {
         private string connectionString;
         private readonly IMetadataProvider metadataProvider;
@@ -27,7 +27,7 @@ namespace Journey.Messaging.Logging
             this.tracer = tracer;
         }
 
-        public void Save(IEvent @event)
+        public void Log(IEvent @event)
         {
             using (var context = new MessageLogDbContext(this.connectionString))
             {
@@ -71,7 +71,7 @@ namespace Journey.Messaging.Logging
             }
         }
 
-        public void Save(ICommand command)
+        public void Log(ICommand command)
         {
             using (var context = new MessageLogDbContext(this.connectionString))
             {

@@ -1,7 +1,7 @@
 ﻿using Journey.Database;
 using Journey.EventSourcing;
+using Journey.EventSourcing.EventStoreRebuilding;
 using Journey.EventSourcing.Handling;
-using Journey.EventSourcing.StoreRebuilding;
 using Journey.Messaging;
 using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
@@ -9,6 +9,7 @@ using Journey.Messaging.Processing;
 using Journey.Serialization;
 using Journey.Utils.SystemDateTime;
 using Journey.Worker;
+using Journey.Worker.Config;
 using Microsoft.Practices.Unity;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,8 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 {
     public class GIVEN_eventStoreDb_AND_messageLogDb_AND_logger_AND_rebuilder : IDisposable
     {
+        protected readonly IUnityContainer container;
+
         protected readonly IWorkerRoleTracer tracer;
 
         protected readonly string eventStoreDbName;
@@ -40,7 +43,16 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 
             // Event Store
             this.eventStoreDbName = typeof(EventStoreFixture).Name + "_eventStore";
-            using (var context = new EventStoreDbContext(this.eventStoreDbName))
+
+            // *********************************
+            // EN FECOPROD:
+
+            var eventStoreConnectionString = string.Format("server=(local);Database={0};User Id=sa;pwd =123456", this.eventStoreDbName);
+
+            // BORRAR CUANDO SEA NECESARIO
+            //***********************************
+
+            using (var context = new EventStoreDbContext(eventStoreConnectionString))
             {
                 if (context.Database.Exists())
                     context.Database.Delete();
@@ -50,7 +62,16 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 
             // Message Log
             this.messageLogDbName = typeof(EventStoreFixture).Name + "_messageLog";
-            using (var context = new MessageLogDbContext(this.messageLogDbName))
+
+            // *********************************
+            // EN FECOPROD:
+
+            var messageLogConnectionString = string.Format("server=(local);Database={0};User Id=sa;pwd =123456", this.messageLogDbName);
+
+            // BORRAR CUANDO SEA NECESARIO
+            //***********************************
+
+            using (var context = new MessageLogDbContext(messageLogConnectionString))
             {
                 if (context.Database.Exists())
                     context.Database.Delete();
@@ -61,16 +82,16 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             // MessageLogger
             this.logger = new MessageLogHandler(
                 new MessageLog(
-                    this.messageLogDbName,
+                    messageLogConnectionString,
                     this.serializer,
                     new StandardMetadataProvider(), new LocalDateTime(), new ConsoleWorkerRoleTracer()));
+
+            this.container = this.CreateContainer(messageLogConnectionString, eventStoreConnectionString);
         }
 
         [Fact]
         public void GIVEN_messages_WHEN_replaying_THEN_rebuilds_event_store()
-        {
-            var container = this.CreateContainer();
-
+        {         
             // GIVEN messages 
             var item = new Item { Id = 1, Name = "silla" };
             var aggregateId = Guid.NewGuid();
@@ -109,7 +130,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 
             // WHEN replaying
 
-            var rebuilder = container.Resolve<IEventStoreRebuilder>();
+            var rebuilder = container.Resolve<IEventStoreRebuilderEngine>();
             rebuilder.Rebuild();
 
             // THEN rebuilds event store
@@ -117,25 +138,37 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
         }
 
         #region Helpers
-        private IUnityContainer CreateContainer()
+        private IUnityContainer CreateContainer(string logConnectionString, string storeConnectionString)
         {
             var container = new UnityContainer();
 
             var commandProcessor = new InMemoryCommandProcessor(this.tracer);
             var eventProcessor = new SynchronousEventDispatcher(this.tracer);
 
+            var commandBus = new InMemoryCommandBus();
+            var eventBus = new InMemoryEventBus();
+
             container.RegisterInstance<ITextSerializer>(new IndentedJsonTextSerializer());
+            container.RegisterInstance<ISystemDateTime>(new LocalDateTime());
             container.RegisterInstance<IWorkerRoleTracer>(this.tracer);
             var inMemorySnapshotCache = new InMemoryRollingSnapshot("EventStoreCache");
             container.RegisterInstance<IInMemoryRollingSnapshotProvider>(inMemorySnapshotCache);
 
-            container.RegisterType<EventStoreDbContext>(new ContainerControlledLifetimeManager(), new InjectionConstructor(this.eventStoreDbName));
-            container.RegisterType<MessageLogDbContext>(new ContainerControlledLifetimeManager(), new InjectionConstructor(this.messageLogDbName));
+            container.RegisterInstance<IMetadataProvider>(new StandardMetadataProvider());
+
+            container.RegisterType<EventStoreDbContext>(new ContainerControlledLifetimeManager(), new InjectionConstructor(storeConnectionString));
+            container.RegisterType<MessageLogDbContext>(new ContainerControlledLifetimeManager(), new InjectionConstructor(logConnectionString));
             container.RegisterType(typeof(IEventStore<>), typeof(InMemoryEventStore<>), new ContainerControlledLifetimeManager());
 
             container.RegisterInstance<IEventDispatcher>(eventProcessor);
             container.RegisterInstance<ICommandProcessor>(commandProcessor);
             container.RegisterInstance<ICommandHandlerRegistry>(commandProcessor);
+
+            container.RegisterInstance<IInMemoryCommandBus>(commandBus);
+            container.RegisterInstance<IInMemoryEventBus>(eventBus);
+
+            var config = new FakeConfig(logConnectionString, logConnectionString);
+            container.RegisterInstance<IEventStoreRebuilderConfig>(config);
 
             container.RegisterType<ICommandHandler, FakeItemsSagaHandler>("FakeItemsSagaHandler");
 
@@ -145,10 +178,23 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 
             eventProcessor.Register(container.Resolve<FakeItemsSagaHandler>());
 
-            container.RegisterType(typeof(IEventStoreRebuilder), typeof(EventStoreRebuilder), new ContainerControlledLifetimeManager());
+            container.RegisterType(typeof(IEventStoreRebuilderEngine), typeof(EventStoreRebuilderEngine), new ContainerControlledLifetimeManager());
             
             return container;
-        }        
+        }
+        
+        public class FakeConfig : IEventStoreRebuilderConfig
+        {
+            public FakeConfig(string source, string newLog)
+            {
+                this.SourceMessageLogConnectionString = source;
+                this.NewMessageLogConnectionString = newLog;
+            }
+
+            public string SourceMessageLogConnectionString { get; set; }
+
+            public string NewMessageLogConnectionString { get; set; }
+        }
 
         #region Fake Domain
 
@@ -263,9 +309,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 
         private void DisposeDatabase(string dbName)
         {
-            var connectionString = System.Data.Entity.Database.DefaultConnectionFactory
-                .CreateConnection(dbName)
-                .ConnectionString;
+            var connectionString = string.Format("server=(local);Database={0};User Id=sa;pwd =123456", dbName);
 
             var builder = new SqlConnectionStringBuilder(connectionString);
             builder.InitialCatalog = "master";

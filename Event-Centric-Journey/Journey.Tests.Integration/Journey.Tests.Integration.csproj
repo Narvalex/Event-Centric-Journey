@@ -85,8 +85,8 @@
     <Compile Include="EventSourcing\ReadModeling\Fakes\ItemAddedEvent.cs" />
     <Compile Include="EventSourcing\ReadModeling\Fakes\ItemReadModelGenerator.cs" />
     <Compile Include="EventSourcing\ReadModeling\ReadModelRebuilderFixture.cs" />
-    <Compile Include="EventSourcing\StoreRebuilding\EventStoreRebuilderFixture.cs" />
-    <Compile Include="EventSourcing\StoreRebuilding\InMemoryEventStoreFixture.cs" />
+    <Compile Include="EventSourcing\EventStoreRebuilding\EventStoreRebuilderFixture.cs" />
+    <Compile Include="EventSourcing\EventStoreRebuilding\InMemoryEventStoreFixture.cs" />
     <Compile Include="EventSourcing\ReadModeling\Fakes\ItemReadModelDbContext.cs" />
     <Compile Include="EventSourcing\ReadModeling\ReadModelGeneratorFixture.cs" />
     <Compile Include="Messaging\EventSubscriptionFixture.cs" />

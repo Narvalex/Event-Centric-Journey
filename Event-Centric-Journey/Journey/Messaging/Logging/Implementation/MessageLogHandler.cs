@@ -9,21 +9,21 @@ namespace Journey.Messaging.Logging
     /// </summary>
     public class MessageLogHandler : IEventHandler<IEvent>, ICommandHandler<ICommand>
     {
-        private MessageLog log;
+        private IMessageLogger logger;
 
-        public MessageLogHandler(MessageLog log)
+        public MessageLogHandler(IMessageLogger logger)
         {
-            this.log = log;
+            this.logger = logger;
         }
 
         public void Handle(IEvent @event)
         {
-            this.log.Save(@event);
+            this.logger.Log(@event);
         }
 
         public void Handle(ICommand command)
         {
-            this.log.Save(command);
+            this.logger.Log(command);
         }
     }
 }

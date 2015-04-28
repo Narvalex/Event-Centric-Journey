@@ -1,4 +1,4 @@
-﻿using Journey.Database;
+﻿using Journey.Messaging;
 using Journey.Serialization;
 using Journey.Utils;
 using Journey.Worker;
@@ -23,6 +23,8 @@ namespace Journey.EventSourcing
 
         // Could potentially use DataAnnotations to get a friendly/unique name in case of collisions between BCs.
         private static readonly string _sourceType = typeof(T).Name;
+        private readonly IInMemoryEventBus eventBus;
+        private readonly IInMemoryCommandBus commandBus;
         private readonly ITextSerializer serializer;
         private readonly EventStoreDbContext context;
         private readonly Func<Guid, IEnumerable<IVersionedEvent>, T> entityFactory;
@@ -32,8 +34,10 @@ namespace Journey.EventSourcing
         private readonly Action<Guid> markCacheAsStale;
         private readonly Func<Guid, IMemento, IEnumerable<IVersionedEvent>, T> originatorEntityFactory;
 
-        public InMemoryEventStore(ITextSerializer serializer, EventStoreDbContext context, IInMemoryRollingSnapshotProvider cache, IWorkerRoleTracer tracer)
+        public InMemoryEventStore(IInMemoryEventBus eventBus, IInMemoryCommandBus commandBus, ITextSerializer serializer, EventStoreDbContext context, IInMemoryRollingSnapshotProvider cache, IWorkerRoleTracer tracer)
         {
+            this.eventBus = eventBus;
+            this.commandBus = commandBus;
             this.serializer = serializer;
             this.context = context;
             this.cache = cache;
@@ -102,17 +106,17 @@ namespace Journey.EventSourcing
                 if (!cachedMemento.Item2.HasValue || cachedMemento.Item2.Value < DateTime.Now.AddSeconds(-1))
                 {
 
-                        deserialized = this.context.Set<Event>()
-                            .Local
-                            .Where(x => x.AggregateId == id && x.AggregateType == _sourceType && x.Version > cachedMemento.Item1.Version)
-                            .OrderBy(x => x.Version)
-                            .AsEnumerable()
-                            .Select(this.Deserialize)
-                            .AsCachedAnyEnumerable();
+                    deserialized = this.context.Set<Event>()
+                        .Local
+                        .Where(x => x.AggregateId == id && x.AggregateType == _sourceType && x.Version > cachedMemento.Item1.Version)
+                        .OrderBy(x => x.Version)
+                        .AsEnumerable()
+                        .Select(this.Deserialize)
+                        .AsCachedAnyEnumerable();
 
-                        if (deserialized.Any())
-                            return entityFactory.Invoke(id, deserialized);
-                    
+                    if (deserialized.Any())
+                        return entityFactory.Invoke(id, deserialized);
+
                 }
                 else
                 {
@@ -129,21 +133,21 @@ namespace Journey.EventSourcing
             else
             {
 
-                    var deserialized = this.context.Set<Event>()
-                        .Local
-                        .Where(x => x.AggregateId == id && x.AggregateType == _sourceType)
-                        .OrderBy(x => x.Version)
-                        .AsEnumerable()
-                        .Select(this.Deserialize)
-                        .AsCachedAnyEnumerable();
+                var deserialized = this.context.Set<Event>()
+                    .Local
+                    .Where(x => x.AggregateId == id && x.AggregateType == _sourceType)
+                    .OrderBy(x => x.Version)
+                    .AsEnumerable()
+                    .Select(this.Deserialize)
+                    .AsCachedAnyEnumerable();
 
-                    if (deserialized.Any())
-                    {
-                        return entityFactory.Invoke(id, deserialized);
-                    }
+                if (deserialized.Any())
+                {
+                    return entityFactory.Invoke(id, deserialized);
+                }
 
-                    return null;
-                
+                return null;
+
             }
         }
 
@@ -156,10 +160,10 @@ namespace Journey.EventSourcing
             return entity;
         }
 
-
         public void Save(T eventSourced, Guid correlationId)
         {
             var events = eventSourced.Events.ToArray();
+
             if (events.Count() == 0)
             {
                 var noEventsMessage = string.Format("Aggregate {0} with Id {1} HAS NO EVENTS to be saved.", _sourceType, eventSourced.Id.ToString());
@@ -167,40 +171,33 @@ namespace Journey.EventSourcing
                 return;
             }
 
+            ICommand[] commands = null;
+            if (typeof(ISaga).IsAssignableFrom(typeof(T)))
+                commands = (eventSourced as ISaga).Commands.ToArray();
 
-                try
+            try
+            {
+                var eventsSet = this.context.Set<Event>();
+
+                foreach (var e in events)
                 {
-                    TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = true;
-
-                        try
-                        {
-                            var eventsSet = this.context.Set<Event>();
-
-                            foreach (var e in events)
-                            {
-                                // le pasamos el command id para que se serialice
-                                e.CorrelationId = correlationId;
-                                eventsSet.Add(this.Serialize(e));
-                            }
-
-                        }
-                        catch (Exception)
-                        {
-
-                            this.markCacheAsStale(eventSourced.Id);
-                            throw;
-                        }
-                    
+                    // le pasamos el command id para que se serialice
+                    e.CorrelationId = correlationId;
+                    eventsSet.Add(this.Serialize(e));
                 }
-                catch (Exception)
-                {
-                    throw;
-                }
-                finally
-                {
-                    TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = false;
-                }
-            
+
+                var correlationIdString = correlationId.ToString();
+                this.eventBus.Publish(events.Select(e => new Envelope<IEvent>(e) { CorrelationId = correlationIdString }));
+
+                if (commands != null && commands.Count() > 0)
+                    this.commandBus.Send(commands.Select(c => new Envelope<ICommand>(c) { CorrelationId = correlationIdString }));
+            }
+            catch (Exception)
+            {
+
+                this.markCacheAsStale(eventSourced.Id);
+                throw;
+            }
 
             this.cacheMementoIfApplicable.Invoke(eventSourced);
         }

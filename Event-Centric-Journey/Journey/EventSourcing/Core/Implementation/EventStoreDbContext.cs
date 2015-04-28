@@ -1,12 +1,10 @@
-﻿using Journey.Database;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 
 namespace Journey.EventSourcing
 {
     /// <summary>
     /// Used by <see cref="SqlEventSourcedRepository{T}"/>.
     /// </summary>
-    [DbConfigurationType(typeof(TransientFaultHandlingDbConfiguration))]
     public class EventStoreDbContext : DbContext
     {
         public const string SchemaName = "EventStore";

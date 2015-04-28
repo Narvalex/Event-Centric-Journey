@@ -94,7 +94,7 @@
     <Compile Include="EventSourcing\Core\IMementoOriginator.cs" />
     <Compile Include="EventSourcing\Core\Implementation\EntityNotFoundException.cs" />
     <Compile Include="EventSourcing\Core\Implementation\Event.cs" />
-    <Compile Include="EventSourcing\Core\Implementation\EventCentricDbContext.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\EventStoreDbContext.cs" />
     <Compile Include="EventSourcing\Core\Implementation\EventSourced.cs" />
     <Compile Include="EventSourcing\Core\Implementation\EventStore.cs" />
     <Compile Include="EventSourcing\Core\Implementation\EventStoreConcurrencyException.cs" />
@@ -118,13 +118,15 @@
     <Compile Include="EventSourcing\ReadModeling\IReadModelGeneratorEngine.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ReadModelGeneratorEngine.cs" />
     <Compile Include="EventSourcing\ReadModeling\IReadModelRebuilderEngine.cs" />
-    <Compile Include="EventSourcing\StoreRebuilding\EventStoreRebuilder.cs" />
-    <Compile Include="EventSourcing\StoreRebuilding\IEventStoreRebuilder.cs" />
+    <Compile Include="EventSourcing\EventStoreRebuilding\EventStoreRebuilderEngine.cs" />
+    <Compile Include="EventSourcing\EventStoreRebuilding\IEventStoreRebuilderEngine.cs" />
     <Compile Include="Messaging\Core\Envelope.cs" />
     <Compile Include="Messaging\Core\ICommand.cs" />
     <Compile Include="Messaging\Core\ICommandBus.cs" />
     <Compile Include="Messaging\Core\IEvent.cs" />
     <Compile Include="Messaging\Core\IEventBus.cs" />
+    <Compile Include="Messaging\Core\IInMemoryCommandBus.cs" />
+    <Compile Include="Messaging\Core\IInMemoryEventBus.cs" />
     <Compile Include="Messaging\Core\IMessageReceiver.cs" />
     <Compile Include="Messaging\Core\IMessageSender.cs" />
     <Compile Include="Messaging\Core\IMessagingSettings.cs" />
@@ -133,6 +135,8 @@
     <Compile Include="Messaging\Core\Implementation\CommandBusExtensions.cs" />
     <Compile Include="Messaging\Core\Implementation\EventBus.cs" />
     <Compile Include="Messaging\Core\Implementation\EventBusExtensions.cs" />
+    <Compile Include="Messaging\Core\Implementation\InMemoryEventBus.cs" />
+    <Compile Include="Messaging\Core\Implementation\InMemoryCommandBus.cs" />
     <Compile Include="Messaging\Core\Implementation\MessageReceiver.cs" />
     <Compile Include="Messaging\Core\Implementation\MessageSender.cs" />
     <Compile Include="Messaging\Core\Implementation\MessagingDbInitializer.cs" />
@@ -143,6 +147,8 @@
     <Compile Include="Messaging\Logging\EventLogExtensions.cs" />
     <Compile Include="Messaging\Logging\EventLogQueryCriteria.cs" />
     <Compile Include="Messaging\Logging\IEventLogReader.cs" />
+    <Compile Include="Messaging\Logging\IMessageLogger.cs" />
+    <Compile Include="Messaging\Logging\Implementation\InMemoryMessageLog.cs" />
     <Compile Include="Messaging\Logging\Implementation\MessageLog.cs" />
     <Compile Include="Messaging\Logging\Implementation\MessageLogDbContext.cs" />
     <Compile Include="Messaging\Logging\Implementation\MessageLogEntity.cs" />
@@ -181,6 +187,7 @@
     <Compile Include="Utils\SystemDateTime\ISystemDateTime.cs" />
     <Compile Include="Utils\SystemDateTime\Implementation\LocalDateTime.cs" />
     <Compile Include="Utils\SystemDateTime\Implementation\UtcDateTime.cs" />
+    <Compile Include="Worker\Config\IEventStoreRebuilderConfig.cs" />
     <Compile Include="Worker\Config\IReadModelRebuilderConfig.cs" />
     <Compile Include="Worker\Config\IWorkerRoleConfig.cs" />
     <Compile Include="Worker\Config\Implementation\DefaultWorkerRoleConfigProvider.cs" />
