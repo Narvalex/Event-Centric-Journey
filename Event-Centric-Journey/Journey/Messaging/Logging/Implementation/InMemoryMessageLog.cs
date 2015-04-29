@@ -25,9 +25,44 @@ namespace Journey.Messaging.Logging
             this.context = context;
         }
 
-        // REFACTORIZAR EN UN METODO PARA ESTIRAR LA ENTIDAD DE MENSAJE Y ASI USARLO PARA 
-        // VERIFICAR SI ES DUPLICADO
         public void Log(IEvent @event)
+        {
+            var message = GetMessage(@event);
+            context.Set<MessageLogEntity>().Add(message);
+            this.tracer.Notify(string.Format("Processing Event:\r\n{0}", message.Payload));
+        }
+
+        public void Log(ICommand command)
+        {
+            var message = GetMessage(command);
+            context.Set<MessageLogEntity>().Add(message);
+            this.tracer.Notify(string.Format("Command processed!\r\n{0}", message.Payload));
+        }
+
+        public bool IsDuplicateMessage(IEvent @event)
+        {
+            var message = GetMessage(@event);
+
+            return context.Set<MessageLogEntity>()
+                .Local
+                .Where(m => m.SourceId.ToUpper() == message.SourceId.ToUpper()
+                        && m.SourceType == message.SourceType
+                        && m.Version == message.Version
+                        && m.TypeName == message.TypeName)
+                .Any();
+        }
+
+        public bool IsDuplicateMessage(ICommand command)
+        {
+            var message = GetMessage(command);
+
+            return context.Set<MessageLogEntity>()
+                .Local
+                .Where(m => m.SourceId.ToUpper() == message.SourceId.ToUpper())
+                .Any();
+        }
+
+        private MessageLogEntity GetMessage(IEvent @event)
         {
             var metadata = this.metadataProvider.GetMetadata(@event);
 
@@ -46,29 +81,11 @@ namespace Journey.Messaging.Logging
                 Payload = serializer.Serialize(@event),
             };
 
-
-            // first lets check if is not a duplicated command message;
-            var duplicatedMessage = context.Set<MessageLogEntity>()
-                .Where(m => m.SourceId.ToUpper() == message.SourceId.ToUpper()
-                        && m.SourceType == message.SourceType
-                        && m.Version == message.Version
-                        && m.TypeName == message.TypeName)
-                .FirstOrDefault();
-
-            if (duplicatedMessage != null)
-                return;
-
-            // Is not duplicated...
-
-
-            context.Set<MessageLogEntity>().Add(message);
-
-            this.tracer.Notify(string.Format("Processing Event:\r\n{0}", message.Payload));
+            return message;
         }
 
-        public void Log(ICommand command)
+        private MessageLogEntity GetMessage(ICommand command)
         {
-
             var metadata = this.metadataProvider.GetMetadata(command);
 
             var message = new MessageLogEntity
@@ -86,29 +103,7 @@ namespace Journey.Messaging.Logging
                 Payload = serializer.Serialize(command),
             };
 
-            // first lets check if is not a duplicated command message;
-            var duplicatedMessage = context.Set<MessageLogEntity>()
-                .Where(m => m.SourceId.ToUpper() == message.SourceId.ToUpper())
-                .FirstOrDefault();
-
-            if (duplicatedMessage != null)
-                return;
-
-            // Is not duplicated...
-
-            context.Set<MessageLogEntity>().Add(message);
-
-            this.tracer.Notify(string.Format("Command processed!\r\n{0}", message.Payload));
-        }
-
-        public bool IsDuplicateMessage(IEvent @event)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsDuplicateMessage(ICommand command)
-        {
-            throw new NotImplementedException();
+            return message;
         }
     }
 }

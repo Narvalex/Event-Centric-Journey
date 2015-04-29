@@ -15,5 +15,19 @@ namespace Journey.Messaging
         /// </summary>
         /// <param name="events">The events to be published.</param>
         void Publish(IEnumerable<IEvent> events);
+
+        /// <summary>
+        /// If it has new commands
+        /// </summary>
+        bool HasNewCommands { get; }
+
+        /// <summary>
+        /// If it has new events
+        /// </summary>
+        bool HasNewEvents { get; }
+
+        IEnumerable<ICommand> GetCommands();
+
+        IEnumerable<IEvent> GetEvents();
     }
 }

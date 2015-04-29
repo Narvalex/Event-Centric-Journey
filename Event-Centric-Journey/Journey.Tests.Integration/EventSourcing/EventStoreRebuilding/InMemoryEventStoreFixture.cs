@@ -19,8 +19,7 @@ namespace Journey.Tests.Integration.EventSourcing
         {
             internal readonly string dbName;
             internal readonly string connectionString;
-            protected readonly IInMemoryCommandBus commandBus;
-            protected readonly IInMemoryEventBus eventBus;
+            protected readonly IInMemoryBus bus;
             internal IEventStore<FakeItemsAggregate> sut;
             internal ITextSerializer serializer;
             internal Mock<IInMemoryRollingSnapshotProvider> cacheMock = new Mock<IInMemoryRollingSnapshotProvider>();
@@ -53,9 +52,7 @@ namespace Journey.Tests.Integration.EventSourcing
                     context.Database.Create();
                 }
 
-                this.commandBus = new InMemoryCommandBus();
-                this.eventBus = new InMemoryEventBus();
-
+                this.bus = new InMemoryBus();
                 MessagingDbInitializer.CreateDatabaseObjects(this.connectionString, "Bus");
             }
 
@@ -64,7 +61,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
-                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.eventBus, this.commandBus, this.serializer, context, this.cacheMock.Object, new ConsoleWorkerRoleTracer());
+                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, this.cacheMock.Object, new ConsoleWorkerRoleTracer());
 
                     this.aggregateId = Guid.NewGuid();
 
@@ -87,7 +84,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
-                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.eventBus, this.commandBus, this.serializer, context, this.cacheMock.Object, new ConsoleWorkerRoleTracer());
+                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, this.cacheMock.Object, new ConsoleWorkerRoleTracer());
                     
                     this.aggregateId = Guid.NewGuid();
 
@@ -117,7 +114,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
-                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.eventBus, this.commandBus, this.serializer, context, this.cacheMock.Object, new ConsoleWorkerRoleTracer());
+                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, this.cacheMock.Object, new ConsoleWorkerRoleTracer());
                     this.aggregateId = Guid.NewGuid();
 
                     var item = new Item { Id = 1, Name = "item1" };

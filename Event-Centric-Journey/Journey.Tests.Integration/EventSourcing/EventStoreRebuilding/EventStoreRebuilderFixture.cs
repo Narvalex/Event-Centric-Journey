@@ -145,8 +145,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             var commandProcessor = new InMemoryCommandProcessor(this.tracer);
             var eventProcessor = new SynchronousEventDispatcher(this.tracer);
 
-            var commandBus = new InMemoryCommandBus();
-            var eventBus = new InMemoryEventBus();
+            var bus = new InMemoryBus();
 
             container.RegisterInstance<ITextSerializer>(new IndentedJsonTextSerializer());
             container.RegisterInstance<ISystemDateTime>(new LocalDateTime());
@@ -164,8 +163,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             container.RegisterInstance<ICommandProcessor>(commandProcessor);
             container.RegisterInstance<ICommandHandlerRegistry>(commandProcessor);
 
-            container.RegisterInstance<IInMemoryCommandBus>(commandBus);
-            container.RegisterInstance<IInMemoryEventBus>(eventBus);
+            container.RegisterInstance<IInMemoryBus>(bus);
 
             var config = new FakeConfig(logConnectionString, logConnectionString);
             container.RegisterInstance<IEventStoreRebuilderConfig>(config);

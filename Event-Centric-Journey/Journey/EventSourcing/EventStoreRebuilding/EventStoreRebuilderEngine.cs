@@ -30,6 +30,8 @@ namespace Journey.EventSourcing.EventStoreRebuilding
         private readonly ICommandProcessor commandProcessor;
         private readonly ICommandHandlerRegistry commandHandlerRegistry;
 
+        private IMessageAuditLog auditLog;
+
         private MessageLogHandler handler;
 
         public EventStoreRebuilderEngine(
@@ -80,8 +82,8 @@ namespace Journey.EventSourcing.EventStoreRebuilding
 
         private void RegisterLogger(MessageLogDbContext newContext)
         {
-            var logger = new InMemoryMessageLog(this.serializer, this.metadataProvider, this.dateTime, this.tracer, newContext);
-            this.handler = new MessageLogHandler(logger);
+            this.auditLog = new InMemoryMessageLog(this.serializer, this.metadataProvider, this.dateTime, this.tracer, newContext);
+            this.handler = new MessageLogHandler(this.auditLog);
             this.commandHandlerRegistry.Register(this.handler);
             this.eventDispatcher.Register(this.handler);
         }
@@ -92,37 +94,39 @@ namespace Journey.EventSourcing.EventStoreRebuilding
             {
                 var body = this.Deserialize(message.Body);
 
-                var @event = body as IEvent;
-                if (@event != null)
-                    this.ProcessEvent(@event);
-
                 var command = body as ICommand;
                 if (command != null)
-                    this.ProcessCommand(body);
+                    this.ProcessCommand(command);
+                else
+                    this.ProcessEvent(body as IEvent);
             }
         }
 
-        private void ProcessCommand(object body)
+        private void ProcessCommand(ICommand command)
         {
-            this.commandProcessor.ProcessMessage(body);
+            if (this.auditLog.IsDuplicateMessage(command))
+                return;
+
+            this.commandProcessor.ProcessMessage(command);
             this.ProcessInnerMessages();
         }
 
         private void ProcessInnerMessages()
         {
-            var innerCommands = this.commandBus.GetCommands();
-            if (innerCommands.Any())
-                foreach (var envelopedCommand in innerCommands)
-                    this.ProcessCommand(envelopedCommand.Body);
+            if (this.bus.HasNewCommands)
+                foreach (var command in bus.GetCommands())
+                    this.ProcessCommand(command);
 
-            var innerEvents = this.eventBus.GetEvents();
-            if (innerEvents.Any())
-                foreach (var e in innerEvents)
-                    this.ProcessEvent(e.Body);
+            if (this.bus.HasNewEvents)
+                foreach (var @event in bus.GetEvents())
+                    this.ProcessEvent(@event);
         }
 
         private void ProcessEvent(IEvent @event)
         {
+            if (this.auditLog.IsDuplicateMessage(@event))
+                return;
+
             this.eventDispatcher.DispatchMessage(@event, null, string.Empty, string.Empty);
             this.ProcessInnerMessages();
         }
