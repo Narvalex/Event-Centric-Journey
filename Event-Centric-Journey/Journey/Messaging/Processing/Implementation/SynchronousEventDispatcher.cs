@@ -26,7 +26,7 @@ namespace Journey.Messaging.Processing
             Action<IEvent, string, string, string> dispatch;
             var wasHandled = false;
 
-            // Invoke the generic handlers that have registered to handle IEvent directly
+            // Invoke the generic handlers that have registered to handle IEvent directly like message log
             if (this.dispatchersByEventType.TryGetValue(typeof(IEvent), out dispatch))
             {
                 dispatch(@event, messageId, correlationId, traceIdentifier);
@@ -36,7 +36,7 @@ namespace Journey.Messaging.Processing
             if (this.dispatchersByEventType.TryGetValue(@event.GetType(), out dispatch))
             {
                 dispatch(@event, messageId, correlationId, traceIdentifier);
-                
+
                 if (!wasHandled)
                     wasHandled = true;
             }

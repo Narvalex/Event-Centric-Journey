@@ -54,17 +54,14 @@ namespace Journey.Messaging.Processing
         {
             ICommandHandler handler = null;
 
-            // If command was already processed, then no op
-                var commandType = payload.GetType();
-                if (this.handlers.TryGetValue(commandType, out handler))
-                    // Actualy handling the message
-                    this.HandleMessage(payload, handler);
-
-
-            // There can be a generic logging/tracing/auditing handlers
-            if (this.handlers.TryGetValue(typeof(ICommand), out handler))
+            var commandType = payload.GetType();
+            if (this.handlers.TryGetValue(commandType, out handler))
             {
                 this.HandleMessage(payload, handler);
+
+                // There logging/tracing/auditing handlers
+                if (this.handlers.TryGetValue(typeof(ICommand), out handler))
+                    this.HandleMessage(payload, handler);
             }
         }
 
