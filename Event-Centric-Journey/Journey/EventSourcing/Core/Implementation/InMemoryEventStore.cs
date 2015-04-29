@@ -23,8 +23,7 @@ namespace Journey.EventSourcing
 
         // Could potentially use DataAnnotations to get a friendly/unique name in case of collisions between BCs.
         private static readonly string _sourceType = typeof(T).Name;
-        private readonly IInMemoryEventBus eventBus;
-        private readonly IInMemoryCommandBus commandBus;
+        private readonly IInMemoryBus bus;
         private readonly ITextSerializer serializer;
         private readonly EventStoreDbContext context;
         private readonly Func<Guid, IEnumerable<IVersionedEvent>, T> entityFactory;
@@ -34,10 +33,9 @@ namespace Journey.EventSourcing
         private readonly Action<Guid> markCacheAsStale;
         private readonly Func<Guid, IMemento, IEnumerable<IVersionedEvent>, T> originatorEntityFactory;
 
-        public InMemoryEventStore(IInMemoryEventBus eventBus, IInMemoryCommandBus commandBus, ITextSerializer serializer, EventStoreDbContext context, IInMemoryRollingSnapshotProvider cache, IWorkerRoleTracer tracer)
+        public InMemoryEventStore(IInMemoryBus bus, ITextSerializer serializer, EventStoreDbContext context, IInMemoryRollingSnapshotProvider cache, IWorkerRoleTracer tracer)
         {
-            this.eventBus = eventBus;
-            this.commandBus = commandBus;
+            this.bus = bus;
             this.serializer = serializer;
             this.context = context;
             this.cache = cache;
@@ -186,11 +184,10 @@ namespace Journey.EventSourcing
                     eventsSet.Add(this.Serialize(e));
                 }
 
-                var correlationIdString = correlationId.ToString();
-                this.eventBus.Publish(events.Select(e => new Envelope<IEvent>(e) { CorrelationId = correlationIdString }));
+                this.bus.Publish(events);
 
                 if (commands != null && commands.Count() > 0)
-                    this.commandBus.Send(commands.Select(c => new Envelope<ICommand>(c) { CorrelationId = correlationIdString }));
+                    this.bus.Send(commands);
             }
             catch (Exception)
             {

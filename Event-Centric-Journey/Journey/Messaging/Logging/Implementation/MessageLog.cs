@@ -10,8 +10,8 @@ using System.Linq;
 
 namespace Journey.Messaging.Logging
 {
-    public class MessageLog : IMessageLogger, IEventLogReader
- {
+    public class MessageLog : IMessageAuditLog, IEventLogReader
+    {
         private string connectionString;
         private readonly IMetadataProvider metadataProvider;
         private readonly ITextSerializer serializer;
@@ -31,7 +31,7 @@ namespace Journey.Messaging.Logging
         {
             using (var context = new MessageLogDbContext(this.connectionString))
             {
-                var metadata = this.metadataProvider.GetMetadata(@event);                
+                var metadata = this.metadataProvider.GetMetadata(@event);
 
                 var message = new MessageLogEntity
                 {
@@ -75,7 +75,7 @@ namespace Journey.Messaging.Logging
         {
             using (var context = new MessageLogDbContext(this.connectionString))
             {
-                var metadata = this.metadataProvider.GetMetadata(command);                
+                var metadata = this.metadataProvider.GetMetadata(command);
 
                 var message = new MessageLogEntity
                 {
@@ -197,6 +197,19 @@ namespace Journey.Messaging.Logging
                     throw new NotSupportedException();
                 }
             }
+        }
+
+
+        public bool IsDuplicateMessage(IEvent @event)
+        {
+            // I did not implement because it is implemented in the log process.
+            throw new NotImplementedException();
+        }
+
+        public bool IsDuplicateMessage(ICommand command)
+        {
+            // I did not implement because it is implemented in the log process.
+            throw new NotImplementedException();
         }
     }
 }

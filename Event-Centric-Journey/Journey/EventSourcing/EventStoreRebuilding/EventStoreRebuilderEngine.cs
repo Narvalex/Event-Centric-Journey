@@ -24,26 +24,24 @@ namespace Journey.EventSourcing.EventStoreRebuilding
 
         private readonly IWorkerRoleTracer tracer;
 
-        private readonly IInMemoryCommandBus commandBus;
-        private readonly IInMemoryEventBus eventBus;
+        private readonly IInMemoryBus bus;
 
         private readonly IEventDispatcher eventDispatcher;
         private readonly ICommandProcessor commandProcessor;
         private readonly ICommandHandlerRegistry commandHandlerRegistry;
 
-        private MessageLogHandler handler;        
+        private MessageLogHandler handler;
 
         public EventStoreRebuilderEngine(
-            IInMemoryCommandBus commandBus, IInMemoryEventBus eventBus, 
-            ICommandProcessor commandProcessor, ICommandHandlerRegistry commandHandlerRegistry, IEventDispatcher eventDispatcher, 
+            IInMemoryBus bus,
+            ICommandProcessor commandProcessor, ICommandHandlerRegistry commandHandlerRegistry, IEventDispatcher eventDispatcher,
             ITextSerializer serializer, IMetadataProvider metadataProvider,
             ISystemDateTime dateTime,
             IWorkerRoleTracer tracer,
-            IEventStoreRebuilderConfig config, 
+            IEventStoreRebuilderConfig config,
             EventStoreDbContext eventStoreDbContext)
         {
-            this.eventBus = eventBus;
-            this.commandBus = commandBus;
+            this.bus = bus;
             this.eventStoreContext = eventStoreDbContext;
             this.serializer = serializer;
             this.eventDispatcher = eventDispatcher;

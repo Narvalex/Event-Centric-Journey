@@ -9,9 +9,9 @@ namespace Journey.Messaging.Logging
     /// </summary>
     public class MessageLogHandler : IEventHandler<IEvent>, ICommandHandler<ICommand>
     {
-        private IMessageLogger logger;
+        private IMessageAuditLog logger;
 
-        public MessageLogHandler(IMessageLogger logger)
+        public MessageLogHandler(IMessageAuditLog logger)
         {
             this.logger = logger;
         }

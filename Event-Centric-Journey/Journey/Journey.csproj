@@ -125,8 +125,7 @@
     <Compile Include="Messaging\Core\ICommandBus.cs" />
     <Compile Include="Messaging\Core\IEvent.cs" />
     <Compile Include="Messaging\Core\IEventBus.cs" />
-    <Compile Include="Messaging\Core\IInMemoryCommandBus.cs" />
-    <Compile Include="Messaging\Core\IInMemoryEventBus.cs" />
+    <Compile Include="Messaging\Core\IInMemoryBus.cs" />
     <Compile Include="Messaging\Core\IMessageReceiver.cs" />
     <Compile Include="Messaging\Core\IMessageSender.cs" />
     <Compile Include="Messaging\Core\IMessagingSettings.cs" />
@@ -135,8 +134,7 @@
     <Compile Include="Messaging\Core\Implementation\CommandBusExtensions.cs" />
     <Compile Include="Messaging\Core\Implementation\EventBus.cs" />
     <Compile Include="Messaging\Core\Implementation\EventBusExtensions.cs" />
-    <Compile Include="Messaging\Core\Implementation\InMemoryEventBus.cs" />
-    <Compile Include="Messaging\Core\Implementation\InMemoryCommandBus.cs" />
+    <Compile Include="Messaging\Core\Implementation\InMemoryBus.cs" />
     <Compile Include="Messaging\Core\Implementation\MessageReceiver.cs" />
     <Compile Include="Messaging\Core\Implementation\MessageSender.cs" />
     <Compile Include="Messaging\Core\Implementation\MessagingDbInitializer.cs" />
@@ -147,7 +145,7 @@
     <Compile Include="Messaging\Logging\EventLogExtensions.cs" />
     <Compile Include="Messaging\Logging\EventLogQueryCriteria.cs" />
     <Compile Include="Messaging\Logging\IEventLogReader.cs" />
-    <Compile Include="Messaging\Logging\IMessageLogger.cs" />
+    <Compile Include="Messaging\Logging\IMessageAuditLog.cs" />
     <Compile Include="Messaging\Logging\Implementation\InMemoryMessageLog.cs" />
     <Compile Include="Messaging\Logging\Implementation\MessageLog.cs" />
     <Compile Include="Messaging\Logging\Implementation\MessageLogDbContext.cs" />
