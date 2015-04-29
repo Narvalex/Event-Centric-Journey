@@ -46,9 +46,8 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 
             // *********************************
             // EN FECOPROD:
-
-            var eventStoreConnectionString = string.Format("server=(local);Database={0};User Id=sa;pwd =123456", this.eventStoreDbName);
-
+                //var eventStoreConnectionString = string.Format("Data Source=.\\sqlexpress;Initial Catalog={0};Integrated Security=True", this.eventStoreDbName);
+                var eventStoreConnectionString = string.Format("server=(local);Database={0};User Id=sa;pwd =123456", this.eventStoreDbName);
             // BORRAR CUANDO SEA NECESARIO
             //***********************************
 
@@ -65,9 +64,8 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 
             // *********************************
             // EN FECOPROD:
-
             var messageLogConnectionString = string.Format("server=(local);Database={0};User Id=sa;pwd =123456", this.messageLogDbName);
-
+            //var messageLogConnectionString = string.Format("Data Source=.\\sqlexpress;Initial Catalog={0};Integrated Security=True", this.messageLogDbName);
             // BORRAR CUANDO SEA NECESARIO
             //***********************************
 
