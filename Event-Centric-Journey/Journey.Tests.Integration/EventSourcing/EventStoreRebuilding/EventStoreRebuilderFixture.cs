@@ -29,6 +29,9 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
         protected readonly string eventStoreDbName;
         protected readonly string messageLogDbName;
 
+        protected readonly string eventStoreConnectionString;
+        protected readonly string messageLogConnectionString;
+
         protected readonly IEventStore<FakeItemsSaga> eventStore;
         protected readonly MessageLogHandler logger;
         protected readonly ITextSerializer serializer;
@@ -39,15 +42,15 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 
             this.serializer = new IndentedJsonTextSerializer();
             this.tracer = new ConsoleWorkerRoleTracer();
-            
+
 
             // Event Store
             this.eventStoreDbName = typeof(EventStoreFixture).Name + "_eventStore";
 
             // *********************************
             // EN FECOPROD:
-                //var eventStoreConnectionString = string.Format("Data Source=.\\sqlexpress;Initial Catalog={0};Integrated Security=True", this.eventStoreDbName);
-                var eventStoreConnectionString = string.Format("server=(local);Database={0};User Id=sa;pwd =123456", this.eventStoreDbName);
+            var eventStoreConnectionString = string.Format("Data Source=.\\sqlexpress;Initial Catalog={0};Integrated Security=True", this.eventStoreDbName);
+            //var eventStoreConnectionString = string.Format("server=(local);Database={0};User Id=sa;pwd =123456", this.eventStoreDbName);
             // BORRAR CUANDO SEA NECESARIO
             //***********************************
 
@@ -64,8 +67,8 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 
             // *********************************
             // EN FECOPROD:
-            var messageLogConnectionString = string.Format("server=(local);Database={0};User Id=sa;pwd =123456", this.messageLogDbName);
-            //var messageLogConnectionString = string.Format("Data Source=.\\sqlexpress;Initial Catalog={0};Integrated Security=True", this.messageLogDbName);
+            //var messageLogConnectionString = string.Format("server=(local);Database={0};User Id=sa;pwd =123456", this.messageLogDbName);
+            var messageLogConnectionString = string.Format("Data Source=.\\sqlexpress;Initial Catalog={0};Integrated Security=True", this.messageLogDbName);
             // BORRAR CUANDO SEA NECESARIO
             //***********************************
 
@@ -89,7 +92,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 
         [Fact]
         public void GIVEN_messages_WHEN_replaying_THEN_rebuilds_event_store()
-        {         
+        {
             // GIVEN messages 
             var item = new Item { Id = 1, Name = "silla" };
             var aggregateId = Guid.NewGuid();
@@ -120,7 +123,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
                 Version = 2
             };
 
-           // ...logging
+            // ...logging
             this.logger.Handle(message1);
             this.logger.Handle(message2);
             this.logger.Handle(message3);
@@ -175,10 +178,10 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             eventProcessor.Register(container.Resolve<FakeItemsSagaHandler>());
 
             container.RegisterType(typeof(IEventStoreRebuilderEngine), typeof(EventStoreRebuilderEngine), new ContainerControlledLifetimeManager());
-            
+
             return container;
         }
-        
+
         public class FakeConfig : IEventStoreRebuilderConfig
         {
             public FakeConfig(string source, string newLog)
@@ -268,7 +271,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             public int Quantity { get; set; }
         }
 
-        public class FakeItemsSagaHandler: 
+        public class FakeItemsSagaHandler :
             ICommandHandler<AddItem>,
             IEventHandler<ItemAdded>
         {
@@ -299,14 +302,12 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
         #region Disposing
         public void Dispose()
         {
-            this.DisposeDatabase(this.eventStoreDbName);
-            this.DisposeDatabase(this.messageLogDbName);
+            this.DisposeDatabase(this.eventStoreConnectionString, this.eventStoreDbName);
+            this.DisposeDatabase(this.messageLogConnectionString, this.messageLogDbName);
         }
 
-        private void DisposeDatabase(string dbName)
+        private void DisposeDatabase(string connectionString, string dbName)
         {
-            var connectionString = string.Format("server=(local);Database={0};User Id=sa;pwd =123456", dbName);
-
             var builder = new SqlConnectionStringBuilder(connectionString);
             builder.InitialCatalog = "master";
             builder.AttachDBFilename = string.Empty;
@@ -331,7 +332,7 @@ DROP DATABASE [{0}]
                     command.ExecuteNonQuery();
                 }
             }
-        }  
+        }
         #endregion
 
         #endregion
