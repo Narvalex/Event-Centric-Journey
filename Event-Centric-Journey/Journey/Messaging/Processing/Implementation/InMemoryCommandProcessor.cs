@@ -63,6 +63,8 @@ namespace Journey.Messaging.Processing
                 if (this.handlers.TryGetValue(typeof(ICommand), out handler))
                     this.HandleMessage(payload, handler);
             }
+            else
+                throw new NotImplementedException("Command does not have handler!");
         }
 
         private void HandleMessage(object payload, ICommandHandler handler)

@@ -191,11 +191,16 @@
     <Compile Include="Worker\Config\Implementation\DefaultWorkerRoleConfigProvider.cs" />
     <Compile Include="Worker\Core\Implementation\DomainWorkerRegistry.cs" />
     <Compile Include="Worker\Core\IDomainWorkerRegistry.cs" />
+    <Compile Include="Worker\Rebuilding\IDomainEventStoreRebuilderRegistry.cs" />
+    <Compile Include="Worker\Rebuilding\IEventStoreRebuilder.cs" />
+    <Compile Include="Worker\Rebuilding\Implementation\DomainEventStoreRebuilderRegistry.cs" />
     <Compile Include="Worker\Rebuilding\Implementation\DomainReadModelRebuilderRegistry.cs" />
     <Compile Include="Worker\Rebuilding\IDomainReadModelRebuilderRegistry.cs" />
+    <Compile Include="Worker\Rebuilding\Implementation\EventStoreRebuilder.cs" />
+    <Compile Include="Worker\Rebuilding\Implementation\EventStoreRebuilderWebPortal.cs" />
     <Compile Include="Worker\Rebuilding\IReadModelRebuilder.cs" />
     <Compile Include="Worker\Rebuilding\Implementation\ReadModelRebuilder.cs" />
-    <Compile Include="Worker\Rebuilding\ReadModelRebuilderWebPortal.cs" />
+    <Compile Include="Worker\Rebuilding\Implementation\ReadModelRebuilderWebPortal.cs" />
     <Compile Include="Worker\Tracing\Implementation\ConsoleWorkerRoleTracer.cs" />
     <Compile Include="Worker\Tracing\Implementation\PortalHub.cs" />
     <Compile Include="Worker\Tracing\Implementation\SignalRBase.cs" />

@@ -7,8 +7,8 @@
     <ProjectGuid>{32CC8657-E194-445A-BFFC-9517AE4A56FF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimpleInventario.Worker</RootNamespace>
-    <AssemblyName>SimpleInventario.Worker</AssemblyName>
+    <RootNamespace>SimpleInventario.DomainRegistry</RootNamespace>
+    <AssemblyName>SimpleInventario.DomainRegistry</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -60,6 +60,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SharedRegistry.cs" />
+    <Compile Include="SimpleInventarioEventStoreRebuilderRegistry.cs" />
     <Compile Include="SimpleInventarioReadModelRebuilderRegistry.cs" />
     <Compile Include="SimpleInventarioWorkerRegistry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

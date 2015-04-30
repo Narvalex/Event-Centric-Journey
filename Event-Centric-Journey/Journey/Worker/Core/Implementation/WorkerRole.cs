@@ -19,8 +19,8 @@ namespace Journey.Worker
         private readonly CancellationTokenSource cancellationTokenSource;
         private readonly IUnityContainer container;
         private readonly List<IMessageProcessor> processors;
-        private static IWorkerRoleTracer _tracer;        
-        
+        private static IWorkerRoleTracer _tracer;
+
         /// <summary>
         /// Acepta aparte del dominio un tracer, que puede ser de consola o web, hasta el momento.
         /// </summary>
@@ -96,9 +96,8 @@ namespace Journey.Worker
             this.RegisterEventStore(container, config.EventStoreConnectionString);
 
             // Bounded Context Registration
-            if (domainRegistry.RegistrationList.Any())
-                foreach (var registrationAction in domainRegistry.RegistrationList)
-                    registrationAction(container, liveEventProcessor);
+            foreach (var registrationAction in domainRegistry.RegistrationList)
+                registrationAction(container, liveEventProcessor);
 
             // Handlers
             this.RegisterCommandHandlers(container);

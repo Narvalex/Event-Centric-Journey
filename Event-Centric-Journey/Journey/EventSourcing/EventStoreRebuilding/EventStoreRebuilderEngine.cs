@@ -1,4 +1,5 @@
-﻿using Journey.Messaging;
+﻿using Journey.Database;
+using Journey.Messaging;
 using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
 using Journey.Messaging.Processing;
@@ -7,6 +8,7 @@ using Journey.Utils;
 using Journey.Utils.SystemDateTime;
 using Journey.Worker;
 using Journey.Worker.Config;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,7 +17,7 @@ namespace Journey.EventSourcing.EventStoreRebuilding
 {
     public class EventStoreRebuilderEngine : IEventStoreRebuilderEngine
     {
-        private readonly EventStoreDbContext eventStoreContext;
+        private readonly Func<EventStoreDbContext> eventStoreContextFactory;
         private readonly ITextSerializer serializer;
         private readonly IMetadataProvider metadataProvider;
         private readonly ISystemDateTime dateTime;
@@ -41,10 +43,10 @@ namespace Journey.EventSourcing.EventStoreRebuilding
             ISystemDateTime dateTime,
             IWorkerRoleTracer tracer,
             IEventStoreRebuilderConfig config,
-            EventStoreDbContext eventStoreDbContext)
+            Func<EventStoreDbContext> eventStoreContextFactory)
         {
             this.bus = bus;
-            this.eventStoreContext = eventStoreDbContext;
+            this.eventStoreContextFactory = eventStoreContextFactory;
             this.serializer = serializer;
             this.eventDispatcher = eventDispatcher;
             this.commandProcessor = commandProcessor;
@@ -57,27 +59,72 @@ namespace Journey.EventSourcing.EventStoreRebuilding
 
         public void Rebuild()
         {
-            using (var sourceContext = new MessageLogDbContext(config.SourceMessageLogConnectionString))
+            try
             {
-                var messages = sourceContext.Set<MessageLogEntity>()
-                                .OrderBy(m => m.Id)
-                                .AsEnumerable()
-                                .Select(this.CreateMessage)
-                                .AsCachedAnyEnumerable();
+                TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = true;
 
-                using (var newContext = new MessageLogDbContext(config.NewMessageLogConnectionString))
+                using (var eventStoreContext = this.eventStoreContextFactory.Invoke())
                 {
-                    this.RegisterLogger(newContext);
+                    using (var eventStoreTransaction = eventStoreContext.Database.BeginTransaction())
+                    {
+                        try
+                        {
+                            eventStoreContext.Database.ExecuteSqlCommand("DELETE FROM [EventStore].[Events]");
 
-                    this.ProcessMessages(messages);
+                            using (var sourceContext = new MessageLogDbContext(config.SourceMessageLogConnectionString))
+                            {
+                                var messages = sourceContext.Set<MessageLogEntity>()
+                                                .OrderBy(m => m.Id)
+                                                .AsEnumerable()
+                                                .Select(this.CreateMessage)
+                                                .AsCachedAnyEnumerable();
 
-                    // el borrado colocamos al final por si se este haciendo desde el mismo connection.
-                    var result = newContext.Database.ExecuteSqlCommand("DELETE FROM [MessageLog].[Messages]");
-                    newContext.SaveChanges();
+                                using (var newAuditLogContext = new MessageLogDbContext(config.NewMessageLogConnectionString))
+                                {
+                                    using (var auditLogTransaction = newAuditLogContext.Database.BeginTransaction())
+                                    {
+                                        try
+                                        {
+                                            this.RegisterLogger(newAuditLogContext);
+
+                                            this.ProcessMessages(messages);
+
+                                            // el borrado colocamos al final por si se este haciendo desde el mismo connection.
+                                            newAuditLogContext.Database.ExecuteSqlCommand("DELETE FROM [MessageLog].[Messages]");
+
+                                            newAuditLogContext.SaveChanges();
+                                            auditLogTransaction.Commit();
+                                        }
+                                        catch (Exception)
+                                        {
+                                            auditLogTransaction.Rollback();
+                                            throw;
+                                        }
+                                    }
+                                }
+                            }
+
+                            eventStoreContext.SaveChanges();
+                            eventStoreTransaction.Commit();
+                        }
+                        catch (Exception)
+                        {
+                            eventStoreTransaction.Rollback();
+                            throw;
+                        }
+                    }
                 }
             }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = false;
+            }
 
-            this.eventStoreContext.SaveChanges();
+
         }
 
         private void RegisterLogger(MessageLogDbContext newContext)

@@ -11,11 +11,8 @@ namespace Journey.Worker.Rebuilding
     public class ReadModelRebuilder<T> : IReadModelRebuilder<T>
         where T : ReadModelDbContext
     {
-        private IWorkerRoleTracer tracer;
-        private IDomainReadModelRebuilderRegistry<T> domainRegistry;
-        private ReadModelRebuilderEngine<T> engine;
-        private bool disposed = false;
-        
+        private readonly IWorkerRoleTracer tracer;
+        private readonly IDomainReadModelRebuilderRegistry<T> domainRegistry;
 
         public ReadModelRebuilder(IDomainReadModelRebuilderRegistry<T> domainRegistry, IWorkerRoleTracer tracer)
         {
@@ -31,15 +28,15 @@ namespace Journey.Worker.Rebuilding
             var serializer = new JsonTextSerializer();
 
             using (var context = domainRegistry.ContextFactory.Invoke())
-            {              
+            {
                 foreach (var registrationAction in domainRegistry.RegistrationList)
                     registrationAction(context, complexEventProcessor, this.tracer);
 
                 Func<EventStoreDbContext> eventStoreContextFactory = () => new EventStoreDbContext(domainRegistry.Config.EventStoreConnectionString);
 
-                this.engine = new ReadModelRebuilderEngine<T>(eventStoreContextFactory, serializer, complexEventProcessor, context);
+                var engine = new ReadModelRebuilderEngine<T>(eventStoreContextFactory, serializer, complexEventProcessor, context);
 
-                this.engine.Rebuild(); 
+                engine.Rebuild();
             }
         }
     }

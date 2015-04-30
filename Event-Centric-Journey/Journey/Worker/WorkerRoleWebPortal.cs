@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Journey.Worker.Rebuilding;
+using System;
 using System.Web.Hosting;
 
 namespace Journey.Worker
@@ -12,7 +13,7 @@ namespace Journey.Worker
 
         private static Action rebuildReadModel;
 
-        private WorkerRoleWebPortal() 
+        private WorkerRoleWebPortal()
         {
             HostingEnvironment.RegisterObject(this);
         }
@@ -56,7 +57,7 @@ namespace Journey.Worker
                 worker.Start();
             }
         }
-        
+
         public void StopWorking()
         {
             lock (lockObject)
@@ -80,6 +81,13 @@ namespace Journey.Worker
         {
             rebuildReadModel.Invoke();
         }
+
+        public void RebuildEventStore()
+        {
+            EventStoreRebuilderWebPortal.Instance.Rebuild();
+        }
+
+        public object LockObject { get { return lockObject; } }
 
         public void Dispose()
         {

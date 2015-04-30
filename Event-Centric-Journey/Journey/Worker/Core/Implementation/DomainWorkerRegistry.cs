@@ -13,10 +13,9 @@ namespace Journey.Worker
 
         public DomainWorkerRegistry()
         {
-            this.registrationList = new List<Action<IUnityContainer, IEventHandlerRegistry>>();
             this.config = DefaultWorkerRoleConfigProvider.Configuration;
 
-            this.registrationList = this.RegisterComplexEventProcessors();
+            this.registrationList = this.RegisterComplexEventProcessors(new List<Action<IUnityContainer, IEventHandlerRegistry>>());
         }
 
         public List<Action<IUnityContainer, IEventHandlerRegistry>> RegistrationList
@@ -29,6 +28,6 @@ namespace Journey.Worker
             get { return this.config; }
         }
 
-        protected abstract List<Action<IUnityContainer, IEventHandlerRegistry>> RegisterComplexEventProcessors();
+        protected abstract List<Action<IUnityContainer, IEventHandlerRegistry>> RegisterComplexEventProcessors(List<Action<IUnityContainer, IEventHandlerRegistry>> list);
     }
 }
