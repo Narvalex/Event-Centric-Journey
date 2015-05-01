@@ -191,6 +191,7 @@
     <Compile Include="Worker\Config\Implementation\DefaultWorkerRoleConfigProvider.cs" />
     <Compile Include="Worker\Core\Implementation\DomainWorkerRegistry.cs" />
     <Compile Include="Worker\Core\IDomainWorkerRegistry.cs" />
+    <Compile Include="Worker\IWorkerRoleWebPortal.cs" />
     <Compile Include="Worker\Rebuilding\IDomainEventStoreRebuilderRegistry.cs" />
     <Compile Include="Worker\Rebuilding\IEventStoreRebuilder.cs" />
     <Compile Include="Worker\Rebuilding\Implementation\DomainEventStoreRebuilderRegistry.cs" />

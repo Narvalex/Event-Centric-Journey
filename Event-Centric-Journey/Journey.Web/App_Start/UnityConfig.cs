@@ -37,9 +37,9 @@ namespace Journey.Web.App_Start
             // TODO: Register your types here
             // container.RegisterType<IProductRepository, ProductRepository>();
 
-            Start();
+            RegisterWebPortal(container);
         }
 
-        static partial void Start();
+        static partial void RegisterWebPortal(IUnityContainer container);
     }
 }

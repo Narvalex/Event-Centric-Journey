@@ -1,10 +1,9 @@
-﻿using Journey.Worker.Rebuilding;
-using System;
+﻿using System;
 using System.Web.Hosting;
 
 namespace Journey.Worker
 {
-    public sealed class WorkerRoleWebPortal : IRegisteredObject, IDisposable
+    public sealed class WorkerRoleWebPortal : IWorkerRoleWebPortal, IRegisteredObject, IDisposable
     {
         private static volatile WorkerRoleWebPortal instance;
         private static volatile IWorkerRole worker;
@@ -12,7 +11,7 @@ namespace Journey.Worker
         private static volatile bool isWorking;
 
         private static Action rebuildReadModel;
-        private static EventStoreRebuilderWebPortal eventStoreRebuilderPortal;
+        private static Action rebuildEventStore;
 
         private WorkerRoleWebPortal()
         {
@@ -24,7 +23,7 @@ namespace Journey.Worker
             get { return instance; }
         }
 
-        public static WorkerRoleWebPortal CreateNew(IWorkerRole workerInstance, Action rebuildReadModel, EventStoreRebuilderWebPortal eventStoreRebuilderPortal)
+        public static WorkerRoleWebPortal CreateNew(IWorkerRole workerInstance, Action rebuildReadModel, Action rebuildEventStore)
         {
             if (instance == null)
             {
@@ -40,7 +39,7 @@ namespace Journey.Worker
 
                         worker = workerInstance;
                         WorkerRoleWebPortal.rebuildReadModel = rebuildReadModel;
-                        WorkerRoleWebPortal.eventStoreRebuilderPortal = eventStoreRebuilderPortal;
+                        WorkerRoleWebPortal.rebuildEventStore = rebuildEventStore;
                     }
                 }
             }
@@ -87,14 +86,14 @@ namespace Journey.Worker
         public void RebuildEventStore()
         {
             this.StopWorking();
-            eventStoreRebuilderPortal.Rebuild();
+            rebuildEventStore.Invoke();
             this.StartWorking();
         }
 
         public void RebuildEventStoreAndReadModel()
         {
             this.StopWorking();
-            eventStoreRebuilderPortal.Rebuild();
+            rebuildEventStore.Invoke();
             rebuildReadModel.Invoke();
             this.StartWorking();
         }

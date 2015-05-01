@@ -11,6 +11,7 @@
         vm.start = start;
         vm.stop = stop;
         vm.rebuildReadModel = rebuildReadModel;
+        vm.rebuildEventStore = rebuildEventStore;
 
         vm.portalHub = null;
 
@@ -98,12 +99,28 @@
             vm.hideAll = true;
             // stopping...
 
-            toastr.warning("Stopping Engine for rebuild...")
+            toastr.warning("Stopping Engine for read model rebuild...")
             vm.portalHub.server.sendMessage('===> Stopping worker and starting read model rebuilding process...');
             return $http.get('/api/portal/rebuildReadModel')
                         .then(function (response) {
                             vm.isWorking = response.data;
                             vm.hideAll = false;
+                            toastr.info('Engine is now working again');
+                        });
+
+        }
+
+        function rebuildEventStore() {
+            vm.hideAll = true;
+            // stopping...
+
+            toastr.warning("Stopping Engine for event store rebuild...")
+            vm.portalHub.server.sendMessage('===> Stopping worker and starting event store rebuilding process...');
+            return $http.get('/api/portal/rebuildEventStore')
+                        .then(function (response) {
+                            vm.isWorking = response.data;
+                            vm.hideAll = false;
+                            toastr.info('Engine is now working again');
                         });
 
         }

@@ -264,10 +264,6 @@
       <Project>{96b26dbf-0e5c-4677-84fc-37985ee1d2d0}</Project>
       <Name>Journey</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SimpleInventario.ReadModel\SimpleInventario.ReadModel.csproj">
-      <Project>{15cb378c-d6a3-4c38-88e3-de495121fd63}</Project>
-      <Name>SimpleInventario.ReadModel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SimpleInventario.Worker\SimpleInventario.DomainRegistry.csproj">
       <Project>{32cc8657-e194-445a-bffc-9517ae4a56ff}</Project>
       <Name>SimpleInventario.DomainRegistry</Name>

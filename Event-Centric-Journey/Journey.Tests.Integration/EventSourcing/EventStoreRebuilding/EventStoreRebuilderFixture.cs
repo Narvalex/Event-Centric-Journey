@@ -193,6 +193,11 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             public string SourceMessageLogConnectionString { get; set; }
 
             public string NewMessageLogConnectionString { get; set; }
+
+            public string EventStoreConnectionString
+            {
+                get { throw new NotImplementedException(); }
+            }
         }
 
         #region Fake Domain

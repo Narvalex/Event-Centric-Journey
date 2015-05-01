@@ -20,7 +20,7 @@ namespace Journey.Worker.Rebuilding
 
         public List<Action<IUnityContainer, IEventHandlerRegistry>> RegistrationList
         {
-            get { throw new NotImplementedException(); }
+            get { return this.registrationList; }
         }
 
         public IEventStoreRebuilderConfig Config
