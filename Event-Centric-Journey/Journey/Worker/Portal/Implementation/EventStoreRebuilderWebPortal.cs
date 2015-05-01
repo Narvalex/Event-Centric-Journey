@@ -1,23 +1,21 @@
-﻿using System;
+﻿using Journey.Worker.Rebuilding;
+using System;
 using System.Web.Hosting;
 
-namespace Journey.Worker.Rebuilding
+namespace Journey.Worker.Portal
 {
     public sealed class EventStoreRebuilderWebPortal : IRegisteredObject
     {
         private static volatile EventStoreRebuilderWebPortal instance;
         private static volatile IEventStoreRebuilder rebuilder;
-        private static readonly object lockObject;
+
         private static volatile bool isRebuilding;
+
+        private static IPortalWorkCoordinator coordinator;
 
         public EventStoreRebuilderWebPortal()
         {
             HostingEnvironment.RegisterObject(this);
-        }
-
-        static EventStoreRebuilderWebPortal()
-        {
-            lockObject = WorkerRoleWebPortal.Instance.LockObject;
         }
 
         public static EventStoreRebuilderWebPortal Instance

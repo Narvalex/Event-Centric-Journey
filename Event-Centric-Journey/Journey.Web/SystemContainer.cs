@@ -1,4 +1,4 @@
-﻿using Journey.Worker;
+﻿using Journey.Worker.Portal;
 using Microsoft.Practices.Unity;
 using SimpleInventario.DomainRegistry;
 

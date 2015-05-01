@@ -1,8 +1,9 @@
 ﻿using Journey.EventSourcing.ReadModeling;
+using Journey.Worker.Rebuilding;
 using System;
 using System.Web.Hosting;
 
-namespace Journey.Worker.Rebuilding
+namespace Journey.Worker.Portal
 {
     public sealed class ReadModelRebuilderWebPortal<T> : IRegisteredObject where T : ReadModelDbContext
     {

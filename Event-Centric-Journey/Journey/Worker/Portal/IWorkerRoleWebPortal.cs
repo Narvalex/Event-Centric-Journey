@@ -1,5 +1,5 @@
 ﻿
-namespace Journey.Worker
+namespace Journey.Worker.Portal
 {
     public interface IWorkerRoleWebPortal
     {

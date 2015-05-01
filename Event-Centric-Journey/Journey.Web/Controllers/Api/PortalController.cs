@@ -1,4 +1,4 @@
-﻿using Journey.Worker;
+﻿using Journey.Worker.Portal;
 using System.Web.Http;
 
 namespace Journey.Web.Controllers.Api
