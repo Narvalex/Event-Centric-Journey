@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Journey.Worker.Rebuilding
 {
-    interface IDomainEventStoreRebuilderRegistry
+    public interface IDomainEventStoreRebuilderRegistry
     {
         /// <summary>
         /// El contenedor, los live event processors y los read model rebuilders processors 

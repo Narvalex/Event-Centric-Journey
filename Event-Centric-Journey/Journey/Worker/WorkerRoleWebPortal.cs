@@ -12,6 +12,7 @@ namespace Journey.Worker
         private static volatile bool isWorking;
 
         private static Action rebuildReadModel;
+        private static EventStoreRebuilderWebPortal eventStoreRebuilderPortal;
 
         private WorkerRoleWebPortal()
         {
@@ -23,7 +24,7 @@ namespace Journey.Worker
             get { return instance; }
         }
 
-        public static WorkerRoleWebPortal CreateNew(IWorkerRole workerInstance, Action rebuildReadModel)
+        public static WorkerRoleWebPortal CreateNew(IWorkerRole workerInstance, Action rebuildReadModel, EventStoreRebuilderWebPortal eventStoreRebuilderPortal)
         {
             if (instance == null)
             {
@@ -39,6 +40,7 @@ namespace Journey.Worker
 
                         worker = workerInstance;
                         WorkerRoleWebPortal.rebuildReadModel = rebuildReadModel;
+                        WorkerRoleWebPortal.eventStoreRebuilderPortal = eventStoreRebuilderPortal;
                     }
                 }
             }
@@ -84,7 +86,17 @@ namespace Journey.Worker
 
         public void RebuildEventStore()
         {
-            EventStoreRebuilderWebPortal.Instance.Rebuild();
+            this.StopWorking();
+            eventStoreRebuilderPortal.Rebuild();
+            this.StartWorking();
+        }
+
+        public void RebuildEventStoreAndReadModel()
+        {
+            this.StopWorking();
+            eventStoreRebuilderPortal.Rebuild();
+            rebuildReadModel.Invoke();
+            this.StartWorking();
         }
 
         public object LockObject { get { return lockObject; } }

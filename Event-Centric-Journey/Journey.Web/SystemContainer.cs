@@ -11,12 +11,12 @@ namespace Journey.Web.App_Start
     partial class SystemContainer
     {
         static partial void Start()
-        {            
+        {
             // Implement Here you Own Domain Components.
             var tracer = new WebWorkerRoleTracer();
 
             var worker = new WorkerRole(
-                new SimpleInventarioWorkerRegistry(), 
+                new SimpleInventarioWorkerRegistry(),
                 tracer);
 
             // Implement here your Own Domain Read Builder Components.
@@ -26,19 +26,16 @@ namespace Journey.Web.App_Start
                     new SimpleInventarioReadModelRebuilderRegistry(),
                     WorkerRoleWebPortal.Instance.WorkerRole.Tracer);
 
-                // Stop working Worker Role
-                WorkerRoleWebPortal.Instance.StopWorking();
-
                 // do rebuild
                 ReadModelRebuilderWebPortal<SimpleInventarioDbContext>
                     .CreateNew(rebuilder).Rebuild();
-
-                // Start Working Again
-                WorkerRoleWebPortal.Instance.StartWorking();
             };
 
+            var eventStoreRebuilder = EventStoreRebuilderWebPortal.CreateNew(
+                new EventStoreRebuilder(new SimpleInventarioEventStoreRebuilderRegistry(), tracer));
+
             WorkerRoleWebPortal
-                .CreateNew(worker, rebuildReadModel)
+                .CreateNew(worker, rebuildReadModel, eventStoreRebuilder)
                 .StartWorking();
         }
     }
