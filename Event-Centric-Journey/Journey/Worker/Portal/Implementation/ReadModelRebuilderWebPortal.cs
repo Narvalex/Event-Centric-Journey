@@ -9,7 +9,8 @@ namespace Journey.Worker.Portal
     {
         private static volatile ReadModelRebuilderWebPortal<T> instance;
         private static volatile IReadModelRebuilder<T> rebuilder;
-        private static volatile bool isRebuilding;
+
+        private static IPortalTaskCoordinator coordinator;
 
         private ReadModelRebuilderWebPortal()
         {
@@ -21,49 +22,70 @@ namespace Journey.Worker.Portal
             get { return instance; }
         }
 
-        public static ReadModelRebuilderWebPortal<T> CreateNew(IReadModelRebuilder<T> rebuilderInstance)
+        public static ReadModelRebuilderWebPortal<T> CreateNew(IReadModelRebuilder<T> rebuilderInstance, IPortalTaskCoordinator coordinator)
         {
-            if (instance == null)
+            try
             {
-                lock (WorkerRoleWebPortal.Instance.LockObject)
+                lock (coordinator.LockObject)
                 {
-                    if (instance == null)
-                    {
-                        instance = new ReadModelRebuilderWebPortal<T>();
-                        isRebuilding = false;
+                    if (rebuilder != null)
+                        throw new InvalidOperationException("Can not create new instance of ReadModelRebuilderWebPortal<T>. You should only start one instance!");
 
-                        if (rebuilder != null)
-                            throw new InvalidOperationException("You should only start one instance!");
+                    if (coordinator.PortalIsRebuilding)
+                        throw new InvalidOperationException("Can not create new instance of ReadModelRebuilderWebPortal<T>. Is already rebuilding");
 
-                        rebuilder = rebuilderInstance;
-                    }
+                    instance = new ReadModelRebuilderWebPortal<T>();
+
+
+
+                    ReadModelRebuilderWebPortal<T>.coordinator = coordinator;
+                    ReadModelRebuilderWebPortal<T>.coordinator.SetPortalIsNotRebuilding();
+                    rebuilder = rebuilderInstance;
                 }
-            }
 
-            return instance;
+                return instance;
+            }
+            catch (Exception ex)
+            {
+                WorkerRoleWebPortal.Instance.WorkerRole.Tracer.Notify(ex.Message);
+                throw;
+            }
         }
 
         public void Rebuild()
         {
-            lock (WorkerRoleWebPortal.Instance.LockObject)
+            try
             {
-                if (isRebuilding)
-                    return;
+                lock (coordinator.LockObject)
+                {
+                    if (coordinator.PortalIsRebuilding)
+                        return;
 
-                isRebuilding = true;
+                    coordinator.SetPortalIsRebuilding();
+                }
+
+                rebuilder.Rebuild();
+
+                lock (coordinator.LockObject)
+                {
+                    coordinator.SetPortalIsNotRebuilding();
+                }
             }
-
-            rebuilder.Rebuild();
-
-            lock (WorkerRoleWebPortal.Instance.LockObject)
+            catch (Exception ex)
             {
-                isRebuilding = false;
+                coordinator.SetPortalIsNotRebuilding();
+                WorkerRoleWebPortal.Instance.WorkerRole.Tracer.Notify(ex.Message);
+                throw;
+            }
+            finally
+            {
+                rebuilder = null;
             }
         }
 
         public void Stop(bool immediate)
         {
-            if (!isRebuilding)
+            if (!coordinator.PortalIsRebuilding)
                 HostingEnvironment.UnregisterObject(this);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Journey.Worker;
+using Journey.Worker.Portal;
 using System.Web.Mvc;
 
 namespace Journey.Web.Controllers

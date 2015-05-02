@@ -8,7 +8,7 @@ namespace Journey.Worker.Portal
         private static volatile WorkerRoleWebPortal instance;
         private static volatile IWorkerRole worker;
 
-        private static IPortalWorkCoordinator coordinator;
+        private static IPortalTaskCoordinator coordinator;
 
         private static Action rebuildReadModel;
         private static Action rebuildEventStore;
@@ -23,7 +23,7 @@ namespace Journey.Worker.Portal
             get { return instance; }
         }
 
-        public static WorkerRoleWebPortal CreateNew(IWorkerRole workerInstance, Action rebuildReadModel, Action rebuildEventStore, IPortalWorkCoordinator coordinator)
+        public static WorkerRoleWebPortal CreateNew(IWorkerRole workerInstance, Action rebuildReadModel, Action rebuildEventStore, IPortalTaskCoordinator coordinator)
         {
             if (instance == null)
             {
@@ -57,7 +57,7 @@ namespace Journey.Worker.Portal
                 if (coordinator.WorkerIsWorking)
                     return;
 
-                coordinator.SetWorkerIsNowWorking();
+                coordinator.SetWorkerIsWorking();
                 worker.Start();
             }
         }

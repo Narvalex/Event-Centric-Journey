@@ -6,17 +6,18 @@
     <title>@ViewBag.Title - Journey</title>
 
     <!-- CSS -->
-    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <link href="~/Content/journey.css" rel="stylesheet" />
-    <link href="~/Content/toastr.css" rel="stylesheet" />
+    <link href="~/Content/toastr.min.css" rel="stylesheet" />
+    <link href="~/Content/animate.min.css" rel="stylesheet" />
 
     <!-- Js -->
-    <script src="~/Scripts/jquery-2.1.3.js"></script>
+    <script src="~/Scripts/jquery-2.1.3.min.js"></script>
     <script src="~/Scripts/modernizr-2.8.3.js"></script>
-    <script src="~/Scripts/bootstrap.js"></script>
-    <script src="~/Scripts/toastr.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/toastr.min.js"></script>
     <script src="~/Scripts/angular.js"></script>
-    <script src="~/Scripts/knockout-3.3.0.debug.js"></script>
+    <script src="~/Scripts/knockout-3.3.0.js"></script>
 
 
     <!-- Portal  -->
@@ -39,14 +40,15 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    @Html.ActionLink("Event Centric Journey", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                    @Html.ActionLink("Event Centric Journey", "Index", "Home", new { area = "" }, new { @class = "navbar-brand animated fadeIn" })
                 </div>
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
                         <li class="dropdown">
+
                             <a ng-show="isWorking && !hideAll"
                                href=""
-                               class="dropdown-toggle"
+                               class="dropdown-toggle animated fadeIn"
                                data-toggle="dropdown"
                                style="font-family:Arial; font-size: 12px; color:#00ff90; font-weight:600;">
                                 <span class="glyphicon glyphicon-ok-sign" style="margin-right: 2px"></span>
@@ -55,13 +57,23 @@
                             </a>
                             <a ng-show="!isWorking && !hideAll"
                                href=""
-                               class="dropdown-toggle"
+                               class="dropdown-toggle animated fadeIn"
                                data-toggle="dropdown"
                                style="font-family:Arial; font-size: 12px; color:#f35454; font-weight:600;">
                                 <span class="glyphicon glyphicon-alert" style="margin-right: 2px"></span>
                                 Worker is down
                                 <span class="glyphicon glyphicon-chevron-down" style="margin-left: 2px; color:#989898;"></span>
                             </a>
+
+                            <a ng-show="hideAll"
+                               href=""
+                               data-toggle="dropdown"
+                               class="animated fadeIn"
+                               style="font-family:Arial; font-size: 12px; color:#dec63d; font-weight:600;">
+                                <span class="glyphicon glyphicon-info-sign" style="margin-right: 2px"></span>
+                                Work in progress...
+                            </a>
+
                             <ul class="dropdown-menu" role="menu">
                                 <li ng-show="!isWorking && !hideAll">
                                     <a href=""
@@ -83,7 +95,7 @@
                                 <li>
                                     <a href=""
                                        ng-click="rebuildReadModel()">
-                                        <span class="glyphicon glyphicon-refresh"
+                                        <span class="glyphicon glyphicon-list-alt"
                                               style="margin-right: 2px"></span>
                                         Rebuild read model
                                     </a>
@@ -94,6 +106,14 @@
                                         <span class="glyphicon glyphicon-sort-by-attributes"
                                               style="margin-right: 2px"></span>
                                         Rebuild event store
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href=""
+                                       ng-click="rebuildEventStoreAndReadModel()">
+                                        <span class="glyphicon glyphicon-repeat"
+                                              style="margin-right: 2px"></span>
+                                        Rebuild All
                                     </a>
                                 </li>
                             </ul>

@@ -191,6 +191,8 @@
   <ItemGroup>
     <Content Include="app\portal\app.js" />
     <Content Include="app\portal\portalController.js" />
+    <Content Include="Content\animate.css" />
+    <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />

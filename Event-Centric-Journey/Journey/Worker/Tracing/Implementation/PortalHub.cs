@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.SignalR;
+﻿using Journey.Worker.Portal;
+using Microsoft.AspNet.SignalR;
 
 namespace Journey.Worker.Tracing
 {

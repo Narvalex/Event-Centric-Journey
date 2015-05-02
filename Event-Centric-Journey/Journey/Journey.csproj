@@ -191,9 +191,9 @@
     <Compile Include="Worker\Config\Implementation\DefaultWorkerRoleConfigProvider.cs" />
     <Compile Include="Worker\Core\Implementation\DomainWorkerRegistry.cs" />
     <Compile Include="Worker\Core\IDomainWorkerRegistry.cs" />
-    <Compile Include="Worker\Portal\IPortalWorkCoordinator.cs" />
+    <Compile Include="Worker\Portal\IPortalTaskCoordinator.cs" />
     <Compile Include="Worker\Portal\IWorkerRoleWebPortal.cs" />
-    <Compile Include="Worker\Portal\Implementation\PortalWorkCoordinator.cs" />
+    <Compile Include="Worker\Portal\Implementation\PortalTaskCoordinator.cs" />
     <Compile Include="Worker\Rebuilding\IDomainEventStoreRebuilderRegistry.cs" />
     <Compile Include="Worker\Rebuilding\IEventStoreRebuilder.cs" />
     <Compile Include="Worker\Rebuilding\Implementation\DomainEventStoreRebuilderRegistry.cs" />

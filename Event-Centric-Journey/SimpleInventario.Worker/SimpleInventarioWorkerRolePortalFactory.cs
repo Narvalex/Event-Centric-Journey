@@ -1,4 +1,5 @@
 ﻿using Journey.Worker;
+using Journey.Worker.Portal;
 using Journey.Worker.Rebuilding;
 using Journey.Worker.Tracing;
 using SimpleInventario.ReadModel;
@@ -14,6 +15,8 @@ namespace SimpleInventario.DomainRegistry
             // Implement Here you Own Domain Components.
             var tracer = new WebWorkerRoleTracer();
 
+            var coordinator = new PortalTaskCoordinator();
+
             var worker = new WorkerRole(
                 new SimpleInventarioWorkerRegistry(),
                 tracer);
@@ -27,19 +30,20 @@ namespace SimpleInventario.DomainRegistry
 
                 // do rebuild
                 ReadModelRebuilderWebPortal<SimpleInventarioDbContext>
-                    .CreateNew(rebuilder).Rebuild();
+                    .CreateNew(rebuilder, coordinator).Rebuild();
             };
 
             Action rebuildEventStore = () =>
             {
                 var eventStoreRebuilder = EventStoreRebuilderWebPortal.CreateNew(
-                    new EventStoreRebuilder(new SimpleInventarioEventStoreRebuilderRegistry(), tracer));
+                    new EventStoreRebuilder(new SimpleInventarioEventStoreRebuilderRegistry(), tracer),
+                    coordinator);
 
                 eventStoreRebuilder.Rebuild();
             };
 
             WorkerRoleWebPortal
-                .CreateNew(worker, rebuildReadModel, rebuildEventStore)
+                .CreateNew(worker, rebuildReadModel, rebuildEventStore, coordinator)
                 .StartWorking();
 
             return WorkerRoleWebPortal.Instance;

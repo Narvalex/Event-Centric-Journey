@@ -1,24 +1,23 @@
-﻿using System;
-
+﻿
 namespace Journey.Worker.Portal
 {
-    public class PortalWorkCoordinator : IPortalWorkCoordinator
+    public class PortalTaskCoordinator : IPortalTaskCoordinator
     {
         private static volatile bool workerIsWorking;
         private static object lockObject = new object();
+        private static volatile bool portalIsRebuilding;
 
         public bool WorkerIsWorking
         {
             get { return workerIsWorking; }
         }
 
-        public bool IsRebuilding()
+        public bool PortalIsRebuilding
         {
-            throw new NotImplementedException();
+            get { return portalIsRebuilding; }
         }
 
-
-        public void SetWorkerIsNowWorking()
+        public void SetWorkerIsWorking()
         {
             workerIsWorking = true;
         }
@@ -28,14 +27,14 @@ namespace Journey.Worker.Portal
             workerIsWorking = false;
         }
 
-        public void SetPortalIsNowRebuilding()
+        public void SetPortalIsRebuilding()
         {
-            throw new NotImplementedException();
+            portalIsRebuilding = true;
         }
 
-        public void SetPortalStoppedRebuilding()
+        public void SetPortalIsNotRebuilding()
         {
-            throw new NotImplementedException();
+            portalIsRebuilding = false;
         }
 
         public object LockObject
