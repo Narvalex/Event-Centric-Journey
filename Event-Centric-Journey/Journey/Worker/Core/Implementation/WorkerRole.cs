@@ -35,6 +35,8 @@ namespace Journey.Worker
 
         public void Start()
         {
+            this.RegisterInMemorySnapshotCache(this.container);
+
             this.processors.ForEach(p => p.Start());
             this.container.Resolve<IWorkerRoleTracer>().Notify("=== Worker Started ===");
         }
@@ -78,9 +80,8 @@ namespace Journey.Worker
             var liveEventProcessor = new EventProcessor(
                 new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.EventBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer);
 
-            var inMemorySnapshotCache = new InMemoryRollingSnapshot("EventStoreCache");
+            this.RegisterInMemorySnapshotCache(container);
 
-            container.RegisterInstance<IInMemoryRollingSnapshotProvider>(inMemorySnapshotCache);
             container.RegisterInstance<ICommandBus>(commandBus);
             container.RegisterInstance<IEventBus>(eventBus);
             container.RegisterInstance<ICommandHandlerRegistry>(commandProcessor);
@@ -104,6 +105,15 @@ namespace Journey.Worker
             this.RegisterAditionalEventHandlers(container, liveEventProcessor);
 
             return container;
+        }
+
+        /// <summary>
+        /// Esto es para evitar que al hacer un update que no coincide funcione
+        /// </summary>
+        private void RegisterInMemorySnapshotCache(IUnityContainer container)
+        {
+            var inMemorySnapshotCache = new InMemoryRollingSnapshot("EventStoreCache");
+            container.RegisterInstance<IInMemoryRollingSnapshotProvider>(inMemorySnapshotCache);
         }
 
         private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString, ISystemDateTime dateTime, IWorkerRoleTracer tracer)
@@ -147,11 +157,6 @@ namespace Journey.Worker
         public IWorkerRoleTracer Tracer
         {
             get { return _tracer; }
-        }
-
-        public void RebuildReadModel()
-        {
-            throw new System.NotImplementedException();
         }
     }
 }
