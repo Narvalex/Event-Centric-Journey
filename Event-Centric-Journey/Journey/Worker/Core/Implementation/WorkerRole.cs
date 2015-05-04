@@ -100,7 +100,7 @@ namespace Journey.Worker
             foreach (var registrationAction in domainRegistry.RegistrationList)
                 registrationAction(container, liveEventProcessor);
 
-            // Handlers
+            // Handlers 
             this.RegisterCommandHandlers(container);
             this.RegisterAditionalEventHandlers(container, liveEventProcessor);
 
