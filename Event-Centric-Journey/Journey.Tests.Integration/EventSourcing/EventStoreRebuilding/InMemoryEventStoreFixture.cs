@@ -139,7 +139,7 @@ namespace Journey.Tests.Integration.EventSourcing
                     retrivedAggregate.RemoveItem(item2.Id, 7);
                     retrivedAggregate.RemoveItem(item.Id, 2);
 
-                    this.sut.Save(retrivedAggregate, Guid.NewGuid());
+                    this.sut.Save(retrivedAggregate, Guid.NewGuid()); 
 
                     var overRetrivedAggregate = this.sut.Find(aggregateId);
 
