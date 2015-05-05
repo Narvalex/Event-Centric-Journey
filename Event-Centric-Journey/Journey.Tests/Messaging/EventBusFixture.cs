@@ -28,12 +28,12 @@ namespace Journey.Tests.Messaging.EventBusFixture
 
     public class FakeSender : IMessageSender, ISqlBus
     {
-        public void Send(Message message)
+        public void Send(MessageForDelivery message)
         {
             throw new NotImplementedException();
         }
 
-        public void Send(IEnumerable<Message> messages)
+        public void Send(IEnumerable<MessageForDelivery> messages)
         {
             throw new NotImplementedException();
         }
@@ -44,7 +44,7 @@ namespace Journey.Tests.Messaging.EventBusFixture
         }
 
 
-        public void Send(IEnumerable<Message> messages, DbContext context)
+        public void Send(IEnumerable<MessageForDelivery> messages, DbContext context)
         {
             throw new NotImplementedException();
         }

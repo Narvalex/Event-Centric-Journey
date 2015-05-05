@@ -1,9 +1,7 @@
 ﻿using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
 using Journey.Utils;
-using Journey.Utils.SystemDateTime;
 using Journey.Worker;
-using System;
 using System.Linq;
 
 namespace Journey.Messaging.Logging
@@ -13,14 +11,12 @@ namespace Journey.Messaging.Logging
         private readonly MessageLogDbContext context;
         private readonly IMetadataProvider metadataProvider;
         private readonly ITextSerializer serializer;
-        private readonly ISystemDateTime dateTime;
         private readonly IWorkerRoleTracer tracer;
 
-        public InMemoryMessageLog(ITextSerializer serializer, IMetadataProvider metadataProvider, ISystemDateTime dateTime, IWorkerRoleTracer tracer, MessageLogDbContext context)
+        public InMemoryMessageLog(ITextSerializer serializer, IMetadataProvider metadataProvider, IWorkerRoleTracer tracer, MessageLogDbContext context)
         {
             this.serializer = serializer;
             this.metadataProvider = metadataProvider;
-            this.dateTime = dateTime;
             this.tracer = tracer;
             this.context = context;
         }
@@ -77,7 +73,7 @@ namespace Journey.Messaging.Logging
                 Namespace = metadata.TryGetValue(StandardMetadata.Namespace),
                 TypeName = metadata.TryGetValue(StandardMetadata.TypeName),
                 SourceType = metadata.TryGetValue(StandardMetadata.SourceType),
-                CreationDate = this.dateTime.Now.ToString("o"),
+                CreationDate = @event.CreationDate.ToString("o"),
                 Payload = serializer.Serialize(@event),
             };
 
@@ -99,7 +95,7 @@ namespace Journey.Messaging.Logging
                 Namespace = metadata.TryGetValue(StandardMetadata.Namespace),
                 TypeName = metadata.TryGetValue(StandardMetadata.TypeName),
                 SourceType = metadata.TryGetValue(StandardMetadata.SourceType),
-                CreationDate = this.dateTime.Now.ToString("o"),
+                CreationDate = command.CreationDate.ToString("o"),
                 Payload = serializer.Serialize(command),
             };
 

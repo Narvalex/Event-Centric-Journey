@@ -22,9 +22,6 @@ namespace Journey.EventSourcing
         /// <summary>
         /// Representa el command id que esta correlacionado con el evento.
         /// </summary>
-        Guid CorrelationId { get; set; } 
-
-
-
+        Guid CorrelationId { get; set; }
     }
 }

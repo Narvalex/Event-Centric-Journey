@@ -56,8 +56,8 @@ namespace Journey.Tests.Messaging.CommandProcessorFixture
             var command1 = new Command1 { Id = Guid.NewGuid() };
             var command2 = new Command2 { Id = Guid.NewGuid() };
 
-            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new Message(Serialize(command1))));
-            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new Message(Serialize(command2))));
+            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new MessageForDelivery(Serialize(command1))));
+            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new MessageForDelivery(Serialize(command2))));
 
             handlerAMock.As<ICommandHandler<Command1>>().Verify(h => h.Handle(It.Is<Command1>(e => e.Id == command1.Id)));
             handlerBMock.As<ICommandHandler<Command2>>().Verify(h => h.Handle(It.Is<Command2>(e => e.Id == command2.Id)));
@@ -73,7 +73,7 @@ namespace Journey.Tests.Messaging.CommandProcessorFixture
             var command1 = new Command1 { Id = Guid.NewGuid() };
 
             Assert.Throws(new Exception().GetType(), 
-                () => this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new Message(Serialize(command1)))));
+                () => this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new MessageForDelivery(Serialize(command1)))));
         }
 
         private string Serialize(object payload)
@@ -98,6 +98,18 @@ namespace Journey.Tests.Messaging.CommandProcessorFixture
 
 
             public DateTime TimeStamp { get; set; }
+
+            public DateTime CreationDate
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+                set
+                {
+                    throw new NotImplementedException();
+                }
+            }
         }
 
         public class Command2 : ICommand
@@ -106,6 +118,18 @@ namespace Journey.Tests.Messaging.CommandProcessorFixture
 
 
             public DateTime TimeStamp { get; set; }
+
+            public DateTime CreationDate
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+                set
+                {
+                    throw new NotImplementedException();
+                }
+            }
         }
 
         public class BuggyCommandHandler : 

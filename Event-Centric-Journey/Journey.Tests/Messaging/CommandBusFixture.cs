@@ -1,5 +1,6 @@
 ﻿using Journey.Messaging;
 using Journey.Serialization;
+using Journey.Utils.SystemDateTime;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace Journey.Tests.Messaging.CommandBusFixture
 
         public GIVEN_a_command_bus()
         {
-            this.sut = new CommandBus(fakeSender, this.serializerMock.Object);
+            this.sut = new CommandBus(fakeSender, this.serializerMock.Object, new LocalDateTime());
         }
 
         [Fact]
@@ -29,12 +30,12 @@ namespace Journey.Tests.Messaging.CommandBusFixture
 
     public class FakeSender : IMessageSender, ISqlBus
     {
-        public void Send(Message message)
+        public void Send(MessageForDelivery message)
         {
             throw new NotImplementedException();
         }
 
-        public void Send(IEnumerable<Message> messages)
+        public void Send(IEnumerable<MessageForDelivery> messages)
         {
             throw new NotImplementedException();
         }
@@ -45,7 +46,7 @@ namespace Journey.Tests.Messaging.CommandBusFixture
         }
 
 
-        public void Send(IEnumerable<Message> messages, DbContext connection)
+        public void Send(IEnumerable<MessageForDelivery> messages, DbContext connection)
         {
             throw new NotImplementedException();
         }

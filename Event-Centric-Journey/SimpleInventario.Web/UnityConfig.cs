@@ -56,7 +56,7 @@ namespace SimpleInventario.Web.App_Start
                     config.CommandBusTableName));
 
             container.RegisterType<ICommandBus, CommandBus>(
-                new ContainerControlledLifetimeManager(), 
+                new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new ResolvedParameter<IMessageSender>("CommandBus"), serializer));
 

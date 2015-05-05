@@ -2,9 +2,9 @@
 
 namespace Journey.Messaging
 {
-    public class Message
+    public class MessageForDelivery
     {
-        public Message(string body, string correlationId = null, DateTime? deliveryDate = null)
+        public MessageForDelivery(string body, string correlationId = null, DateTime? deliveryDate = null)
         {
             this.Body = body;
             this.CorrelationId = correlationId;

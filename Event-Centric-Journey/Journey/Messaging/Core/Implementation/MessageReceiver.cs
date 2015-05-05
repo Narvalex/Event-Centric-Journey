@@ -130,7 +130,7 @@ namespace Journey.Messaging
             var currentDate = this.GetCurrentDate();
 
             long messageId = -1;
-            Message message = null;
+            MessageForDelivery message = null;
 
             try
             {
@@ -155,7 +155,7 @@ namespace Journey.Messaging
                         var correlationIdValue = reader["CorrelationId"];
                         var correlationId = (string)(correlationIdValue == DBNull.Value ? null : correlationIdValue);
 
-                        message = new Message(body, correlationId, deliveryDate);
+                        message = new MessageForDelivery(body, correlationId, deliveryDate);
                         messageId = (long)reader["Id"];
                     }
                 }

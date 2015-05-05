@@ -12,17 +12,17 @@ namespace Journey.Messaging
         /// Sends the specified message.
         /// </summary>
         /// <param name="message">The message to be sent.</param>
-        void Send(Message message);
+        void Send(MessageForDelivery message);
 
         /// <summary>
         /// Sends a batch of messages.
         /// </summary>
         /// <param name="messages">The messages to be sent.</param>
-        void Send(IEnumerable<Message> messages);
+        void Send(IEnumerable<MessageForDelivery> messages);
 
         /// <summary>
         /// Sends reliably messages to the bus.
         /// </summary>
-        void Send(IEnumerable<Message> messages, DbContext context);
+        void Send(IEnumerable<MessageForDelivery> messages, DbContext context);
     }
 }

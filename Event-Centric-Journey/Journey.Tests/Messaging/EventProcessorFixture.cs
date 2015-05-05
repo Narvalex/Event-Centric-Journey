@@ -57,8 +57,8 @@ namespace Journey.Tests.Messaging.EventProcessorFixture
             var event1 = new Event1 { SourceId = Guid.NewGuid() };
             var event2 = new Event2 { SourceId = Guid.NewGuid() };
 
-            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new Message(Serialize(event1))));
-            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new Message(Serialize(event2))));
+            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new MessageForDelivery(Serialize(event1))));
+            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new MessageForDelivery(Serialize(event2))));
 
             handlerAMock.As<IEventHandler<Event1>>().Verify(h => h.Handle(It.Is<Event1>(e => e.SourceId == event1.SourceId)));
             handlerAMock.As<IEventHandler<Event2>>().Verify(h => h.Handle(It.Is<Event2>(e => e.SourceId == event2.SourceId)));
@@ -78,8 +78,8 @@ namespace Journey.Tests.Messaging.EventProcessorFixture
             var event1 = new Event1 { SourceId = Guid.NewGuid() };
             var event2 = new Event2 { SourceId = Guid.NewGuid() };
 
-            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new Message(Serialize(event1))));
-            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new Message(Serialize(event2))));
+            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new MessageForDelivery(Serialize(event1))));
+            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new MessageForDelivery(Serialize(event2))));
 
             handler.As<IEventHandler<IEvent>>().Verify(h => h.Handle(It.Is<Event1>(e => e.SourceId == event1.SourceId)));
             handler.As<IEventHandler<IEvent>>().Verify(h => h.Handle(It.Is<Event2>(e => e.SourceId == event2.SourceId)));
@@ -102,8 +102,8 @@ namespace Journey.Tests.Messaging.EventProcessorFixture
             var event1 = new Event1 { SourceId = Guid.NewGuid() };
             var event2 = new Event2 { SourceId = Guid.NewGuid() };
 
-            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new Message(Serialize(event1))));
-            Assert.Throws(new AggregateException().GetType(), () => this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new Message(Serialize(event2)))));
+            this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new MessageForDelivery(Serialize(event1))));
+            Assert.Throws(new AggregateException().GetType(), () => this.receiverMock.Raise(r => r.MessageReceived += null, new MessageReceivedEventArgs(new MessageForDelivery(Serialize(event2)))));
         }
 
         private string Serialize(object payload)
@@ -129,6 +129,18 @@ namespace Journey.Tests.Messaging.EventProcessorFixture
             public DateTime SourceTimeStamp { get; set; }
 
             public DateTime TimeStamp { get; set; }
+
+            public DateTime CreationDate
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+                set
+                {
+                    throw new NotImplementedException();
+                }
+            }
         }
 
         public class Event2 : IEvent
@@ -138,6 +150,18 @@ namespace Journey.Tests.Messaging.EventProcessorFixture
             public DateTime SourceTimeStamp { get; set; }
 
             public DateTime TimeStamp { get; set; }
+
+            public DateTime CreationDate
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+                set
+                {
+                    throw new NotImplementedException();
+                }
+            }
         }
 
         protected class TestableBuggyEventHandler : 

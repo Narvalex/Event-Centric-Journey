@@ -158,7 +158,7 @@ namespace Journey.EventSourcing
             return entity;
         }
 
-        public void Save(T eventSourced, Guid correlationId)
+        public void Save(T eventSourced, Guid correlationId, DateTime creationDate)
         {
             var events = eventSourced.Events.ToArray();
 
@@ -181,6 +181,7 @@ namespace Journey.EventSourcing
                 {
                     // le pasamos el command id para que se serialice
                     e.CorrelationId = correlationId;
+                    e.CreationDate = creationDate;
                     eventsSet.Add(this.Serialize(e));
                 }
 
@@ -213,7 +214,7 @@ namespace Journey.EventSourcing
                     Payload = writer.ToString(),
                     CorrelationId = e.CorrelationId,
                     EventType = e.GetType().Name,
-                    CreationDate = DateTime.Now
+                    CreationDate = e.CreationDate
                 };
             }
             return serialized;

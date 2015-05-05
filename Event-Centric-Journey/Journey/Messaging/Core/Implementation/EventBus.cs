@@ -50,12 +50,12 @@ namespace Journey.Messaging
             this.sender.Send(messages, context);
         }
 
-        private Message BuildMessage(Envelope<IEvent> @event)
+        private MessageForDelivery BuildMessage(Envelope<IEvent> @event)
         {
             using (var payloadWriter = new StringWriter())
             {
                 this.serializer.Serialize(payloadWriter, @event.Body);
-                return new Message(payloadWriter.ToString(), correlationId: @event.CorrelationId);
+                return new MessageForDelivery(payloadWriter.ToString(), correlationId: @event.CorrelationId);
             }
         }
     }

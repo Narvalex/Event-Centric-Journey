@@ -5,7 +5,7 @@ namespace Journey.Messaging
     /// <summary>
     /// Represents an event message.
     /// </summary>
-    public interface IEvent
+    public interface IEvent : IMessage
     {
         /// <summary>
         /// Gets the identifier of the source originating the event.

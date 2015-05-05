@@ -5,7 +5,6 @@ using Journey.Messaging.Logging.Metadata;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
 using Journey.Utils;
-using Journey.Utils.SystemDateTime;
 using Journey.Worker;
 using Journey.Worker.Config;
 using System;
@@ -20,7 +19,6 @@ namespace Journey.EventSourcing.EventStoreRebuilding
         private readonly Func<EventStoreDbContext> eventStoreContextFactory;
         private readonly ITextSerializer serializer;
         private readonly IMetadataProvider metadataProvider;
-        private readonly ISystemDateTime dateTime;
 
         private readonly IEventStoreRebuilderConfig config;
 
@@ -40,7 +38,6 @@ namespace Journey.EventSourcing.EventStoreRebuilding
             IInMemoryBus bus,
             ICommandProcessor commandProcessor, ICommandHandlerRegistry commandHandlerRegistry, IEventDispatcher eventDispatcher,
             ITextSerializer serializer, IMetadataProvider metadataProvider,
-            ISystemDateTime dateTime,
             IWorkerRoleTracer tracer,
             IEventStoreRebuilderConfig config,
             Func<EventStoreDbContext> eventStoreContextFactory)
@@ -52,7 +49,6 @@ namespace Journey.EventSourcing.EventStoreRebuilding
             this.commandProcessor = commandProcessor;
             this.commandHandlerRegistry = commandHandlerRegistry;
             this.config = config;
-            this.dateTime = dateTime;
             this.tracer = tracer;
             this.metadataProvider = metadataProvider;
         }
@@ -129,13 +125,13 @@ namespace Journey.EventSourcing.EventStoreRebuilding
 
         private void RegisterLogger(MessageLogDbContext newContext)
         {
-            this.auditLog = new InMemoryMessageLog(this.serializer, this.metadataProvider, this.dateTime, this.tracer, newContext);
+            this.auditLog = new InMemoryMessageLog(this.serializer, this.metadataProvider, this.tracer, newContext);
             this.handler = new MessageLogHandler(this.auditLog);
             this.commandHandlerRegistry.Register(this.handler);
             this.eventDispatcher.Register(this.handler);
         }
 
-        private void ProcessMessages(IEnumerable<Message> messages)
+        private void ProcessMessages(IEnumerable<MessageForDelivery> messages)
         {
             foreach (var message in messages)
             {
@@ -178,9 +174,9 @@ namespace Journey.EventSourcing.EventStoreRebuilding
             this.ProcessInnerMessages();
         }
 
-        private Message CreateMessage(MessageLogEntity message)
+        private MessageForDelivery CreateMessage(MessageLogEntity message)
         {
-            return new Message(message.Payload);
+            return new MessageForDelivery(message.Payload);
         }
 
         private object Deserialize(string serializedPayload)

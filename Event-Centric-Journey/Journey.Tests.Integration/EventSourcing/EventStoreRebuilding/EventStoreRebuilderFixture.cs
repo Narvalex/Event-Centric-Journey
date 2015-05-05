@@ -85,7 +85,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
                 new MessageLog(
                     messageLogConnectionString,
                     this.serializer,
-                    new StandardMetadataProvider(), new LocalDateTime(), new ConsoleWorkerRoleTracer()));
+                    new StandardMetadataProvider(), new ConsoleWorkerRoleTracer()));
 
             this.container = this.CreateContainer(messageLogConnectionString, eventStoreConnectionString);
         }

@@ -44,7 +44,7 @@ VALUES
         /// <summary>
         /// Sends the specified message.
         /// </summary>
-        public void Send(Message message)
+        public void Send(MessageForDelivery message)
         {
             using (var connection = this.connectionFactory.CreateConnection(this.connectionString))
             {
@@ -57,7 +57,7 @@ VALUES
         /// <summary>
         /// Sends a batch of messages.
         /// </summary>
-        public void Send(IEnumerable<Message> messages)
+        public void Send(IEnumerable<MessageForDelivery> messages)
         {
             using (var scope = new TransactionScope(TransactionScopeOption.Required))
             {
@@ -78,14 +78,14 @@ VALUES
         /// <summary>
         /// Reliably sends a batch of messages.
         /// </summary>
-        public void Send(IEnumerable<Message> messages, DbContext context)
+        public void Send(IEnumerable<MessageForDelivery> messages, DbContext context)
         {
             foreach (var message in messages)
                 this.ReliablyInsertMessage(message, context);
         }
 
         [SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Does not contain user input.")]
-        private void InsertMessage(Message message, DbConnection connection)
+        private void InsertMessage(MessageForDelivery message, DbConnection connection)
         {
             using (var command = (SqlCommand)connection.CreateCommand())
             {
@@ -101,7 +101,7 @@ VALUES
         }
 
         [SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Does not contain user input.")]
-        private void ReliablyInsertMessage(Message message, DbContext context)
+        private void ReliablyInsertMessage(MessageForDelivery message, DbContext context)
         {
             context.Database.ExecuteSqlCommand(this.insertQuery,
                 new SqlParameter("@Body", message.Body),

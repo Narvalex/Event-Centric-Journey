@@ -114,6 +114,18 @@ namespace Journey.Tests.Messaging.MessageDispatcherFixture
         public DateTime TimeStamp { get; set; }
 
         public DateTime SourceTimeStamp { get; set; }
+
+        public DateTime CreationDate
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 
     public class EventB : IEvent
@@ -123,6 +135,18 @@ namespace Journey.Tests.Messaging.MessageDispatcherFixture
         public DateTime TimeStamp { get; set; }
 
         public DateTime SourceTimeStamp { get; set; }
+
+        public DateTime CreationDate
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 
     public class EventC : IEvent
@@ -132,5 +156,17 @@ namespace Journey.Tests.Messaging.MessageDispatcherFixture
         public DateTime TimeStamp { get; set; }
 
         public DateTime SourceTimeStamp { get; set; }
+
+        public DateTime CreationDate
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }

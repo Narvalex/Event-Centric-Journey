@@ -21,5 +21,7 @@ namespace Journey.Messaging
         /// The command identifier.
         /// </summary>
         public Guid Id { get; private set; }
+
+        public DateTime CreationDate { get; set; }
     }
 }

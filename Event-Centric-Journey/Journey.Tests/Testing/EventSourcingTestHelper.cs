@@ -19,7 +19,7 @@ namespace Journey.Tests.Testing
         {
             this.Events = new List<IVersionedEvent>();
             this.store =
-                new EventStoreStub((eventSourced, correlationId) =>
+                new EventStoreStub((eventSourced, correlationId, dateTime) =>
             {
                 if (this.expectedCorrelationId != null)
                     Assert.Equal(this.expectedCorrelationId, correlationId);
@@ -93,10 +93,10 @@ namespace Journey.Tests.Testing
         private class EventStoreStub : IEventStore<T>
         {
             public readonly List<IVersionedEvent> History = new List<IVersionedEvent>();
-            private readonly Action<T, string> onSave;
+            private readonly Action<T, string, DateTime> onSave;
             private readonly Func<Guid, IEnumerable<IVersionedEvent>, T> entityFactory;
 
-            internal EventStoreStub(Action<T, string> onSave)
+            internal EventStoreStub(Action<T, string, DateTime> onSave)
             {
                 this.onSave = onSave;
                 var constructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IEnumerable<IVersionedEvent>) });
@@ -117,9 +117,9 @@ namespace Journey.Tests.Testing
                 return default(T);
             }
 
-            void IEventStore<T>.Save(T eventSourced, Guid correlationId)
+            void IEventStore<T>.Save(T eventSourced, Guid correlationId, DateTime dateTime)
             {
-                this.onSave(eventSourced, correlationId.ToString());
+                this.onSave(eventSourced, correlationId.ToString(), dateTime);
             }
 
             T IEventStore<T>.Get(Guid id)

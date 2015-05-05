@@ -30,5 +30,7 @@ namespace Journey.EventSourcing
         /// Esto se agrega en el motor del event store, antes de impactarlo en la tabla.
         /// </summary>
         public Guid CorrelationId { get; set; }
+
+        public DateTime CreationDate { get; set; }
     }
 }

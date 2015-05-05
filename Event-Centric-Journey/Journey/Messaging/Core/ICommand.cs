@@ -2,7 +2,7 @@
 
 namespace Journey.Messaging
 {
-    public interface ICommand
+    public interface ICommand : IMessage
     {
         /// <summary>
         /// Gets the command identifier.

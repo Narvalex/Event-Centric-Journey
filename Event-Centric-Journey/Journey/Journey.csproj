@@ -140,8 +140,9 @@
     <Compile Include="Messaging\Core\Implementation\MessagingDbInitializer.cs" />
     <Compile Include="Messaging\Core\Implementation\SqlBus.cs" />
     <Compile Include="Messaging\Core\ISqlBus.cs" />
-    <Compile Include="Messaging\Core\Message.cs" />
+    <Compile Include="Messaging\Core\MessageForDelivery.cs" />
     <Compile Include="Messaging\Core\MessageReceivedEventArgs.cs" />
+    <Compile Include="Messaging\Core\IMessage.cs" />
     <Compile Include="Messaging\Logging\EventLogExtensions.cs" />
     <Compile Include="Messaging\Logging\EventLogQueryCriteria.cs" />
     <Compile Include="Messaging\Logging\IEventLogReader.cs" />

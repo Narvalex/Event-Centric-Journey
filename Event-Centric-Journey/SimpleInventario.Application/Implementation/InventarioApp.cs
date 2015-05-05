@@ -1,6 +1,7 @@
 ﻿using Journey.Client;
 using Journey.Utils;
 using Journey.Utils.Guids;
+using Journey.Utils.SystemDateTime;
 using SimpleInventario.Application.DTOs;
 using SimpleInventario.Commands;
 using System;
@@ -34,11 +35,11 @@ namespace SimpleInventario.Application
 
             this.app.Send(
                 new AgregarAnimales(
-                    this.guid.NewGuid(), 
-                    this.idEmpresa, 
-                    animal, 
-                    sucursal, 
-                    dto.Cantidad, 
+                    this.guid.NewGuid(),
+                    this.idEmpresa,
+                    animal,
+                    sucursal,
+                    dto.Cantidad,
                     dto.Periodo)
                 );
         }

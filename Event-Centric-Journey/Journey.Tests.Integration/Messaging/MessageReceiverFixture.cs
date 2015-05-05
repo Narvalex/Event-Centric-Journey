@@ -31,11 +31,11 @@ namespace Journey.Tests.Integration.Messaging.MessageReceiverFixture
         [Fact]
         public void WHEN_sending_confirmed_message_THEN_receives_message()
         {
-            Message message = null;
+            MessageForDelivery message = null;
 
             this.receiver.MessageReceived += (s, e) => { message = e.Message; };
 
-            this.sender.Send(new Message("test message"));
+            this.sender.Send(new MessageForDelivery("test message"));
 
             Assert.True(this.receiver.ReceiveMessage());
             Assert.Equal("test message", message.Body);
@@ -98,11 +98,11 @@ namespace Journey.Tests.Integration.Messaging.MessageReceiverFixture
         [Fact]
         public void WHEN_sending_message_with_correlation_id_THEN_receives_message()
         {
-            Message message = null;
+            MessageForDelivery message = null;
 
             this.receiver.MessageReceived += (s, e) => { message = e.Message; };
 
-            this.sender.Send(new Message("test message", correlationId: "correlation"));
+            this.sender.Send(new MessageForDelivery("test message", correlationId: "correlation"));
 
             Assert.True(this.receiver.ReceiveMessage());
             Assert.Equal("test message", message.Body);
@@ -115,7 +115,7 @@ namespace Journey.Tests.Integration.Messaging.MessageReceiverFixture
         {
             this.receiver.MessageReceived += (s, e) => { };
 
-            this.sender.Send(new Message("test message"));
+            this.sender.Send(new MessageForDelivery("test message"));
 
             Assert.True(this.receiver.ReceiveMessage());
             Assert.False(this.receiver.ReceiveMessage());
@@ -129,7 +129,7 @@ namespace Journey.Tests.Integration.Messaging.MessageReceiverFixture
 
             this.receiver.MessageReceived += failureHandler;
 
-            this.sender.Send(new Message("test message"));
+            this.sender.Send(new MessageForDelivery("test message"));
 
             try
             {
@@ -149,12 +149,12 @@ namespace Journey.Tests.Integration.Messaging.MessageReceiverFixture
         [Fact]
         public void WHEN_sending_message_with_delay_THEN_receives_message_after_delay()
         {
-            Message message = null;
+            MessageForDelivery message = null;
 
             this.receiver.MessageReceived += (s, e) => { message = e.Message; };
 
             var deliveryDate = DateTime.Now.Add(TimeSpan.FromSeconds(2));
-            this.sender.Send(new Message("test message", null, deliveryDate));
+            this.sender.Send(new MessageForDelivery("test message", null, deliveryDate));
 
             Assert.False(this.receiver.ReceiveMessage());
 
@@ -172,8 +172,8 @@ namespace Journey.Tests.Integration.Messaging.MessageReceiverFixture
         {
             var secondReceiver = new TestableMessageReceiver(this.connectionFactory);
 
-            this.sender.Send(new Message("message1"));
-            this.sender.Send(new Message("message2"));
+            this.sender.Send(new MessageForDelivery("message1"));
+            this.sender.Send(new MessageForDelivery("message2"));
 
             var waitEvent = new AutoResetEvent(false);
             string receiver1Message = null;
@@ -205,7 +205,7 @@ namespace Journey.Tests.Integration.Messaging.MessageReceiverFixture
         {
             var secondReceiver = new TestableMessageReceiver(this.connectionFactory);
 
-            this.sender.Send(new Message("message1"));
+            this.sender.Send(new MessageForDelivery("message1"));
 
             var waitEvent = new AutoResetEvent(false);
             string receiver1Message = null;
@@ -225,7 +225,7 @@ namespace Journey.Tests.Integration.Messaging.MessageReceiverFixture
             ThreadPool.QueueUserWorkItem(_ => { this.receiver.ReceiveMessage(); });
 
             Assert.True(waitEvent.WaitOne(TimeSpan.FromSeconds(10)));
-            this.sender.Send(new Message("message2"));
+            this.sender.Send(new MessageForDelivery("message2"));
             secondReceiver.ReceiveMessage();
             waitEvent.Set();
 

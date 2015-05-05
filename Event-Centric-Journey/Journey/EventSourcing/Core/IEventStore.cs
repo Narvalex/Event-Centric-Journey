@@ -25,6 +25,6 @@ namespace Journey.EventSourcing
         /// </summary>
         /// <param name="eventSourced">The entity.</param>
         /// <param name="correlationId">A correlation id to use when publishing events. It could be either a command id or an event sourced aggregate id that raised an event.</param>
-        void Save(T eventSourced, Guid correlationId);
+        void Save(T eventSourced, Guid correlationId, DateTime creationDate);
     }
 }

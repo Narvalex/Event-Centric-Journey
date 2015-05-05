@@ -4,11 +4,11 @@ namespace Journey.Messaging
 {
     public class MessageReceivedEventArgs : EventArgs
     {
-        public MessageReceivedEventArgs(Message message)
+        public MessageReceivedEventArgs(MessageForDelivery message)
         {
             this.Message = message;            
         }
 
-        public Message Message { get; private set; }
+        public MessageForDelivery Message { get; private set; }
     }
 }

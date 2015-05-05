@@ -173,7 +173,7 @@ namespace Journey.EventSourcing
         }
 
 
-        public void Save(T eventSourced, Guid correlationId)
+        public void Save(T eventSourced, Guid correlationId, DateTime creationDate)
         {
             var events = eventSourced.Events.ToArray();
             if (events.Count() == 0)
@@ -203,18 +203,20 @@ namespace Journey.EventSourcing
                             {
                                 // le pasamos el command id para que se serialice
                                 e.CorrelationId = correlationId;
+                                // la fecha en que se creó el evento
+                                e.CreationDate = creationDate;
                                 eventsSet.Add(this.Serialize(e));
                             }
 
                             this.GuaranteeIncrementalEventVersionStoring(eventSourced, events, context);
 
-                            
+
 
                             var correlationIdString = correlationId.ToString();
                             this.eventBus.Publish(events.Select(e => new Envelope<IEvent>(e) { CorrelationId = correlationIdString }), context);
 
                             if (commands != null && commands.Count() > 0)
-                                this.commandBus.Send(commands.Select(c => new Envelope<ICommand>(c) { CorrelationId = correlationIdString }), context);                          
+                                this.commandBus.Send(commands.Select(c => new Envelope<ICommand>(c) { CorrelationId = correlationIdString }), context);
 
                             context.SaveChanges();
 
@@ -290,7 +292,7 @@ e
                     Payload = writer.ToString(),
                     CorrelationId = e.CorrelationId,
                     EventType = e.GetType().Name,
-                    CreationDate = this.dateTime.Now
+                    CreationDate = e.CreationDate
                 };
             }
             return serialized;

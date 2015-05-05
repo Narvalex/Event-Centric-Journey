@@ -1,4 +1,5 @@
 ﻿using Journey.Serialization;
+using Journey.Utils.SystemDateTime;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -12,13 +13,17 @@ namespace Journey.Messaging
     /// </summary>
     public class CommandBus : SqlBus, ICommandBus
     {
+        private readonly ISystemDateTime dateTime;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandBus"/> class.
         /// </summary>
         /// <param name="serializer">The serializer to use for the message body.</param>
-        public CommandBus(IMessageSender sender, ITextSerializer serializer)
+        public CommandBus(IMessageSender sender, ITextSerializer serializer, ISystemDateTime dateTime)
             : base(sender, serializer)
-        { }
+        {
+            this.dateTime = dateTime;
+        }
 
         /// <summary>
         /// Sends the specified command.
@@ -50,13 +55,15 @@ namespace Journey.Messaging
             this.sender.Send(messages, context);
         }
 
-        private Message BuildMessage(Envelope<ICommand> envelopedCommand)
+        private MessageForDelivery BuildMessage(Envelope<ICommand> envelopedCommand)
         {
             // TODO: should use the Command ID as a unique constraint when storing it.
             using (var payloadWriter = new StringWriter())
             {
-                this.serializer.Serialize(payloadWriter, envelopedCommand.Body);
-                return new Message(payloadWriter.ToString(), envelopedCommand.CorrelationId, envelopedCommand.Delay != TimeSpan.Zero ? (DateTime?)DateTime.Now.Add(envelopedCommand.Delay) : null);
+                var body = envelopedCommand.Body;
+                body.CreationDate = dateTime.Now;
+                this.serializer.Serialize(payloadWriter, body);
+                return new MessageForDelivery(payloadWriter.ToString(), envelopedCommand.CorrelationId, envelopedCommand.Delay != TimeSpan.Zero ? (DateTime?)DateTime.Now.Add(envelopedCommand.Delay) : null);
             }
         }
     }

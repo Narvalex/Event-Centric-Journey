@@ -28,7 +28,7 @@ namespace Journey.Tests.Integration.Messaging.MessageSenderFixture
         {
             var messageWasSaved = false;
             var messageBody = "Message-" + Guid.NewGuid().ToString();
-            var message = new Message(messageBody);
+            var message = new MessageForDelivery(messageBody);
 
             this.sender.Send(message);
 

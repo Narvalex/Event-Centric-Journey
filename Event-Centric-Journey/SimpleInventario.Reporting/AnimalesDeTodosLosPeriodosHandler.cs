@@ -25,7 +25,7 @@ namespace SimpleInventario.Reporting
                 aggregate = new AnimalesDeTodosLosPeriodos(e.IdEmpresa);
 
             aggregate.Consume(e);
-            this.store.Save(aggregate, e.CorrelationId);
+            this.store.Save(aggregate, e.CorrelationId, e.CreationDate);
         }
     }
 }

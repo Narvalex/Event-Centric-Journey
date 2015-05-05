@@ -159,7 +159,7 @@ namespace Journey.Tests.Integration.EventSourcing
 
 
                 this.eventBus = new EventBus(this.messageSender, this.serializer);
-                this.commandBus = new CommandBus(this.messageSender, this.serializer);
+                this.commandBus = new CommandBus(this.messageSender, this.serializer, new LocalDateTime());
 
                 this.sut =
                     new EventStore<FakeItemsAggregate>(this.eventBus, this.commandBus, this.serializer,
@@ -322,7 +322,7 @@ DROP DATABASE [{0}]
 
 
                 this.eventBus = new EventBus(this.eventSender, this.serializer);
-                this.commandBus = new CommandBus(this.commandSender, this.serializer);
+                this.commandBus = new CommandBus(this.commandSender, this.serializer, new LocalDateTime());
 
 
                 this.sut =
