@@ -85,7 +85,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
                 new MessageLog(
                     messageLogConnectionString,
                     this.serializer,
-                    new StandardMetadataProvider(), new ConsoleWorkerRoleTracer()));
+                    new StandardMetadataProvider(), new ConsoleWorkerRoleTracer(), new LocalDateTime()));
 
             this.container = this.CreateContainer(messageLogConnectionString, eventStoreConnectionString);
         }
@@ -293,7 +293,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
                 if (aggregate == null)
                     aggregate = new FakeItemsSaga(command.ItemGuid);
                 aggregate.Handle(command);
-                this.store.Save(aggregate, command.Id);
+                this.store.Save(aggregate, command.Id, new DateTime());
             }
 
             public void Handle(ItemAdded e)

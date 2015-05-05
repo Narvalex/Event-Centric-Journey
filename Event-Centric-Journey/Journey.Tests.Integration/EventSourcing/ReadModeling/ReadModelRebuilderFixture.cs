@@ -87,7 +87,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
             var id = SequentialGuid.GenerateNewGuid();
             var actor = new ItemActor(id);
             actor.HandleCommands();
-            this.eventStore.Save(actor, id);
+            this.eventStore.Save(actor, id, new DateTime());
 
             using (var context = this.readModelContextFactory.Invoke())
             {

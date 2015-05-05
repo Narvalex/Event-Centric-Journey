@@ -1,6 +1,5 @@
 ﻿using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
-using Journey.Utils;
 using Journey.Utils.SystemDateTime;
 using Journey.Worker;
 using System;
@@ -10,42 +9,21 @@ using System.Linq;
 
 namespace Journey.Messaging.Logging
 {
-    public class MessageLog : IMessageAuditLog, IEventLogReader
+    public class MessageLog : MessageLogBase, IMessageAuditLog, IEventLogReader
     {
         private string connectionString;
-        private readonly IMetadataProvider metadataProvider;
-        private readonly ITextSerializer serializer;
-        private readonly IWorkerRoleTracer tracer;
 
-        public MessageLog(string connectionString, ITextSerializer serializer, IMetadataProvider metadataProvider, IWorkerRoleTracer tracer)
+        public MessageLog(string connectionString, ITextSerializer serializer, IMetadataProvider metadataProvider, IWorkerRoleTracer tracer, ISystemDateTime dateTime)
+            : base(metadataProvider, serializer, tracer, dateTime)
         {
             this.connectionString = connectionString;
-            this.serializer = serializer;
-            this.metadataProvider = metadataProvider;
-            this.tracer = tracer;
         }
 
         public void Log(IEvent @event)
         {
             using (var context = new MessageLogDbContext(this.connectionString))
             {
-                var metadata = this.metadataProvider.GetMetadata(@event);
-
-                var message = new MessageLogEntity
-                {
-                    //Id = Guid.NewGuid(),
-                    SourceId = metadata.TryGetValue(StandardMetadata.SourceId),
-                    Version = metadata.TryGetValue(StandardMetadata.Version),
-                    Kind = metadata.TryGetValue(StandardMetadata.Kind),
-                    AssemblyName = metadata.TryGetValue(StandardMetadata.AssemblyName),
-                    FullName = metadata.TryGetValue(StandardMetadata.FullName),
-                    Namespace = metadata.TryGetValue(StandardMetadata.Namespace),
-                    TypeName = metadata.TryGetValue(StandardMetadata.TypeName),
-                    SourceType = metadata.TryGetValue(StandardMetadata.SourceType),
-                    CreationDate = @event.CreationDate.ToString("o"),
-                    Payload = serializer.Serialize(@event),
-                };
-
+                var message = base.GetMessage(@event);
 
                 // first lets check if is not a duplicated command message;
                 var duplicatedMessage = context.Set<MessageLogEntity>()
@@ -73,22 +51,7 @@ namespace Journey.Messaging.Logging
         {
             using (var context = new MessageLogDbContext(this.connectionString))
             {
-                var metadata = this.metadataProvider.GetMetadata(command);
-
-                var message = new MessageLogEntity
-                {
-                    //Id = Guid.NewGuid(),
-                    SourceId = metadata.TryGetValue(StandardMetadata.SourceId),
-                    Version = metadata.TryGetValue(StandardMetadata.Version),
-                    Kind = metadata.TryGetValue(StandardMetadata.Kind),
-                    AssemblyName = metadata.TryGetValue(StandardMetadata.AssemblyName),
-                    FullName = metadata.TryGetValue(StandardMetadata.FullName),
-                    Namespace = metadata.TryGetValue(StandardMetadata.Namespace),
-                    TypeName = metadata.TryGetValue(StandardMetadata.TypeName),
-                    SourceType = metadata.TryGetValue(StandardMetadata.SourceType),
-                    CreationDate = command.CreationDate.ToString("o"),
-                    Payload = serializer.Serialize(command),
-                };
+                var message = base.GetMessage(command);
 
                 // first lets check if is not a duplicated command message;
                 var duplicatedMessage = context.Set<MessageLogEntity>()

@@ -175,7 +175,7 @@ namespace Journey.Tests.Integration.EventSourcing
                 var aggregate = new FakeItemsAggregate(aggregateId);
                 aggregate.AddItem(item.Id, item.Name, 10);
 
-                this.sut.Save(aggregate, Guid.NewGuid());
+                this.sut.Save(aggregate, Guid.NewGuid(), new DateTime());
 
                 var retrivedAggregate = this.sut.Find(aggregateId);
                 Assert.NotNull(retrivedAggregate);
@@ -198,7 +198,7 @@ namespace Journey.Tests.Integration.EventSourcing
                 aggregate.AddItem(item2.Id, item2.Name, 10);
                 aggregate.AddItem(item.Id, item.Name, 5);
 
-                this.sut.Save(aggregate, Guid.NewGuid());
+                this.sut.Save(aggregate, Guid.NewGuid(), new DateTime());
 
                 var retrivedAggregate = this.sut.Find(aggregateId);
 
@@ -223,7 +223,7 @@ namespace Journey.Tests.Integration.EventSourcing
                 aggregate.AddItem(item2.Id, item2.Name, 10);
                 aggregate.AddItem(item.Id, item.Name, 5);
 
-                this.sut.Save(aggregate, Guid.NewGuid());
+                this.sut.Save(aggregate, Guid.NewGuid(), new DateTime());
 
                 var retrivedAggregate = this.sut.Find(aggregateId);
 
@@ -236,7 +236,7 @@ namespace Journey.Tests.Integration.EventSourcing
                 retrivedAggregate.RemoveItem(item2.Id, 7);
                 retrivedAggregate.RemoveItem(item.Id, 2);
 
-                this.sut.Save(retrivedAggregate, Guid.NewGuid());
+                this.sut.Save(retrivedAggregate, Guid.NewGuid(), new DateTime());
 
                 var overRetrivedAggregate = this.sut.Find(aggregateId);
 
@@ -339,7 +339,7 @@ DROP DATABASE [{0}]
                 var saga = new FakeItemsSaga(sagaId);
                 saga.AddItem(item.Id, item.Name, 10);
 
-                this.sut.Save(saga, Guid.NewGuid());
+                this.sut.Save(saga, Guid.NewGuid(), new DateTime());
 
                 var retrivedAggregate = this.sut.Find(sagaId);
                 Assert.NotNull(retrivedAggregate);
@@ -362,7 +362,7 @@ DROP DATABASE [{0}]
                 saga.AddItem(item2.Id, item2.Name, 10);
                 saga.AddItem(item.Id, item.Name, 5);
 
-                this.sut.Save(saga, Guid.NewGuid());
+                this.sut.Save(saga, Guid.NewGuid(), new DateTime());
 
                 var retrivedSaga = this.sut.Find(sagaId);
 
@@ -387,7 +387,7 @@ DROP DATABASE [{0}]
                 saga.AddItem(item2.Id, item2.Name, 10);
                 saga.AddItem(item.Id, item.Name, 5);
 
-                this.sut.Save(saga, Guid.NewGuid());
+                this.sut.Save(saga, Guid.NewGuid(), new DateTime());
 
                 var retrivedSaga = this.sut.Find(sagaId);
 
@@ -400,7 +400,7 @@ DROP DATABASE [{0}]
                 retrivedSaga.RemoveItem(item2.Id, 7);
                 retrivedSaga.RemoveItem(item.Id, 2);
 
-                this.sut.Save(retrivedSaga, Guid.NewGuid());
+                this.sut.Save(retrivedSaga, Guid.NewGuid(), new DateTime());
 
                 var overRetrivedSaga = this.sut.Find(sagaId);
 
@@ -422,7 +422,7 @@ DROP DATABASE [{0}]
 
                 Assert.Empty(saga.Commands);
 
-                this.sut.Save(saga, Guid.NewGuid());
+                this.sut.Save(saga, Guid.NewGuid(), new DateTime());
 
                 var retrivedSaga = this.sut.Find(sagaId);
                 Assert.NotNull(retrivedSaga);
@@ -435,7 +435,7 @@ DROP DATABASE [{0}]
                 Assert.Equal(1, retrivedSaga.Commands.Count());
 
                 /* Command Publishing */
-                this.sut.Save(retrivedSaga, Guid.NewGuid());
+                this.sut.Save(retrivedSaga, Guid.NewGuid(), new DateTime());
                 var overRetrivedSaga = this.sut.Find(sagaId);
 
                 Assert.NotNull(overRetrivedSaga);

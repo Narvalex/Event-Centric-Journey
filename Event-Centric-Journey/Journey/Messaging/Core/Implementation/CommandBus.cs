@@ -61,9 +61,12 @@ namespace Journey.Messaging
             using (var payloadWriter = new StringWriter())
             {
                 var body = envelopedCommand.Body;
-                body.CreationDate = dateTime.Now;
+
+                // para que la fecha del mensaje sea la fecha de la entrega.
+                body.CreationDate = envelopedCommand.Delay != TimeSpan.Zero ? (DateTime)dateTime.Now.Add(envelopedCommand.Delay) : dateTime.Now;
+
                 this.serializer.Serialize(payloadWriter, body);
-                return new MessageForDelivery(payloadWriter.ToString(), envelopedCommand.CorrelationId, envelopedCommand.Delay != TimeSpan.Zero ? (DateTime?)DateTime.Now.Add(envelopedCommand.Delay) : null);
+                return new MessageForDelivery(payloadWriter.ToString(), envelopedCommand.CorrelationId, envelopedCommand.Delay != TimeSpan.Zero ? (DateTime?)dateTime.Now.Add(envelopedCommand.Delay) : null);
             }
         }
     }

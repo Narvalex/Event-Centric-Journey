@@ -1,10 +1,10 @@
 ﻿using Journey.Messaging;
 using Journey.Serialization;
 using Journey.Utils;
+using Journey.Utils.SystemDateTime;
 using Journey.Worker;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
 
@@ -17,36 +17,22 @@ namespace Journey.EventSourcing
     /// It does do snapshots for entities that implements <see cref="IMementoOriginator"/>.
     /// </summary>
     /// <typeparam name="T">The entity type to persist.</typeparam>
-    public class InMemoryEventStore<T> : IEventStore<T> where T : class, IEventSourced
+    public class InMemoryEventStore<T> : EventStoreBase<T> where T : class, IEventSourced
     {
-        private readonly IWorkerRoleTracer tracer;
-
-        // Could potentially use DataAnnotations to get a friendly/unique name in case of collisions between BCs.
-        private static readonly string _sourceType = typeof(T).Name;
         private readonly IInMemoryBus bus;
-        private readonly ITextSerializer serializer;
         private readonly EventStoreDbContext context;
-        private readonly Func<Guid, IEnumerable<IVersionedEvent>, T> entityFactory;
         private readonly Action<T> cacheMementoIfApplicable;
         private readonly IInMemoryRollingSnapshotProvider cache;
         private readonly Func<Guid, Tuple<IMemento, DateTime?>> getMementoFromCache;
         private readonly Action<Guid> markCacheAsStale;
         private readonly Func<Guid, IMemento, IEnumerable<IVersionedEvent>, T> originatorEntityFactory;
 
-        public InMemoryEventStore(IInMemoryBus bus, ITextSerializer serializer, EventStoreDbContext context, IInMemoryRollingSnapshotProvider cache, IWorkerRoleTracer tracer)
+        public InMemoryEventStore(IInMemoryBus bus, ITextSerializer serializer, EventStoreDbContext context, IInMemoryRollingSnapshotProvider cache, IWorkerRoleTracer tracer, ISystemDateTime dateTime)
+            : base(tracer, serializer, dateTime)
         {
             this.bus = bus;
-            this.serializer = serializer;
             this.context = context;
             this.cache = cache;
-
-            // TODO: could be replaced with a compiled lambda
-            var constructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IEnumerable<IVersionedEvent>) });
-            if (constructor == null)
-            {
-                throw new InvalidCastException("Type T must have a constructor with the following signature: .ctor(Guid, IEnumerable<IVersionedEvent>)");
-            }
-            this.entityFactory = (id, events) => (T)constructor.Invoke(new object[] { id, events });
 
             if (typeof(IMementoOriginator).IsAssignableFrom(typeof(T)) && this.cache != null)
             {
@@ -89,11 +75,9 @@ namespace Journey.EventSourcing
                 this.getMementoFromCache = id => { return null; };
                 this.markCacheAsStale = id => { };
             }
-
-            this.tracer = tracer;
         }
 
-        public T Find(Guid id)
+        public override T Find(Guid id)
         {
             var cachedMemento = this.getMementoFromCache(id);
             if (cachedMemento != null && cachedMemento.Item1 != null)
@@ -149,16 +133,7 @@ namespace Journey.EventSourcing
             }
         }
 
-        public T Get(Guid id)
-        {
-            var entity = this.Find(id);
-            if (entity == null)
-                throw new EntityNotFoundException(id, _sourceType);
-
-            return entity;
-        }
-
-        public void Save(T eventSourced, Guid correlationId, DateTime creationDate)
+        public override void Save(T eventSourced, Guid correlationId, DateTime creationDate)
         {
             var events = eventSourced.Events.ToArray();
 
@@ -198,39 +173,6 @@ namespace Journey.EventSourcing
             }
 
             this.cacheMementoIfApplicable.Invoke(eventSourced);
-        }
-
-        private Event Serialize(IVersionedEvent e)
-        {
-            Event serialized;
-            using (var writer = new StringWriter())
-            {
-                this.serializer.Serialize(writer, e);
-                serialized = new Event
-                {
-                    AggregateId = e.SourceId,
-                    AggregateType = _sourceType,
-                    Version = e.Version,
-                    Payload = writer.ToString(),
-                    CorrelationId = e.CorrelationId,
-                    EventType = e.GetType().Name,
-                    CreationDate = e.CreationDate
-                };
-            }
-            return serialized;
-        }
-
-        private IVersionedEvent Deserialize(Event @event)
-        {
-            using (var reader = new StringReader(@event.Payload))
-            {
-                return (IVersionedEvent)this.serializer.Deserialize(reader);
-            }
-        }
-
-        private string GetPartitionKey(Guid id)
-        {
-            return _sourceType + "_" + id.ToString();
         }
     }
 }

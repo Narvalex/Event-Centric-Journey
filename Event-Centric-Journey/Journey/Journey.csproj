@@ -88,6 +88,7 @@
     <Compile Include="Database\SqlCommandWrapper.cs" />
     <Compile Include="Database\SqlDataReaderExtensions.cs" />
     <Compile Include="Database\TransientFaultHandlingDbConfiguration.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\EventStoreBase.cs" />
     <Compile Include="EventSourcing\Core\IEventSourced.cs" />
     <Compile Include="EventSourcing\Core\IEventStore.cs" />
     <Compile Include="EventSourcing\Core\IMemento.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="Messaging\Logging\Implementation\MessageLogEntity.cs" />
     <Compile Include="Messaging\Logging\Implementation\MessageLogHandler.cs" />
     <Compile Include="Messaging\Logging\Implementation\MessageLogQueryCriteriaExtensions.cs" />
+    <Compile Include="Messaging\Logging\Implementation\MessageLogBase.cs" />
     <Compile Include="Messaging\Logging\Metadata\IMetadataProvider.cs" />
     <Compile Include="Messaging\Logging\Metadata\Implementation\StandardMetadata.cs" />
     <Compile Include="Messaging\Logging\Metadata\Implementation\StandardMetadataProvider.cs" />

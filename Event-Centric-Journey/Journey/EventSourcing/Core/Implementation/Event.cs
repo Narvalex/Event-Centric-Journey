@@ -9,6 +9,7 @@ namespace Journey.EventSourcing
         public string EventType { get; set; }
         public string Payload { get; set; }
         public DateTime CreationDate { get; set; }
+        public DateTime LastUpdateTime { get; set; }
         public Guid CorrelationId { get; set; }
         public Guid AggregateId { get; set; }
         public string AggregateType { get; set; }

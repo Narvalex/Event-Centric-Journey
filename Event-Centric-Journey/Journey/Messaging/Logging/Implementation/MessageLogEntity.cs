@@ -13,6 +13,7 @@ namespace Journey.Messaging.Logging
         public string TypeName { get; set; }
         public string SourceType { get; set; }
         public string CreationDate { get; set; }
+        public string LastUpdateTime { get; set; }
         public string Payload { get; set; }
     }
 }

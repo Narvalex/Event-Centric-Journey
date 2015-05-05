@@ -5,6 +5,7 @@ using Journey.Messaging.Logging.Metadata;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
 using Journey.Utils;
+using Journey.Utils.SystemDateTime;
 using Journey.Worker;
 using Journey.Worker.Config;
 using System;
@@ -125,7 +126,7 @@ namespace Journey.EventSourcing.EventStoreRebuilding
 
         private void RegisterLogger(MessageLogDbContext newContext)
         {
-            this.auditLog = new InMemoryMessageLog(this.serializer, this.metadataProvider, this.tracer, newContext);
+            this.auditLog = new InMemoryMessageLog(this.serializer, this.metadataProvider, this.tracer, newContext, new LocalDateTime());
             this.handler = new MessageLogHandler(this.auditLog);
             this.commandHandlerRegistry.Register(this.handler);
             this.eventDispatcher.Register(this.handler);
