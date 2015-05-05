@@ -17,7 +17,7 @@ namespace Journey.EventSourcing
         /// <summary>
         /// El aggregate al que pertenece el evento.
         /// </summary>
-        string AggregateType { get; }
+        string SourceType { get; }
 
         /// <summary>
         /// Representa el command id que esta correlacionado con el evento.

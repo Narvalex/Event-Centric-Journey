@@ -8,5 +8,7 @@ namespace Journey.Utils.SystemDateTime
     public interface ISystemDateTime
     {
         DateTime Now { get; }
+
+        DateTimeOffset NowOffset { get; }
     }
 }

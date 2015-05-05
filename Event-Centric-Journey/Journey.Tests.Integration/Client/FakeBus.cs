@@ -37,8 +37,8 @@ namespace Journey.Tests.Integration.Client
                     .ReadModelingEvents
                     .Add(new ProjectedEvent
                     {
-                        AggregateId = Guid.Empty, 
-                        AggregateType = "Items",
+                        SourceId = Guid.Empty, 
+                        SourceType = "Items",
                         Version = 1,
                         CorrelationId = command.Body.Id
                     });

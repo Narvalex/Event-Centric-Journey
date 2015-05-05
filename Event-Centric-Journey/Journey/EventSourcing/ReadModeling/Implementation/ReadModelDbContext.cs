@@ -45,7 +45,7 @@ namespace Journey.EventSourcing.ReadModeling
 
             modelBuilder
             .Entity<ProjectedEvent>()
-            .HasKey(l => new { l.AggregateId, l.Version, l.AggregateType })
+            .HasKey(l => new { SourceId = l.SourceId, SourceType = l.SourceType, Version = l.Version })
             .ToTable(
                 this.tablesInfo.TryGetValue(ReadModelDbContextTables.ReadModelingEvents).TableName,
                 this.tablesInfo.TryGetValue(ReadModelDbContextTables.ReadModelingEvents).SchemaName);

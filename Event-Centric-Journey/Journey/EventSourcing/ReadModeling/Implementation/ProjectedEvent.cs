@@ -4,9 +4,9 @@ namespace Journey.EventSourcing.ReadModeling
 {
     public class ProjectedEvent : IProcessedEvent
     {
-        public Guid AggregateId { get; set; }
+        public Guid SourceId { get; set; }
 
-        public string AggregateType { get; set; }
+        public string SourceType { get; set; }
 
         public int Version { get; set; }
 

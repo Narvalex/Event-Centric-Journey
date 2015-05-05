@@ -3,7 +3,7 @@ namespace Journey.Messaging.Logging
 {
     public class MessageLogEntity
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Kind { get; set; }
         public string SourceId { get; set; }
         public string Version { get; set; }

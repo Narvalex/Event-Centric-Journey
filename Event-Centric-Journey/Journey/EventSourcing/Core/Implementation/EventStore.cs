@@ -19,6 +19,10 @@ namespace Journey.EventSourcing
     /// It does check for event versions before committing, but is not transactional with the event bus nor resilient to connectivity errors or crashes.
     /// It does do snapshots for entities that implements <see cref="IMementoOriginator"/>.
     /// </summary>
+    /// <remarks>
+    /// <para>This is a basic implementation of the event store that could be optimized in the future.</para>
+    /// <para>It supports caching of snapshot if the entity implements the <see cref="IMementoOriginator"/> interface. </para>
+    /// </remarks>
     /// <typeparam name="T">The entity type to persist.</typeparam>
     public class EventStore<T> : EventStoreBase<T> where T : class, IEventSourced
     {
@@ -54,8 +58,8 @@ namespace Journey.EventSourcing
                     this.cache.Set(
                         key,
                         new Tuple<IMemento, DateTime?>(memento, this.dateTime.Now),
-                        //new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddYears(1) });
-                        new CacheItemPolicy { AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration });
+                        new CacheItemPolicy { AbsoluteExpiration = this.dateTime.Now.AddMinutes(30) });
+                    //new CacheItemPolicy { AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration });
                 };
                 this.getMementoFromCache = id => (Tuple<IMemento, DateTime?>)this.cache.Get(this.GetPartitionKey(id));
                 this.markCacheAsStale = id =>
@@ -68,8 +72,8 @@ namespace Journey.EventSourcing
                         this.cache.Set(
                             key,
                             item,
-                            //new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(30) });
-                            new CacheItemPolicy { AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration });
+                            new CacheItemPolicy { AbsoluteExpiration = this.dateTime.NowOffset.AddMinutes(30) });
+                        //new CacheItemPolicy { AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration });
                     }
                 };
             }
@@ -101,7 +105,7 @@ namespace Journey.EventSourcing
                     using (var context = this.contextFactory.Invoke())
                     {
                         deserialized = context.Set<Event>()
-                            .Where(x => x.AggregateId == id && x.AggregateType == _sourceType && x.Version > cachedMemento.Item1.Version)
+                            .Where(x => x.SourceId == id && x.SourceType == _sourceType && x.Version > cachedMemento.Item1.Version)
                             .OrderBy(x => x.Version)
                             .AsEnumerable()
                             .Select(this.Deserialize)
@@ -128,7 +132,7 @@ namespace Journey.EventSourcing
                 using (var context = this.contextFactory.Invoke())
                 {
                     var deserialized = context.Set<Event>()
-                        .Where(x => x.AggregateId == id && x.AggregateType == _sourceType)
+                        .Where(x => x.SourceId == id && x.SourceType == _sourceType)
                         .OrderBy(x => x.Version)
                         .AsEnumerable()
                         .Select(this.Deserialize)
@@ -217,8 +221,6 @@ namespace Journey.EventSourcing
                 }
             }
 
-
-
             this.cacheMementoIfApplicable.Invoke(eventSourced);
         }
 
@@ -236,12 +238,12 @@ SELECT LastVersion = Max([e].[Version])
 FROM 
 (SELECT [Version] 
 FROM [{0}].[{1}] WITH (READPAST)
-WHERE AggregateId = @AggregateId
-	AND AggregateType = @AggregateType)
+WHERE SourceId = @SourceId
+	AND SourceType = @SourceType)
 e
 ", EventStoreDbContext.SchemaName, EventStoreDbContext.TableName),
-            new SqlParameter("@AggregateId", eventSourced.Id),
-            new SqlParameter("@AggregateType", _sourceType))
+            new SqlParameter("@SourceId", eventSourced.Id),
+            new SqlParameter("@SourceType", _sourceType))
             .FirstOrDefault() as int? ?? default(int);
 
 

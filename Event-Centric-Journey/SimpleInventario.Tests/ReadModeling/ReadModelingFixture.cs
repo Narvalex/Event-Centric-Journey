@@ -54,7 +54,7 @@ namespace SimpleInventario.Tests.ReadModeling.ReadModelingFixture
 
             var e = new SeActualizoResumenDeAnimalesPorPeriodo
             {
-                AggregateType = "TestAggregate",
+                SourceType = "TestAggregate",
                 CantidadDeAnimales = 5,
                 CorrelationId = correlationId,
                 Periodo = 2015,

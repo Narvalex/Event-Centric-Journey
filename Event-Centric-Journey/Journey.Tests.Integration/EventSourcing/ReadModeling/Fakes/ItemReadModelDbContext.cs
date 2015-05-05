@@ -20,7 +20,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling
 
             modelBuilder.Entity<MailingSubscription>()
                 .ToTable("Mailing", "SubscriptionLog")
-                .HasKey(l => new { l.AggregateId, l.Version, l.AggregateType });
+                .HasKey(l => new { SourceId = l.SourceId, SourceType = l.SourceType });
         }
 
         public IDbSet<Item> Items { get; set; }
@@ -36,9 +36,9 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling
 
     public class MailingSubscription : IProcessedEvent
     {
-        public Guid AggregateId { get; set; }
+        public Guid SourceId { get; set; }
 
-        public string AggregateType { get; set; }
+        public string SourceType { get; set; }
 
         public int Version { get; set; }
 

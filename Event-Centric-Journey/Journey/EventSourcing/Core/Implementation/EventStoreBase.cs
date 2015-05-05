@@ -52,8 +52,8 @@ namespace Journey.EventSourcing
                 this.serializer.Serialize(writer, e);
                 serialized = new Event
                 {
-                    AggregateId = e.SourceId,
-                    AggregateType = _sourceType,
+                    SourceId = e.SourceId,
+                    SourceType = _sourceType,
                     Version = e.Version,
                     Payload = writer.ToString(),
                     CorrelationId = e.CorrelationId,

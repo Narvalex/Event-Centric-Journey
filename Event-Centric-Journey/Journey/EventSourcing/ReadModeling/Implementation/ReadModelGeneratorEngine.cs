@@ -51,8 +51,8 @@ namespace Journey.EventSourcing.ReadModeling
                     if (context
                         .ReadModelingEvents
                         .Where(log =>
-                            log.AggregateId == e.SourceId &&
-                            log.AggregateType == e.AggregateType &&
+                            log.SourceId == e.SourceId &&
+                            log.SourceType == e.SourceType &&
                             log.Version >= e.Version)
                         .Any())
                     {
@@ -86,8 +86,8 @@ namespace Journey.EventSourcing.ReadModeling
                     if (context
                         .ReadModelingEvents
                         .Where(log =>
-                            log.AggregateId == e.SourceId &&
-                            log.AggregateType == e.AggregateType &&
+                            log.SourceId == e.SourceId &&
+                            log.SourceType == e.SourceType &&
                             log.Version >= e.Version)
                         .Any())
                     {
@@ -122,8 +122,8 @@ namespace Journey.EventSourcing.ReadModeling
                 {
                         if (context.Set<Log>()
                             .Where(l =>
-                                l.AggregateId == e.SourceId &&
-                                l.AggregateType == e.AggregateType &&
+                                l.SourceId == e.SourceId &&
+                                l.SourceType == e.SourceType &&
                                 l.Version >= e.Version)
                             .Any())
                         {
@@ -155,8 +155,8 @@ namespace Journey.EventSourcing.ReadModeling
         {
             return new ProjectedEvent
             {
-                AggregateId = e.SourceId,
-                AggregateType = e.AggregateType,
+                SourceId = e.SourceId,
+                SourceType = e.SourceType,
                 Version = e.Version,
                 EventType = e.GetType().Name,
                 CorrelationId = e.CorrelationId
@@ -168,8 +168,8 @@ namespace Journey.EventSourcing.ReadModeling
         {
             return new Log
             {
-                AggregateId = e.SourceId,
-                AggregateType = e.AggregateType,
+                SourceId = e.SourceId,
+                SourceType = e.SourceType,
                 Version = e.Version,
                 EventType = e.GetType().Name,
                 CorrelationId = e.CorrelationId

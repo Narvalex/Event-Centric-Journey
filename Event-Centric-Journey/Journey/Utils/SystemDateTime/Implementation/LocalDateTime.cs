@@ -11,5 +11,13 @@ namespace Journey.Utils.SystemDateTime
                 return DateTime.Now;
             }
         }
+
+        public DateTimeOffset NowOffset
+        {
+            get
+            {
+                return DateTimeOffset.Now;
+            }
+        }
     }
 }

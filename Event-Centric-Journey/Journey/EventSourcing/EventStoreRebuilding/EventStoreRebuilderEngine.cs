@@ -87,7 +87,10 @@ namespace Journey.EventSourcing.EventStoreRebuilding
                                             this.ProcessMessages(messages);
 
                                             // el borrado colocamos al final por si se este haciendo desde el mismo connection.
-                                            newAuditLogContext.Database.ExecuteSqlCommand("DELETE FROM [MessageLog].[Messages]");
+                                            newAuditLogContext.Database.ExecuteSqlCommand(@"
+                                                DELETE FROM [MessageLog].[Messages]
+                                                DBCC CHECKIDENT ('[MessageLog].[Messages]', RESEED, 0)");
+
 
                                             newAuditLogContext.SaveChanges();
                                             auditLogTransaction.Commit();

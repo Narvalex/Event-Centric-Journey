@@ -6,6 +6,7 @@ using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
+using Journey.Utils.SystemDateTime;
 using Journey.Worker.Config;
 using Microsoft.Practices.Unity;
 using System.Data.Entity;
@@ -41,6 +42,7 @@ namespace Journey.Worker.Rebuilding
 
             var commandProcessor = new InMemoryCommandProcessor(this.tracer);
             var eventProcessor = new SynchronousEventDispatcher(this.tracer);
+            var dateTime = new LocalDateTime();
 
             var bus = new InMemoryBus();
 
@@ -48,6 +50,7 @@ namespace Journey.Worker.Rebuilding
             container.RegisterInstance<IWorkerRoleTracer>(this.tracer);
             var inMemorySnapshotCache = new InMemoryRollingSnapshot("EventStoreCache");
             container.RegisterInstance<IInMemoryRollingSnapshotProvider>(inMemorySnapshotCache);
+            container.RegisterInstance<ISystemDateTime>(dateTime);
 
             container.RegisterInstance<IMetadataProvider>(new StandardMetadataProvider());
 

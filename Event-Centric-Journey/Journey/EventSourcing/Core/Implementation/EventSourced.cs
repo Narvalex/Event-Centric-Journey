@@ -58,7 +58,7 @@ namespace Journey.EventSourcing
         {
             e.SourceId = this.Id;
             e.Version = this.version + 1;
-            e.AggregateType = this.GetType().Name;
+            e.SourceType = this.GetType().Name;
             ((dynamic)this).Rehydrate((dynamic)e);
             this.version = e.Version;
             this.pendingEvents.Add(e);

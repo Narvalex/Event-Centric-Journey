@@ -23,7 +23,7 @@ namespace Journey.EventSourcing
         /// <summary>
         /// El aggregate al que pertenece el evento.
         /// </summary>
-        public string AggregateType { get; set; }
+        public string SourceType { get; set; }
 
         /// <summary>
         /// El identificador del command que inició la tarea. Es últil para rastrear la materialización del aggregate.

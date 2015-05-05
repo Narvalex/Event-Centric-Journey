@@ -37,7 +37,7 @@ namespace Journey.Messaging.Logging.Metadata
                 var te = payload as IVersionedEvent;
                 if (te != null)
                 {
-                    metadata[StandardMetadata.SourceType] = te.AggregateType;
+                    metadata[StandardMetadata.SourceType] = te.SourceType;
                     metadata[StandardMetadata.Version] = te.Version.ToString();
                 }
             }

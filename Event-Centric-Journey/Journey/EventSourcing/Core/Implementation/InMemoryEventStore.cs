@@ -90,7 +90,7 @@ namespace Journey.EventSourcing
 
                     deserialized = this.context.Set<Event>()
                         .Local
-                        .Where(x => x.AggregateId == id && x.AggregateType == _sourceType && x.Version > cachedMemento.Item1.Version)
+                        .Where(x => x.SourceId == id && x.SourceType == _sourceType && x.Version > cachedMemento.Item1.Version)
                         .OrderBy(x => x.Version)
                         .AsEnumerable()
                         .Select(this.Deserialize)
@@ -117,7 +117,7 @@ namespace Journey.EventSourcing
 
                 var deserialized = this.context.Set<Event>()
                     .Local
-                    .Where(x => x.AggregateId == id && x.AggregateType == _sourceType)
+                    .Where(x => x.SourceId == id && x.SourceType == _sourceType)
                     .OrderBy(x => x.Version)
                     .AsEnumerable()
                     .Select(this.Deserialize)

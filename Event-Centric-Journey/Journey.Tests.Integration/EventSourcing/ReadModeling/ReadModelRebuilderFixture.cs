@@ -94,9 +94,9 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
                 context.ReadModelingEvents.Add(
                     new ProjectedEvent
                     {
-                        AggregateId = Guid.Empty,
+                        SourceId = Guid.Empty,
                         CorrelationId = Guid.Empty,
-                        AggregateType = "TestAggregate",
+                        SourceType = "TestAggregate",
                         EventType = "TestEvent",
                         Version = 1
                     });
@@ -104,9 +104,9 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
                 context.ReadModelingEvents.Add(
                     new ProjectedEvent
                     {
-                        AggregateId = Guid.Empty,
+                        SourceId = Guid.Empty,
                         CorrelationId = Guid.Empty,
-                        AggregateType = "TestAggregate",
+                        SourceType = "TestAggregate",
                         EventType = "TestEvent",
                         Version = 2
                     });
@@ -114,9 +114,9 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
                 context.ReadModelingEvents.Add(
                     new ProjectedEvent
                     {
-                        AggregateId = Guid.Empty,
+                        SourceId = Guid.Empty,
                         CorrelationId = Guid.Empty,
-                        AggregateType = "TestAggregate",
+                        SourceType = "TestAggregate",
                         EventType = "TestEvent",
                         Version = 3
                     });

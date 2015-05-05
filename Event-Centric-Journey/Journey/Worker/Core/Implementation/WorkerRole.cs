@@ -91,7 +91,7 @@ namespace Journey.Worker
 
             var indentedSerializer = new IndentedJsonTextSerializer();
             // Event log database and handler
-            this.RegisterMessageLogger(container, indentedSerializer, metadata, liveEventProcessor, config.MessageLogConnectionString, tracer);
+            this.RegisterMessageLogger(container, indentedSerializer, metadata, liveEventProcessor, config.MessageLogConnectionString, tracer, dateTime);
 
             // Event Store
             this.RegisterEventStore(container, config.EventStoreConnectionString);
@@ -116,10 +116,10 @@ namespace Journey.Worker
             container.RegisterInstance<IInMemoryRollingSnapshotProvider>(inMemorySnapshotCache);
         }
 
-        private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString, IWorkerRoleTracer tracer)
+        private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString, IWorkerRoleTracer tracer, ISystemDateTime dateTime)
         {
             //Database.SetInitializer<MessageLogDbContext>(null);
-            container.RegisterType<IMessageAuditLog, MessageLog>(new InjectionConstructor(connectionString, serializer, metadata, tracer));
+            container.RegisterType<IMessageAuditLog, MessageLog>(new InjectionConstructor(connectionString, serializer, metadata, tracer, dateTime));
             container.RegisterType<IEventHandler, MessageLogHandler>("MessageLogHandler");
             container.RegisterType<ICommandHandler, MessageLogHandler>("MessageLogHandler");
             eventProcessor.Register(container.Resolve<MessageLogHandler>());

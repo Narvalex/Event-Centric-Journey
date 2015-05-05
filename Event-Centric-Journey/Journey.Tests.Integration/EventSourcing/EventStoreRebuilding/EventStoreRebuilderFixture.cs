@@ -102,7 +102,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             var message2 = new ItemAdded
             {
                 Id = item.Id,
-                AggregateType = typeof(FakeItemsSaga).Name,
+                SourceType = typeof(FakeItemsSaga).Name,
                 CorrelationId = aggregateId,
                 Name = item.Name,
                 Quantity = 2,
@@ -115,7 +115,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             var message4 = new ItemAdded
             {
                 Id = item.Id,
-                AggregateType = typeof(FakeItemsSaga).Name,
+                SourceType = typeof(FakeItemsSaga).Name,
                 CorrelationId = Guid.NewGuid(),
                 Name = item.Name,
                 Quantity = 1,

@@ -27,7 +27,7 @@ namespace Journey.EventSourcing
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Event>().HasKey(x => new { x.AggregateId, x.AggregateType, x.Version }).ToTable(TableName, SchemaName);
+            modelBuilder.Entity<Event>().HasKey(x => new { SourceId = x.SourceId, SourceType = x.SourceType, x.Version }).ToTable(TableName, SchemaName);
         }
     }
 }

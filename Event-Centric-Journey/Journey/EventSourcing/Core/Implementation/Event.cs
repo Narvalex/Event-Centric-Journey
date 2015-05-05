@@ -11,8 +11,8 @@ namespace Journey.EventSourcing
         public DateTime CreationDate { get; set; }
         public DateTime LastUpdateTime { get; set; }
         public Guid CorrelationId { get; set; }
-        public Guid AggregateId { get; set; }
-        public string AggregateType { get; set; }
+        public Guid SourceId { get; set; }
+        public string SourceType { get; set; }
         public int Version { get; set; }
     }
 }

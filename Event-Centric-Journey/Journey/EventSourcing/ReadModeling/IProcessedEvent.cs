@@ -12,13 +12,13 @@ namespace Journey.EventSourcing.ReadModeling
         /// utiliza para saber si el evento ya ha sido procesado por el 
         /// read model generator.
         /// </summary>
-        Guid AggregateId { get; set; }
+        Guid SourceId { get; set; }
 
         /// <summary>
         /// El tipo de actor o aggrefate. Esto es un metadata que
         /// ayuda a que sea trazable.
         /// </summary>
-        string AggregateType { get; set; }
+        string SourceType { get; set; }
 
         /// <summary>
         /// La versión del actor o aggregate. Esto junto al aggregate id sirve para 

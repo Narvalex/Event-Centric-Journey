@@ -2,6 +2,7 @@ using Journey.Client;
 using Journey.Database;
 using Journey.Messaging;
 using Journey.Serialization;
+using Journey.Utils.SystemDateTime;
 using Microsoft.Practices.Unity;
 using SimpleInventario.Application;
 using SimpleInventario.Querying;
@@ -43,9 +44,12 @@ namespace SimpleInventario.Web.App_Start
 
             var serializer = new IndentedJsonTextSerializer();
             var config = DefaultClientApplicationConfigProvider.Configuration;
+            var dateTime = new LocalDateTime();
 
             container.RegisterInstance<ITextSerializer>(serializer);
             container.RegisterInstance<IClientApplicationConfig>(config);
+            container.RegisterInstance<ISystemDateTime>(dateTime);
+
 
             container.RegisterType<IMessageSender, MessageSender>(
                 "CommandBus",
@@ -58,7 +62,7 @@ namespace SimpleInventario.Web.App_Start
             container.RegisterType<ICommandBus, CommandBus>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
-                    new ResolvedParameter<IMessageSender>("CommandBus"), serializer));
+                    new ResolvedParameter<IMessageSender>("CommandBus"), serializer, dateTime));
 
 
             Func<SimpleInventarioDbContext> readModelContextFactory = () => new SimpleInventarioDbContext(config.ReadModelConnectionString);
