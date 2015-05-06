@@ -91,6 +91,19 @@ namespace Journey.Database
         }
 
         /// <summary>
+        /// Gets the value of the specified column as a double in Null-Safe mode.
+        /// </summary>
+        /// <param name="reader">The <see cref="SqlDataReader"/> instance.</param>
+        /// <param name="i">The zero-based column ordinal.</param>
+        public static double SafeGetDouble(this IDataReader reader, int i)
+        {
+            if (!reader.IsDBNull(i))
+                return reader.GetDouble(i);
+            else
+                return default(float);
+        }
+
+        /// <summary>
         /// Gets the value of the specified column as a GUID in Null-Safe mode.
         /// </summary>
         /// <param name="reader">The <see cref="SqlDataReader"/> instance.</param>
