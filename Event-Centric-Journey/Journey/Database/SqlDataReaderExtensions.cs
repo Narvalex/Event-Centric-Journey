@@ -78,6 +78,19 @@ namespace Journey.Database
         }
 
         /// <summary>
+        /// Gets the value of the specified column as a float in Null-Safe mode.
+        /// </summary>
+        /// <param name="reader">The <see cref="SqlDataReader"/> instance.</param>
+        /// <param name="i">The zero-based column ordinal.</param>
+        public static float SafeGetFloat(this IDataReader reader, int i)
+        {
+            if (!reader.IsDBNull(i))
+                return reader.GetFloat(i);
+            else
+                return default(float);
+        }
+
+        /// <summary>
         /// Gets the value of the specified column as a GUID in Null-Safe mode.
         /// </summary>
         /// <param name="reader">The <see cref="SqlDataReader"/> instance.</param>
