@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Journey.Utils.SystemDateTime
+namespace Journey.Utils.SystemTime
 {
-    public class LocalDateTime : ISystemDateTime
+    public class LocalDateTime : ISystemTime
     {
         public DateTime Now
         {

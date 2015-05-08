@@ -2,7 +2,7 @@ using Journey.Client;
 using Journey.Database;
 using Journey.Messaging;
 using Journey.Serialization;
-using Journey.Utils.SystemDateTime;
+using Journey.Utils.SystemTime;
 using Microsoft.Practices.Unity;
 using SimpleInventario.Application;
 using SimpleInventario.Querying;
@@ -48,7 +48,7 @@ namespace SimpleInventario.Web.App_Start
 
             container.RegisterInstance<ITextSerializer>(serializer);
             container.RegisterInstance<IClientApplicationConfig>(config);
-            container.RegisterInstance<ISystemDateTime>(dateTime);
+            container.RegisterInstance<ISystemTime>(dateTime);
 
 
             container.RegisterType<IMessageSender, MessageSender>(

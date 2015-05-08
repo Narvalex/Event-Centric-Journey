@@ -1,6 +1,6 @@
 ﻿using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
-using Journey.Utils.SystemDateTime;
+using Journey.Utils.SystemTime;
 using Journey.Worker;
 using System.Linq;
 
@@ -10,7 +10,7 @@ namespace Journey.Messaging.Logging
     {
         private readonly MessageLogDbContext context;
 
-        public InMemoryMessageLog(ITextSerializer serializer, IMetadataProvider metadataProvider, IWorkerRoleTracer tracer, MessageLogDbContext context, ISystemDateTime dateTime)
+        public InMemoryMessageLog(ITextSerializer serializer, IMetadataProvider metadataProvider, IWorkerRoleTracer tracer, MessageLogDbContext context, ISystemTime dateTime)
             : base(metadataProvider, serializer, tracer, dateTime)
         {
             this.context = context;

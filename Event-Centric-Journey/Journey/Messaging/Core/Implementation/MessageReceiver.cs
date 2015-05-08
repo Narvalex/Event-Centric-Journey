@@ -1,4 +1,4 @@
-﻿using Journey.Utils.SystemDateTime;
+﻿using Journey.Utils.SystemTime;
 using System;
 using System.Data;
 using System.Data.Common;
@@ -23,9 +23,9 @@ namespace Journey.Messaging
         private readonly object lockObject = new object();
         private CancellationTokenSource cancellationSource;
         private Action delegateMessageReceiving;
-        private readonly ISystemDateTime dateTime;
+        private readonly ISystemTime dateTime;
 
-        public MessageReceiver(IDbConnectionFactory connectionFactory, string connectionString, string tableName, TimeSpan busPollDelay, int numberOfThreads, ISystemDateTime dateTime)
+        public MessageReceiver(IDbConnectionFactory connectionFactory, string connectionString, string tableName, TimeSpan busPollDelay, int numberOfThreads, ISystemTime dateTime)
         {
             this.connectionFactory = connectionFactory;
             this.connectionString = connectionString;

@@ -2,7 +2,7 @@
 using Journey.EventSourcing;
 using Journey.Messaging;
 using Journey.Serialization;
-using Journey.Utils.SystemDateTime;
+using Journey.Utils.SystemTime;
 using Journey.Worker;
 using Moq;
 using System;
@@ -24,7 +24,7 @@ namespace Journey.Tests.Integration.EventSourcing
             private Mock<IEventBus> eventBusMock = new Mock<IEventBus>();
             private Mock<ICommandBus> commandBusMock = new Mock<ICommandBus>();
             private ITextSerializer serializer;
-            private Mock<IInMemoryRollingSnapshotProvider> cacheMock = new Mock<IInMemoryRollingSnapshotProvider>();
+            private Mock<ISnapshotProvider> cacheMock = new Mock<ISnapshotProvider>();
 
 
             public GIVEN_a_badly_implemented_aggregate_ctor()
@@ -54,7 +54,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 Assert.Throws<InvalidCastException>(() => this.sut =
                     new EventStore<FakePretendingEventSourcedAggregate>(eventBusMock.Object, commandBusMock.Object, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), cacheMock.Object, new ConsoleWorkerRoleTracer(), new LocalDateTime()));
+                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleWorkerRoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime())));
             }
 
             private static ITextSerializer CreateSerializer()
@@ -79,7 +79,7 @@ namespace Journey.Tests.Integration.EventSourcing
             private Mock<IEventBus> eventBusMock = new Mock<IEventBus>();
             private Mock<ICommandBus> commandBusMock = new Mock<ICommandBus>();
             private ITextSerializer serializer;
-            private Mock<IInMemoryRollingSnapshotProvider> cacheMock = new Mock<IInMemoryRollingSnapshotProvider>();
+            private Mock<ISnapshotProvider> cacheMock = new Mock<ISnapshotProvider>();
 
 
             public GIVEN_an_aggregate_with_a_badly_implemented_memento()
@@ -105,7 +105,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 Assert.Throws<InvalidCastException>(() => this.sut =
                     new EventStore<FakePretendingEventSourcedMementoAggregate>(eventBusMock.Object, commandBusMock.Object, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), cacheMock.Object, new ConsoleWorkerRoleTracer(), new LocalDateTime()));
+                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleWorkerRoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime())));
             }
 
             private static ITextSerializer CreateSerializer()
@@ -129,7 +129,7 @@ namespace Journey.Tests.Integration.EventSourcing
             internal readonly string connectionString;
             internal IEventStore<FakeItemsAggregate> sut;
             internal ITextSerializer serializer;
-            internal Mock<IInMemoryRollingSnapshotProvider> cacheMock = new Mock<IInMemoryRollingSnapshotProvider>();
+            internal Mock<ISnapshotProvider> cacheMock = new Mock<ISnapshotProvider>();
             internal MessageSender messageSender;
             internal EventBus eventBus;
             internal CommandBus commandBus;
@@ -163,7 +163,7 @@ namespace Journey.Tests.Integration.EventSourcing
 
                 this.sut =
                     new EventStore<FakeItemsAggregate>(this.eventBus, this.commandBus, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), cacheMock.Object, new ConsoleWorkerRoleTracer(), new LocalDateTime());
+                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleWorkerRoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime()));
             }
 
             [Fact]
@@ -287,7 +287,7 @@ DROP DATABASE [{0}]
             internal readonly string connectionString;
             internal IEventStore<FakeItemsSaga> sut;
             internal ITextSerializer serializer;
-            internal Mock<IInMemoryRollingSnapshotProvider> cacheMock = new Mock<IInMemoryRollingSnapshotProvider>();
+            internal Mock<ISnapshotProvider> cacheMock = new Mock<ISnapshotProvider>();
             internal MessageSender commandSender;
             internal MessageSender eventSender;
             internal EventBus eventBus;
@@ -327,7 +327,7 @@ DROP DATABASE [{0}]
 
                 this.sut =
                     new EventStore<FakeItemsSaga>(this.eventBus, this.commandBus, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), cacheMock.Object, new ConsoleWorkerRoleTracer(), new LocalDateTime());
+                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleWorkerRoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime()));
             }
 
             [Fact]

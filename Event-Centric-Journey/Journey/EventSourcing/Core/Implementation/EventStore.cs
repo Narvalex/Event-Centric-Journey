@@ -2,7 +2,7 @@
 using Journey.Messaging;
 using Journey.Serialization;
 using Journey.Utils;
-using Journey.Utils.SystemDateTime;
+using Journey.Utils.SystemTime;
 using Journey.Worker;
 using System;
 using System.Collections.Generic;
@@ -29,61 +29,13 @@ namespace Journey.EventSourcing
         private readonly IEventBus eventBus;
         private readonly ICommandBus commandBus;
         private readonly Func<EventStoreDbContext> contextFactory;
-        private readonly Action<T> cacheMementoIfApplicable;
-        private readonly IInMemoryRollingSnapshotProvider cache;
-        private readonly Func<Guid, Tuple<IMemento, DateTime?>> getMementoFromCache;
-        private readonly Action<Guid> markCacheAsStale;
-        private readonly Func<Guid, IMemento, IEnumerable<IVersionedEvent>, T> originatorEntityFactory;
 
-        public EventStore(IEventBus eventBus, ICommandBus commandBus, ITextSerializer serializer, Func<EventStoreDbContext> contextFactory, IInMemoryRollingSnapshotProvider cache, IWorkerRoleTracer tracer, ISystemDateTime dateTime)
-            : base(tracer, serializer, dateTime)
+        public EventStore(IEventBus eventBus, ICommandBus commandBus, ITextSerializer serializer, Func<EventStoreDbContext> contextFactory, IWorkerRoleTracer tracer, ISystemTime dateTime, ISnapshotProvider snapshoter)
+            : base(tracer, serializer, dateTime, snapshoter)
         {
             this.eventBus = eventBus;
             this.commandBus = commandBus;
-            this.contextFactory = contextFactory;
-            this.cache = cache;
-
-            if (typeof(IMementoOriginator).IsAssignableFrom(typeof(T)) && this.cache != null)
-            {
-                // TODO: could be replaced with a compiled lambda to make it more performant
-                var mementoConstructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IMemento), typeof(IEnumerable<IVersionedEvent>) });
-                if (mementoConstructor == null)
-                    throw new InvalidCastException(
-                        "Type T must have a constructor with the following signature: .ctor(Guid, IMemento, IEnumerable<IVersionedEvent>)");
-                this.originatorEntityFactory = (id, memento, events) => (T)mementoConstructor.Invoke(new object[] { id, memento, events });
-                this.cacheMementoIfApplicable = (T originator) =>
-                {
-                    var key = this.GetPartitionKey(originator.Id);
-                    var memento = ((IMementoOriginator)originator).SaveToMemento();
-                    this.cache.Set(
-                        key,
-                        new Tuple<IMemento, DateTime?>(memento, this.dateTime.Now),
-                        new CacheItemPolicy { AbsoluteExpiration = this.dateTime.Now.AddMinutes(30) });
-                    //new CacheItemPolicy { AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration });
-                };
-                this.getMementoFromCache = id => (Tuple<IMemento, DateTime?>)this.cache.Get(this.GetPartitionKey(id));
-                this.markCacheAsStale = id =>
-                {
-                    var key = this.GetPartitionKey(id);
-                    var item = (Tuple<IMemento, DateTime?>)this.cache.Get(key);
-                    if (item != null && item.Item2.HasValue)
-                    {
-                        item = new Tuple<IMemento, DateTime?>(item.Item1, null);
-                        this.cache.Set(
-                            key,
-                            item,
-                            new CacheItemPolicy { AbsoluteExpiration = this.dateTime.NowOffset.AddMinutes(30) });
-                        //new CacheItemPolicy { AbsoluteExpiration = ObjectCache.InfiniteAbsoluteExpiration });
-                    }
-                };
-            }
-            else
-            {
-                // if no cache object or is not a cache originator, then no-op
-                this.cacheMementoIfApplicable = o => { };
-                this.getMementoFromCache = id => { return null; };
-                this.markCacheAsStale = id => { };
-            }
+            this.contextFactory = contextFactory;          
 
             if (!typeof(ISqlBus).IsAssignableFrom(this.eventBus.GetType()))
                 throw new InvalidCastException("El eventBus debe implementar ISqlBus para ser transaccional con el EventStore");

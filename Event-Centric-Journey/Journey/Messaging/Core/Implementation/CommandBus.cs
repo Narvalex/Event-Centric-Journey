@@ -1,5 +1,5 @@
 ﻿using Journey.Serialization;
-using Journey.Utils.SystemDateTime;
+using Journey.Utils.SystemTime;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -13,13 +13,13 @@ namespace Journey.Messaging
     /// </summary>
     public class CommandBus : SqlBus, ICommandBus
     {
-        private readonly ISystemDateTime dateTime;
+        private readonly ISystemTime dateTime;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandBus"/> class.
         /// </summary>
         /// <param name="serializer">The serializer to use for the message body.</param>
-        public CommandBus(IMessageSender sender, ITextSerializer serializer, ISystemDateTime dateTime)
+        public CommandBus(IMessageSender sender, ITextSerializer serializer, ISystemTime dateTime)
             : base(sender, serializer)
         {
             this.dateTime = dateTime;

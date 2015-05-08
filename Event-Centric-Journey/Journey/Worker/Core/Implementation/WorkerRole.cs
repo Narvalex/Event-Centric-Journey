@@ -5,7 +5,7 @@ using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
-using Journey.Utils.SystemDateTime;
+using Journey.Utils.SystemTime;
 using Microsoft.Practices.Unity;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -35,7 +35,7 @@ namespace Journey.Worker
 
         public void Start()
         {
-            this.RegisterInMemorySnapshotCache(this.container);
+            this.RegisterSnapshoter(this.container);
 
             this.processors.ForEach(p => p.Start());
             this.container.Resolve<IWorkerRoleTracer>().Notify("=== Worker Started ===");
@@ -56,7 +56,7 @@ namespace Journey.Worker
             container.RegisterInstance<IDomainWorkerRegistry>(domainRegistry);
 
             // Infrastructure
-            container.RegisterInstance<ISystemDateTime>(new LocalDateTime());
+            container.RegisterInstance<ISystemTime>(new LocalDateTime());
             container.RegisterInstance<ITextSerializer>(new JsonTextSerializer());
             container.RegisterInstance<IMetadataProvider>(new StandardMetadataProvider());
             container.RegisterInstance<IWorkerRoleTracer>(_tracer);
@@ -66,7 +66,7 @@ namespace Journey.Worker
             var serializer = container.Resolve<ITextSerializer>();
             var metadata = container.Resolve<IMetadataProvider>();
             var tracer = container.Resolve<IWorkerRoleTracer>();
-            var dateTime = container.Resolve<ISystemDateTime>();
+            var dateTime = container.Resolve<ISystemTime>();
 
             var commandBus = new CommandBus(
                 new MessageSender(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.CommandBusTableName), serializer, dateTime);
@@ -80,7 +80,7 @@ namespace Journey.Worker
             var liveEventProcessor = new EventProcessor(
                 new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.EventBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer);
 
-            this.RegisterInMemorySnapshotCache(container);
+            this.RegisterSnapshoter(container);
 
             container.RegisterInstance<ICommandBus>(commandBus);
             container.RegisterInstance<IEventBus>(eventBus);
@@ -110,13 +110,13 @@ namespace Journey.Worker
         /// <summary>
         /// Esto es para evitar que al hacer un update que no coincide funcione
         /// </summary>
-        private void RegisterInMemorySnapshotCache(IUnityContainer container)
+        private void RegisterSnapshoter(IUnityContainer container)
         {
-            var inMemorySnapshotCache = new InMemoryRollingSnapshot("EventStoreCache");
-            container.RegisterInstance<IInMemoryRollingSnapshotProvider>(inMemorySnapshotCache);
+            var snapshoter = new InMemorySnapshotProvider("Snapshoter", container.Resolve<ISystemTime>());
+            container.RegisterInstance<ISnapshotProvider>(snapshoter);
         }
 
-        private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString, IWorkerRoleTracer tracer, ISystemDateTime dateTime)
+        private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString, IWorkerRoleTracer tracer, ISystemTime dateTime)
         {
             //Database.SetInitializer<MessageLogDbContext>(null);
             container.RegisterType<IMessageAuditLog, MessageLog>(new InjectionConstructor(connectionString, serializer, metadata, tracer, dateTime));

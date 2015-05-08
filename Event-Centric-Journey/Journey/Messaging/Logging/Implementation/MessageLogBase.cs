@@ -1,7 +1,7 @@
 ﻿using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
 using Journey.Utils;
-using Journey.Utils.SystemDateTime;
+using Journey.Utils.SystemTime;
 using Journey.Worker;
 using System;
 
@@ -14,7 +14,7 @@ namespace Journey.Messaging.Logging
         protected readonly IWorkerRoleTracer tracer;
         protected Func<string> lastUpdateTimeProvider;
 
-        public MessageLogBase(IMetadataProvider metadataProvider, ITextSerializer serializer, IWorkerRoleTracer tracer, ISystemDateTime dateTime)
+        public MessageLogBase(IMetadataProvider metadataProvider, ITextSerializer serializer, IWorkerRoleTracer tracer, ISystemTime dateTime)
         {
             this.metadataProvider = metadataProvider;
             this.serializer = serializer;

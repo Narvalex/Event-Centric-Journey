@@ -2,7 +2,7 @@
 using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
-using Journey.Utils.SystemDateTime;
+using Journey.Utils.SystemTime;
 using Journey.Worker;
 using Moq;
 using System;

@@ -1,6 +1,6 @@
 ﻿using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
-using Journey.Utils.SystemDateTime;
+using Journey.Utils.SystemTime;
 using Journey.Worker;
 using System;
 using System.Collections;
@@ -13,7 +13,7 @@ namespace Journey.Messaging.Logging
     {
         private string connectionString;
 
-        public MessageLog(string connectionString, ITextSerializer serializer, IMetadataProvider metadataProvider, IWorkerRoleTracer tracer, ISystemDateTime dateTime)
+        public MessageLog(string connectionString, ITextSerializer serializer, IMetadataProvider metadataProvider, IWorkerRoleTracer tracer, ISystemTime dateTime)
             : base(metadataProvider, serializer, tracer, dateTime)
         {
             this.connectionString = connectionString;

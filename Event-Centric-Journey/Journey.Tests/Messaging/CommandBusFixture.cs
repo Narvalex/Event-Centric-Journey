@@ -1,6 +1,6 @@
 ﻿using Journey.Messaging;
 using Journey.Serialization;
-using Journey.Utils.SystemDateTime;
+using Journey.Utils.SystemTime;
 using Moq;
 using System;
 using System.Collections.Generic;

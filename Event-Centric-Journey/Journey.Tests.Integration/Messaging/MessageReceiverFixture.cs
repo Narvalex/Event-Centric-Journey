@@ -1,5 +1,5 @@
 ﻿using Journey.Messaging;
-using Journey.Utils.SystemDateTime;
+using Journey.Utils.SystemTime;
 using System;
 using System.Data;
 using System.Data.Entity.Infrastructure;

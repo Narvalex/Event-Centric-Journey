@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Journey.Utils.SystemDateTime
+namespace Journey.Utils.SystemTime
 {
-    public class UtcDateTime : ISystemDateTime
+    public class UtcDateTime : ISystemTime
     {
         public DateTime Now
         {

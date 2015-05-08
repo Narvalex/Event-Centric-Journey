@@ -1,5 +1,5 @@
 ﻿using Journey.Serialization;
-using Journey.Utils.SystemDateTime;
+using Journey.Utils.SystemTime;
 using Journey.Worker;
 using System;
 using System.Collections.Generic;
@@ -14,14 +14,21 @@ namespace Journey.EventSourcing
 
         protected readonly IWorkerRoleTracer tracer;
         private readonly ITextSerializer serializer;
-        protected readonly ISystemDateTime dateTime;
+        protected readonly ISystemTime dateTime;
+        protected readonly ISnapshotProvider snapshoter;
         protected readonly Func<Guid, IEnumerable<IVersionedEvent>, T> entityFactory;
 
-        public EventStoreBase(IWorkerRoleTracer tracer, ITextSerializer serializer, ISystemDateTime dateTime)
+        protected readonly Func<Guid, Tuple<IMemento, DateTime?>> getMementoFromCache;
+        protected readonly Action<Guid> markCacheAsStale;
+        protected readonly Func<Guid, IMemento, IEnumerable<IVersionedEvent>, T> originatorEntityFactory;
+        protected readonly Action<T> cacheMementoIfApplicable;
+
+        public EventStoreBase(IWorkerRoleTracer tracer, ITextSerializer serializer, ISystemTime dateTime, ISnapshotProvider snapshoter)
         {
             this.tracer = tracer;
             this.serializer = serializer;
             this.dateTime = dateTime;
+            this.snapshoter = snapshoter;
 
             // TODO: could be replaced with a compiled lambda
             var constructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IEnumerable<IVersionedEvent>) });
@@ -29,6 +36,29 @@ namespace Journey.EventSourcing
                 throw new InvalidCastException("Type T must have a constructor with the following signature: .ctor(Guid, IEnumerable<IVersionedEvent>)");
 
             this.entityFactory = (id, events) => (T)constructor.Invoke(new object[] { id, events });
+
+            if (typeof(IMementoOriginator).IsAssignableFrom(typeof(T)) && this.snapshoter != null)
+            {
+                // TODO: could be replaced with a compiled lambda to make it more performant
+                var mementoConstructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IMemento), typeof(IEnumerable<IVersionedEvent>) });
+                if (mementoConstructor == null)
+                    throw new InvalidCastException(
+                        "Type T must have a constructor with the following signature: .ctor(Guid, IMemento, IEnumerable<IVersionedEvent>)");
+                this.originatorEntityFactory = (id, memento, events) => (T)mementoConstructor.Invoke(new object[] { id, memento, events });
+
+                this.cacheMementoIfApplicable = (T originator) => this.snapshoter.CacheMementoIfApplicable(originator, _sourceType);
+
+                this.getMementoFromCache = id => this.snapshoter.GetMementoFromCache(id, _sourceType);
+
+                this.markCacheAsStale = id => this.snapshoter.MarkCacheAsStale(id, _sourceType);
+            }
+            else
+            {
+                // if no cache object or is not a cache originator, then no-op
+                this.cacheMementoIfApplicable = o => { };
+                this.getMementoFromCache = id => { return null; };
+                this.markCacheAsStale = id => { };
+            }
         }
 
         public T Get(Guid id)
@@ -72,11 +102,6 @@ namespace Journey.EventSourcing
             {
                 return (IVersionedEvent)this.serializer.Deserialize(reader);
             }
-        }
-
-        protected string GetPartitionKey(Guid id)
-        {
-            return _sourceType + "_" + id.ToString();
         }
     }
 }

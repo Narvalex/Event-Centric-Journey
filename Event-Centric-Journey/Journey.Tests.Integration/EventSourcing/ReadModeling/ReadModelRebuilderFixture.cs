@@ -5,7 +5,7 @@ using Journey.Messaging;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
 using Journey.Utils.Guids;
-using Journey.Utils.SystemDateTime;
+using Journey.Utils.SystemTime;
 using Journey.Worker;
 using Moq;
 using System;
@@ -69,7 +69,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
             }
 
             this.eventStore = new EventStore<ItemActor>(
-                new Mock<ISqlBus>().As<IEventBus>().Object, new Mock<ISqlBus>().As<ICommandBus>().Object, this.serializer, this.eventStoreContextFactory, new Mock<IInMemoryRollingSnapshotProvider>().Object, this.tracer, new LocalDateTime());
+                new Mock<ISqlBus>().As<IEventBus>().Object, new Mock<ISqlBus>().As<ICommandBus>().Object, this.serializer, this.eventStoreContextFactory, this.tracer, new LocalDateTime(), new Mock<ISnapshotProvider>().Object);
 
         }
 
