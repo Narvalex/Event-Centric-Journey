@@ -1,6 +1,6 @@
-﻿
-using Xunit;
-namespace Journey.Tests.Integration.EventSourcing.RollingSnapshotProviderFixture
+﻿using Xunit;
+
+namespace Journey.Tests.Integration.EventSourcing.SnapshotProviderFixture
 {
     public class GIVEN
     {

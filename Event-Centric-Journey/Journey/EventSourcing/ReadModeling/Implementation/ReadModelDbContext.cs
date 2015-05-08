@@ -1,7 +1,6 @@
 ﻿using Journey.Utils;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
 
 namespace Journey.EventSourcing.ReadModeling
 {
@@ -26,19 +25,6 @@ namespace Journey.EventSourcing.ReadModeling
             this.OnRegisteringTableInfo();
         }
 
-        public IQueryable<T> Query<T>() where T : class
-        {
-            return this.Set<T>();
-        }
-
-        public void AddToUnitOfWork<T>(T entity) where T : class
-        {
-            var entry = this.Entry(entity);
-
-            if (entry.State == EntityState.Detached)
-                this.Set<T>().Add(entity);
-        }
-
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -53,8 +39,8 @@ namespace Journey.EventSourcing.ReadModeling
 
         public IDbSet<ProjectedEvent> ReadModelingEvents { get; set; }
 
-        public Dictionary<string, TableInfo> TablesInfo 
-        { 
+        public Dictionary<string, TableInfo> TablesInfo
+        {
             get { return this.tablesInfo; }
         }
 

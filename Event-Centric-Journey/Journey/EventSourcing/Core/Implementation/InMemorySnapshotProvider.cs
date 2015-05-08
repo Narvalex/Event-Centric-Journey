@@ -1,6 +1,7 @@
 ﻿using Journey.Utils.SystemTime;
 using System;
 using System.Runtime.Caching;
+
 namespace Journey.EventSourcing
 {
     public class InMemorySnapshotProvider : ISnapshotProvider

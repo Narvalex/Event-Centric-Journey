@@ -5,6 +5,7 @@ using SimpleInventario.ReadModel.Entities;
 using SimpleInventario.Reporting.Events;
 using System;
 using System.Linq;
+using Journey.Utils;
 
 namespace SimpleInventario.ReadModeling
 {
@@ -20,13 +21,13 @@ namespace SimpleInventario.ReadModeling
 
         public void Handle(SeActualizoResumenDeAnimalesPorPeriodo e)
         {
-            Action<SimpleInventarioDbContext, CantidadDeAnimalesDeUnPeriodo> 
+            Action<SimpleInventarioDbContext, CantidadDeAnimalesDeUnPeriodo>
                 actualizarResumenDeAnimalesPorPeriodo =
                     (context, registroExistente) =>
                     {
                         if (registroExistente == null)
                             // es un registro nuevo
-                            context.AddToUnitOfWork<CantidadDeAnimalesDeUnPeriodo>(
+                            context.AddToUnityOfWork(
                                 new CantidadDeAnimalesDeUnPeriodo
                                 {
                                     Periodo = e.Periodo.ToString(),
@@ -36,7 +37,7 @@ namespace SimpleInventario.ReadModeling
                         {
                             // El periodo ya esta registrado, actualizamos las cantidades
                             registroExistente.Cantidad = e.CantidadDeAnimales;
-                            context.AddToUnitOfWork<CantidadDeAnimalesDeUnPeriodo>(registroExistente);
+                            context.AddToUnityOfWork(registroExistente);
                         };
                     };
 

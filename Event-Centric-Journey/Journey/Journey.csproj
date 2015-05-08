@@ -101,13 +101,14 @@
     <Compile Include="EventSourcing\Core\Implementation\EventStoreConcurrencyException.cs" />
     <Compile Include="EventSourcing\Core\Implementation\InMemoryEventStore.cs" />
     <Compile Include="EventSourcing\Core\Implementation\InMemorySnapshotProvider.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\RollingSnapshot.cs" />
     <Compile Include="EventSourcing\Core\ISnapshotProvider.cs" />
     <Compile Include="EventSourcing\Core\Implementation\Saga.cs" />
     <Compile Include="EventSourcing\Core\Implementation\VersionedEvent.cs" />
     <Compile Include="EventSourcing\Core\IRehydratesFrom.cs" />
     <Compile Include="EventSourcing\Core\ISaga.cs" />
     <Compile Include="EventSourcing\Core\IVersionedEvent.cs" />
-    <Compile Include="EventSourcing\Core\Implementation\SnapshorProvider.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\SnapshotProvider.cs" />
     <Compile Include="EventSourcing\Handling\IDomainService.cs" />
     <Compile Include="EventSourcing\Handling\IHandlerOf.cs" />
     <Compile Include="EventSourcing\Handling\ISubscribedTo.cs" />
@@ -181,6 +182,7 @@
     <Compile Include="Serialization\ITextSerializer.cs" />
     <Compile Include="Utils\CacheAnyEnumerableExtensions.cs" />
     <Compile Include="Utils\CollectionExtensions.cs" />
+    <Compile Include="Utils\DbContextExtensions.cs" />
     <Compile Include="Utils\DictionaryExtensions.cs" />
     <Compile Include="Utils\ExpressionCombiner.cs" />
     <Compile Include="Utils\Guids\IGuid.cs" />

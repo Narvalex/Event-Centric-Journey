@@ -6,7 +6,6 @@ using Journey.Worker;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Caching;
 
 namespace Journey.EventSourcing
 {
@@ -35,39 +34,13 @@ namespace Journey.EventSourcing
             var cachedMemento = this.getMementoFromCache(id);
             if (cachedMemento != null && cachedMemento.Item1 != null)
             {
-                // NOTE: if we had a guarantee that this is running in a single process, there is
-                // no need to check if there are new events after the cached version.
                 IEnumerable<IVersionedEvent> deserialized;
-                if (!cachedMemento.Item2.HasValue || cachedMemento.Item2.Value < DateTime.Now.AddSeconds(-1))
-                {
-
-                    deserialized = this.context.Set<Event>()
-                        .Local
-                        .Where(x => x.SourceId == id && x.SourceType == _sourceType && x.Version > cachedMemento.Item1.Version)
-                        .OrderBy(x => x.Version)
-                        .AsEnumerable()
-                        .Select(this.Deserialize)
-                        .AsCachedAnyEnumerable();
-
-                    if (deserialized.Any())
-                        return entityFactory.Invoke(id, deserialized);
-
-                }
-                else
-                {
-                    // if the cache entry was updated in the last seconds, then there is a high possibility that it is not stale
-                    // (because we typically have a single writer for high contention aggregates). This is why we optimistically avoid
-                    // getting the new events from the EventStore since the last memento was created. In the low probable case
-                    // where we get an exception on save, then we mark the cache item as stale so when the command gets
-                    // reprocessed, this time we get the new events from the EventStore.
-                    deserialized = Enumerable.Empty<IVersionedEvent>();
-                }
+                deserialized = Enumerable.Empty<IVersionedEvent>();
 
                 return this.originatorEntityFactory.Invoke(id, cachedMemento.Item1, deserialized);
             }
             else
             {
-
                 var deserialized = this.context.Set<Event>()
                     .Local
                     .Where(x => x.SourceId == id && x.SourceType == _sourceType)

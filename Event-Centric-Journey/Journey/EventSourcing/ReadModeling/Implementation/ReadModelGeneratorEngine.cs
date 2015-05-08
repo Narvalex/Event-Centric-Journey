@@ -1,6 +1,7 @@
 ﻿using Journey.Worker;
 using System;
 using System.Linq;
+using Journey.Utils;
 
 namespace Journey.EventSourcing.ReadModeling
 {
@@ -73,7 +74,7 @@ namespace Journey.EventSourcing.ReadModeling
             {
                 doRebuildProjection(this.rebuildContext as T);
 
-                this.rebuildContext.AddToUnitOfWork<ProjectedEvent>(this.BuildProjectedEventEntity(e));
+                this.rebuildContext.AddToUnityOfWork(this.BuildProjectedEventEntity(e));
             }            
         }
 
@@ -108,7 +109,7 @@ namespace Journey.EventSourcing.ReadModeling
             {
                 doProjectionOrRebuild(this.rebuildContext as T);
 
-                this.rebuildContext.AddToUnitOfWork<ProjectedEvent>(this.BuildProjectedEventEntity(e));
+                this.rebuildContext.AddToUnityOfWork(this.BuildProjectedEventEntity(e));
             }            
         }
 
@@ -139,7 +140,7 @@ namespace Journey.EventSourcing.ReadModeling
                     doConsume();
 
                     // Mark as consumed in the consumers subscription log
-                    context.AddToUnitOfWork<Log>(this.BuildConsumedEventEntity<Log>(e));
+                    context.AddToUnityOfWork(this.BuildConsumedEventEntity<Log>(e));
 
                     context.SaveChanges();
                 }
@@ -147,7 +148,7 @@ namespace Journey.EventSourcing.ReadModeling
             }
             else
             {
-                this.rebuildContext.AddToUnitOfWork<Log>(this.BuildConsumedEventEntity<Log>(e));
+                this.rebuildContext.AddToUnityOfWork(this.BuildConsumedEventEntity<Log>(e));
             }
         }
 

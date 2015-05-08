@@ -8,7 +8,8 @@ namespace Journey.EventSourcing
     public class EventStoreDbContext : DbContext
     {
         public const string SchemaName = "EventStore";
-        public const string TableName = "Events";
+        public const string EventsTableName = "Events";
+        public const string SnapshotsTableName = "Snapshots";
 
         static EventStoreDbContext()
         {
@@ -23,11 +24,19 @@ namespace Journey.EventSourcing
             : base("Name=defaultConnection")
         { }
 
+        public IDbSet<RollingSnapshot> Snapshsots { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Event>().HasKey(x => new { SourceId = x.SourceId, SourceType = x.SourceType, x.Version }).ToTable(TableName, SchemaName);
+            modelBuilder.Entity<Event>()
+                .HasKey(x => new { SourceId = x.SourceId, SourceType = x.SourceType, x.Version })
+                .ToTable(EventsTableName, SchemaName);
+
+            modelBuilder.Entity<RollingSnapshot>()
+                .HasKey(x => x.PartitionKey)
+                .ToTable(SnapshotsTableName, SchemaName);
         }
     }
 }

@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Runtime.Caching;
 
 namespace Journey.EventSourcing
 {
@@ -28,14 +27,23 @@ namespace Journey.EventSourcing
     {
         private readonly IEventBus eventBus;
         private readonly ICommandBus commandBus;
+
         private readonly Func<EventStoreDbContext> contextFactory;
+        private readonly Func<EventStoreDbContext> queryContextFactory;
 
         public EventStore(IEventBus eventBus, ICommandBus commandBus, ITextSerializer serializer, Func<EventStoreDbContext> contextFactory, IWorkerRoleTracer tracer, ISystemTime dateTime, ISnapshotProvider snapshoter)
             : base(tracer, serializer, dateTime, snapshoter)
         {
             this.eventBus = eventBus;
             this.commandBus = commandBus;
-            this.contextFactory = contextFactory;          
+
+            this.contextFactory = contextFactory;
+            this.queryContextFactory = () =>
+            {
+                var context = this.contextFactory.Invoke();
+                context.Configuration.AutoDetectChangesEnabled = false;
+                return context;
+            };
 
             if (!typeof(ISqlBus).IsAssignableFrom(this.eventBus.GetType()))
                 throw new InvalidCastException("El eventBus debe implementar ISqlBus para ser transaccional con el EventStore");
@@ -52,9 +60,9 @@ namespace Journey.EventSourcing
                 // NOTE: if we had a guarantee that this is running in a single process, there is
                 // no need to check if there are new events after the cached version.
                 IEnumerable<IVersionedEvent> deserialized;
-                if (!cachedMemento.Item2.HasValue || cachedMemento.Item2.Value < this.dateTime.Now.AddSeconds(-1))
+                if (!cachedMemento.Item2.HasValue || cachedMemento.Item2.Value < this.dateTime.Now.AddMinutes(-30))
                 {
-                    using (var context = this.contextFactory.Invoke())
+                    using (var context = this.queryContextFactory.Invoke())
                     {
                         deserialized = context.Set<Event>()
                             .Where(x => x.SourceId == id && x.SourceType == _sourceType && x.Version > cachedMemento.Item1.Version)
@@ -81,7 +89,7 @@ namespace Journey.EventSourcing
             }
             else
             {
-                using (var context = this.contextFactory.Invoke())
+                using (var context = this.queryContextFactory.Invoke())
                 {
                     var deserialized = context.Set<Event>()
                         .Where(x => x.SourceId == id && x.SourceType == _sourceType)
@@ -193,7 +201,7 @@ FROM [{0}].[{1}] WITH (READPAST)
 WHERE SourceId = @SourceId
 	AND SourceType = @SourceType)
 e
-", EventStoreDbContext.SchemaName, EventStoreDbContext.TableName),
+", EventStoreDbContext.SchemaName, EventStoreDbContext.EventsTableName),
             new SqlParameter("@SourceId", eventSourced.Id),
             new SqlParameter("@SourceType", _sourceType))
             .FirstOrDefault() as int? ?? default(int);

@@ -7,6 +7,7 @@ using Journey.Messaging.Processing;
 using Journey.Serialization;
 using Journey.Utils.SystemTime;
 using Microsoft.Practices.Unity;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -80,8 +81,6 @@ namespace Journey.Worker
             var liveEventProcessor = new EventProcessor(
                 new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.EventBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer);
 
-            this.RegisterSnapshoter(container);
-
             container.RegisterInstance<ICommandBus>(commandBus);
             container.RegisterInstance<IEventBus>(eventBus);
             container.RegisterInstance<ICommandHandlerRegistry>(commandProcessor);
@@ -94,7 +93,9 @@ namespace Journey.Worker
             this.RegisterMessageLogger(container, indentedSerializer, metadata, liveEventProcessor, config.MessageLogConnectionString, tracer, dateTime);
 
             // Event Store
-            this.RegisterEventStore(container, config.EventStoreConnectionString);
+            container.RegisterType<EventStoreDbContext>(new TransientLifetimeManager(), new InjectionConstructor(config.EventStoreConnectionString));
+            this.RegisterSnapshoter(container);
+            container.RegisterType(typeof(IEventStore<>), typeof(EventStore<>), new ContainerControlledLifetimeManager());
 
             // Bounded Context Registration
             foreach (var registrationAction in domainRegistry.RegistrationList)
@@ -112,7 +113,7 @@ namespace Journey.Worker
         /// </summary>
         private void RegisterSnapshoter(IUnityContainer container)
         {
-            var snapshoter = new InMemorySnapshotProvider("Snapshoter", container.Resolve<ISystemTime>());
+            var snapshoter = new SnapshotProvider("Snapshoter", container.Resolve<ISystemTime>(), container.Resolve<Func<EventStoreDbContext>>(), container.Resolve<ITextSerializer>());
             container.RegisterInstance<ISnapshotProvider>(snapshoter);
         }
 
@@ -123,13 +124,6 @@ namespace Journey.Worker
             container.RegisterType<IEventHandler, MessageLogHandler>("MessageLogHandler");
             container.RegisterType<ICommandHandler, MessageLogHandler>("MessageLogHandler");
             eventProcessor.Register(container.Resolve<MessageLogHandler>());
-        }
-
-        private void RegisterEventStore(IUnityContainer container, string connectionString)
-        {
-            //Database.SetInitializer<EventStoreDbContext>(null);
-            container.RegisterType<EventStoreDbContext>(new TransientLifetimeManager(), new InjectionConstructor(connectionString));
-            container.RegisterType(typeof(IEventStore<>), typeof(EventStore<>), new ContainerControlledLifetimeManager());
         }
 
         private void RegisterCommandHandlers(IUnityContainer container)

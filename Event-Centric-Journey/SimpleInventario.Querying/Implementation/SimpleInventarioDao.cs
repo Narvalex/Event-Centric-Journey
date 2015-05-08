@@ -12,7 +12,13 @@ namespace SimpleInventario.Querying
 
         public SimpleInventarioDao(Func<SimpleInventarioDbContext> contextFactory)
         {
-            this.contextFactory = contextFactory;
+            // performance optimizer.
+            this.contextFactory = () =>
+            {
+                var context = contextFactory.Invoke();
+                context.Configuration.AutoDetectChangesEnabled = false;
+                return context;
+            };
         }
 
         public IList<CantidadDeAnimalesDeUnPeriodo> GetResumenDeCantidadDeAnimalesPorPeriodo()
