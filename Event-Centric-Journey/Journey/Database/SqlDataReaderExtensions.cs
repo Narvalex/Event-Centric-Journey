@@ -121,12 +121,12 @@ namespace Journey.Database
         /// </summary>
         /// <param name="reader">The <see cref="SqlDataReader"/> instance.</param>
         /// <param name="i">The zero-based column ordinal.</param>
-        public static DateTime SafeGetDateTime(this IDataReader reader, int i)
+        public static DateTime? SafeGetDateTime(this IDataReader reader, int i)
         {
             if (!reader.IsDBNull(i))
                 return reader.GetDateTime(i);
             else
-                return default(DateTime);
+                return null;
         }
 
         /// <summary>
