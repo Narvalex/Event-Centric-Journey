@@ -47,7 +47,7 @@ namespace Journey.Worker.Rebuilding
             var bus = new InMemoryBus();
 
             container.RegisterInstance<ISystemTime>(dateTime);
-            container.RegisterInstance<ITextSerializer>(new IndentedJsonTextSerializer());
+            container.RegisterInstance<ITextSerializer>(new JsonTextSerializer());
             container.RegisterInstance<IWorkerRoleTracer>(this.tracer);
 
             var snapshoter = new InMemorySnapshotProvider("Snapshotter", container.Resolve<ISystemTime>());

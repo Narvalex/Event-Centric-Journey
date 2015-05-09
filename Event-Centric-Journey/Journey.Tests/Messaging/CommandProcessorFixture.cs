@@ -89,7 +89,7 @@ namespace Journey.Tests.Messaging.CommandProcessorFixture
 
         private static ITextSerializer CreateSerializer()
         {
-            return new IndentedJsonTextSerializer();
+            return new JsonTextSerializer();
         }
 
         public class Command1 : ICommand

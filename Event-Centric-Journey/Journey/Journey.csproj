@@ -176,7 +176,6 @@
     <Compile Include="Messaging\Processing\Implementation\SynchronousEventDispatcher.cs" />
     <Compile Include="Messaging\Processing\Implementation\CommandBusTransientFaultDetector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\Implementation\IndentedJsonTextSerializer.cs" />
     <Compile Include="Serialization\Implementation\JsonTextSerializer.cs" />
     <Compile Include="Serialization\Implementation\TextSerializerExtensions.cs" />
     <Compile Include="Serialization\ITextSerializer.cs" />

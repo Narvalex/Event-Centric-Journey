@@ -66,7 +66,8 @@ namespace Journey.EventSourcing.EventStoreRebuilding
                     {
                         try
                         {
-                            eventStoreContext.Database.ExecuteSqlCommand("DELETE FROM [EventStore].[Events]");
+                            eventStoreContext.Database.ExecuteSqlCommand(@"DELETE FROM [EventStore].[Events]
+                                                                           DELETE FROM [EventStore].[Snapshots]");
 
                             using (var sourceContext = new MessageLogDbContext(config.SourceMessageLogConnectionString))
                             {

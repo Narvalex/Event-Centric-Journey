@@ -41,17 +41,19 @@ namespace SimpleInventario.Reporting
 
         public IMemento SaveToMemento()
         {
-            return new Memento
-            {
-                Version = this.Version,
-                AnimalesPorPeriodo = this.animalesPorPeriodo.ToArray()
-            };
+            return new Memento(this.Version, this.animalesPorPeriodo.ToArray());
         }
 
-        internal class Memento : IMemento
+        public class Memento : IMemento
         {
-            public int Version { get; internal set; }
-            internal KeyValuePair<int, int>[] AnimalesPorPeriodo { get; set; }
+            public Memento(int version, KeyValuePair<int, int>[] animalesPorPeriodo)
+            {
+                this.Version = version;
+                this.AnimalesPorPeriodo = animalesPorPeriodo;
+            }
+
+            public int Version { get; private set; }
+            public KeyValuePair<int, int>[] AnimalesPorPeriodo { get; private set; }
         }
 
         public void Consume(SeAgregaronAnimalesAlInventario e)

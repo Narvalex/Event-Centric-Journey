@@ -5,6 +5,7 @@ using Journey.Utils.SystemTime;
 using Journey.Worker;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Journey.EventSourcing
@@ -98,7 +99,48 @@ namespace Journey.EventSourcing
                 throw;
             }
 
-            this.cacheMementoIfApplicable.Invoke(eventSourced);
+            this.TakeSnapshotIfApplicable(eventSourced);
         }
+
+        private void TakeSnapshotIfApplicable(T eventSourced)
+        {
+            this.cacheMementoIfApplicable.Invoke(eventSourced);
+
+            var key = _sourceType + "_" + eventSourced.Id.ToString();
+            var snapshot = this.getMementoFromCache(eventSourced.Id);
+
+            var storedSnapshot = this.context
+                .Snapshsots
+                .Local
+                .Where(x => x.PartitionKey == key)
+                .FirstOrDefault();
+
+            if (storedSnapshot == null)
+                context.AddToUnityOfWork(this.SerializeSnapshot(key, snapshot.Item1, snapshot.Item2));
+            else
+            {
+                storedSnapshot.Memento = this.SerializeSnapshot(key, snapshot.Item1, snapshot.Item2).Memento;
+                storedSnapshot.LastUpdateTime = snapshot.Item2;
+                context.AddToUnityOfWork(storedSnapshot);
+            }
+        }
+
+        private RollingSnapshot SerializeSnapshot(string partitionKey, IMemento memento, DateTime? lastUpdateTime)
+        {
+            RollingSnapshot serialized;
+            using (var writer = new StringWriter())
+            {
+                this.serializer.Serialize(writer, memento);
+                serialized = new RollingSnapshot
+                {
+                    PartitionKey = partitionKey,
+                    Memento = writer.ToString(),
+                    LastUpdateTime = lastUpdateTime
+                };
+            }
+            return serialized;
+        }
+
+
     }
 }

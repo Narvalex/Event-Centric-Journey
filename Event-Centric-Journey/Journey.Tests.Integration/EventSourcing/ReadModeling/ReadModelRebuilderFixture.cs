@@ -32,7 +32,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
 
             this.tracer = new ConsoleWorkerRoleTracer();
-            this.serializer = new IndentedJsonTextSerializer();
+            this.serializer = new JsonTextSerializer();
 
             this.readModelDbName = "ReadModelRebuilderFixture_ReadModel";
             this.eventStoreDbName = "ReadModelRebuilderFixture_EventStore";

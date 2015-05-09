@@ -59,7 +59,7 @@ namespace Journey.Tests.Integration.EventSourcing
 
             private static ITextSerializer CreateSerializer()
             {
-                return new IndentedJsonTextSerializer();
+                return new JsonTextSerializer();
             }
 
             public void Dispose()
@@ -110,7 +110,7 @@ namespace Journey.Tests.Integration.EventSourcing
 
             private static ITextSerializer CreateSerializer()
             {
-                return new IndentedJsonTextSerializer();
+                return new JsonTextSerializer();
             }
 
             public void Dispose()
@@ -249,7 +249,7 @@ namespace Journey.Tests.Integration.EventSourcing
 
             private static ITextSerializer CreateSerializer()
             {
-                return new IndentedJsonTextSerializer();
+                return new JsonTextSerializer();
             }
 
             public void Dispose()
@@ -445,7 +445,7 @@ DROP DATABASE [{0}]
 
             private static ITextSerializer CreateSerializer()
             {
-                return new IndentedJsonTextSerializer();
+                return new JsonTextSerializer();
             }
 
             public void Dispose()

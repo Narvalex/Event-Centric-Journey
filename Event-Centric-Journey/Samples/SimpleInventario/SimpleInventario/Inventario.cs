@@ -49,15 +49,17 @@ namespace SimpleInventario
 
         public IMemento SaveToMemento()
         {
-            return new Memento
-            {
-                Version = this.Version
-            };
+            return new Memento(this.Version);
         }
 
-        internal class Memento : IMemento
+        public class Memento : IMemento
         {
-            public int Version { get; internal set; }
+            public Memento(int version)
+            {
+                this.Version = version;
+            }
+
+            public int Version { get; private set; }
         }
     }
 }

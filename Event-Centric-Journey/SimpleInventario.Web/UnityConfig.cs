@@ -42,7 +42,7 @@ namespace SimpleInventario.Web.App_Start
         {
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
 
-            var serializer = new IndentedJsonTextSerializer();
+            var serializer = new JsonTextSerializer();
             var config = DefaultClientApplicationConfigProvider.Configuration;
             var dateTime = new LocalDateTime();
 

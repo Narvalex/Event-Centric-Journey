@@ -28,6 +28,10 @@ namespace Journey.Serialization
         {
             var jsonWriter = new JsonTextWriter(writer);
 
+#if DEBUG
+            jsonWriter.Formatting = Formatting.Indented;
+#endif
+
             this.serializer.Serialize(jsonWriter, graph);
 
             // We don't close the stream as it's owned by the message.

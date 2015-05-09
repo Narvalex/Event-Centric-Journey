@@ -40,7 +40,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
         {
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
 
-            this.serializer = new IndentedJsonTextSerializer();
+            this.serializer = new JsonTextSerializer();
             this.tracer = new ConsoleWorkerRoleTracer();
 
 
@@ -148,7 +148,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 
             var bus = new InMemoryBus();
 
-            container.RegisterInstance<ITextSerializer>(new IndentedJsonTextSerializer());
+            container.RegisterInstance<ITextSerializer>(new JsonTextSerializer());
             container.RegisterInstance<ISystemTime>(new LocalDateTime());
             container.RegisterInstance<IWorkerRoleTracer>(this.tracer);
             var snapshoter = new InMemorySnapshotProvider("EventStoreCache", container.Resolve<ISystemTime>());

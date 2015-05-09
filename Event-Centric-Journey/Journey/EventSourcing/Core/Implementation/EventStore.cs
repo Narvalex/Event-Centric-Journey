@@ -156,17 +156,18 @@ namespace Journey.EventSourcing
                             context.SaveChanges();
 
                             dbContextTransaction.Commit();
+
+                            this.cacheMementoIfApplicable.Invoke(eventSourced);
                         }
                         catch (Exception)
                         {
                             try
                             {
                                 dbContextTransaction.Rollback();
+                                this.markCacheAsStale(eventSourced.Id);
                             }
                             catch (Exception)
                             { }
-
-                            this.markCacheAsStale(eventSourced.Id);
                             throw;
                         }
                     }
@@ -180,8 +181,6 @@ namespace Journey.EventSourcing
                     TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = false;
                 }
             }
-
-            this.cacheMementoIfApplicable.Invoke(eventSourced);
         }
 
         /// <summary>

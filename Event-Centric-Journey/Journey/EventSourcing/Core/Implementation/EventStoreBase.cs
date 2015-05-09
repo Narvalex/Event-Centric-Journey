@@ -13,7 +13,7 @@ namespace Journey.EventSourcing
         protected static readonly string _sourceType = typeof(T).Name;
 
         protected readonly IWorkerRoleTracer tracer;
-        private readonly ITextSerializer serializer;
+        protected readonly ITextSerializer serializer;
         protected readonly ISystemTime dateTime;
         protected readonly ISnapshotProvider snapshoter;
         protected readonly Func<Guid, IEnumerable<IVersionedEvent>, T> entityFactory;

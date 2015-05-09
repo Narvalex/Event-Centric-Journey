@@ -119,7 +119,7 @@ namespace Journey.Tests.Messaging.EventProcessorFixture
 
         private static ITextSerializer CreateSerializer()
         {
-            return new IndentedJsonTextSerializer();
+            return new JsonTextSerializer();
         }
 
         public class Event1 : IEvent
