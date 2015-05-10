@@ -1,4 +1,6 @@
-﻿using Journey.Worker;
+﻿using Journey.EventSourcing.EventStoreRebuilding;
+using Journey.EventSourcing.ReadModeling;
+using Journey.Worker;
 using Journey.Worker.Portal;
 using Journey.Worker.Rebuilding;
 using Journey.Worker.Tracing;
@@ -13,33 +15,37 @@ namespace SimpleInventario.DomainRegistry
         public static IWorkerRoleWebPortal CreatePortal()
         {
             // Implement Here you Own Domain Components.
-            var tracer = new WebWorkerRoleTracer();
+            var workerRegistry = new SimpleInventarioWorkerRegistry();
+
+            var tracer = new WebWorkerRoleTracer(workerRegistry.Config.SystemTime);
 
             var coordinator = new PortalTaskCoordinator();
 
             var worker = new WorkerRole(
-                new SimpleInventarioWorkerRegistry(),
+                workerRegistry,
                 tracer);
 
             // Implement here your Own Domain Read Builder Components.
-            Action rebuildReadModel = () =>
+            Func<IReadModelRebuilderPerfCounter> rebuildReadModel = () =>
             {
                 var rebuilder = new ReadModelRebuilder<SimpleInventarioDbContext>(
                     new SimpleInventarioReadModelRebuilderRegistry(),
                     WorkerRoleWebPortal.Instance.WorkerRole.Tracer);
 
                 // do rebuild
-                ReadModelRebuilderWebPortal<SimpleInventarioDbContext>
-                    .CreateNew(rebuilder, coordinator).Rebuild();
+                return ReadModelRebuilderWebPortal<SimpleInventarioDbContext>
+                    .CreateNew(rebuilder, coordinator)
+                    .Rebuild();
+
             };
 
-            Action rebuildEventStore = () =>
+            Func<IEventStoreRebuilderPerfCounter> rebuildEventStore = () =>
             {
-                var eventStoreRebuilder = EventStoreRebuilderWebPortal.CreateNew(
+                var eventStoreRebuilderPortal = EventStoreRebuilderWebPortal.CreateNew(
                     new EventStoreRebuilder(new SimpleInventarioEventStoreRebuilderRegistry(), tracer),
                     coordinator);
 
-                eventStoreRebuilder.Rebuild();
+                return eventStoreRebuilderPortal.Rebuild();
             };
 
             WorkerRoleWebPortal

@@ -52,16 +52,17 @@ namespace Journey.Worker.Portal
             }
         }
 
-        public void Rebuild()
+        public IReadModelRebuilderPerfCounter Rebuild()
         {
             try
             {
                 lock (coordinator.LockObject)
                 {
                     if (coordinator.PortalIsRebuilding)
-                        return;
-
-                    coordinator.SetPortalIsRebuilding();
+                    {
+                        coordinator.SetPortalIsRebuilding();
+                        return rebuilder.PerformanceCounter;
+                    }
                 }
 
                 rebuilder.Rebuild();
@@ -70,6 +71,8 @@ namespace Journey.Worker.Portal
                 {
                     coordinator.SetPortalIsNotRebuilding();
                 }
+
+                return rebuilder.PerformanceCounter;
             }
             catch (Exception ex)
             {

@@ -15,13 +15,15 @@ namespace Journey.EventSourcing.ReadModeling
         private readonly IEventDispatcher eventDispatcher;
         private readonly Func<EventStoreDbContext> storeContextFactory;
         private readonly T readModelContext;
+        private readonly IReadModelRebuilderPerfCounter perfCounter;
 
-        public ReadModelRebuilderEngine(Func<EventStoreDbContext> storeContextFactory, ITextSerializer serializer, IEventDispatcher synchronousEventDispatcher, T readModelContext)
+        public ReadModelRebuilderEngine(Func<EventStoreDbContext> storeContextFactory, ITextSerializer serializer, IEventDispatcher synchronousEventDispatcher, T readModelContext, IReadModelRebuilderPerfCounter perfCounter)
         {
             this.storeContextFactory = storeContextFactory;
             this.serializer = serializer;
             this.eventDispatcher = synchronousEventDispatcher;
             this.readModelContext = readModelContext;
+            this.perfCounter = perfCounter;
         }
 
         /// <summary>
@@ -30,8 +32,8 @@ namespace Journey.EventSourcing.ReadModeling
         /// </summary>
         public void Rebuild()
         {
-            // paramos el worker role
-            // TODO: verificar que efectivamente esta parado.
+            this.perfCounter.OnStartingRebuildProcess();
+            this.perfCounter.OnOpeningEventStoreConnection();
 
             using (var context = this.storeContextFactory.Invoke())
             {
@@ -41,6 +43,8 @@ namespace Journey.EventSourcing.ReadModeling
 
                     using (var dbContextTransaction = this.readModelContext.Database.BeginTransaction())
                     {
+                        this.perfCounter.OnEventStoreConnectionOpened();
+
                         try
                         {
                             this.ClearDatabase();
@@ -72,7 +76,7 @@ namespace Journey.EventSourcing.ReadModeling
                             }
                             catch (Exception)
                             { }
-                            
+
                             throw;
                         }
                     }
@@ -85,7 +89,7 @@ namespace Journey.EventSourcing.ReadModeling
                 {
                     TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = false;
                 }
-            }            
+            }
         }
 
         private IVersionedEvent Deserialize(Event @event)

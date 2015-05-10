@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Journey.EventSourcing.EventStoreRebuilding;
+using Journey.EventSourcing.ReadModeling;
+using System;
 using System.Web.Hosting;
 
 namespace Journey.Worker.Portal
@@ -10,8 +12,8 @@ namespace Journey.Worker.Portal
 
         private static IPortalTaskCoordinator coordinator;
 
-        private static Action rebuildReadModel;
-        private static Action rebuildEventStore;
+        private static Func<IReadModelRebuilderPerfCounter> rebuildReadModel;
+        private static Func<IEventStoreRebuilderPerfCounter> rebuildEventStore;
 
         private WorkerRoleWebPortal()
         {
@@ -23,7 +25,7 @@ namespace Journey.Worker.Portal
             get { return instance; }
         }
 
-        public static WorkerRoleWebPortal CreateNew(IWorkerRole workerInstance, Action rebuildReadModel, Action rebuildEventStore, IPortalTaskCoordinator coordinator)
+        public static WorkerRoleWebPortal CreateNew(IWorkerRole workerInstance, Func<IReadModelRebuilderPerfCounter> rebuildReadModel, Func<IEventStoreRebuilderPerfCounter> rebuildEventStore, IPortalTaskCoordinator coordinator)
         {
             if (instance == null)
             {
@@ -83,22 +85,37 @@ namespace Journey.Worker.Portal
 
         public void RebuildReadModel()
         {
-            rebuildReadModel.Invoke();
+            this.StopWorking();
+
+            rebuildReadModel
+                .Invoke()
+                .ShowResults();
+
+            //this.StartWorking();
         }
 
         public void RebuildEventStore()
         {
             this.StopWorking();
-            rebuildEventStore.Invoke();
-            this.StartWorking();
+
+            rebuildEventStore
+                .Invoke()
+                .ShowResults();
+
+            //this.StartWorking();
         }
 
         public void RebuildEventStoreAndReadModel()
         {
             this.StopWorking();
-            rebuildEventStore.Invoke();
-            rebuildReadModel.Invoke();
-            this.StartWorking();
+
+            var eventStoreRebuildingResults = rebuildEventStore.Invoke();
+            var readModelRebuildingResults = rebuildReadModel.Invoke();
+
+            readModelRebuildingResults.ShowResults();
+            eventStoreRebuildingResults.ShowResults();
+
+            //this.StartWorking();
         }
 
         public void Dispose()

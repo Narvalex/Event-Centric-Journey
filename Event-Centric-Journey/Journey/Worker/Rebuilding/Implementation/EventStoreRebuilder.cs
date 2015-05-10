@@ -43,7 +43,7 @@ namespace Journey.Worker.Rebuilding
             var commandProcessor = new InMemoryCommandProcessor(this.tracer);
             var eventProcessor = new SynchronousEventDispatcher(this.tracer);
 
-            var bus = new InMemoryBus();
+
 
             container.RegisterInstance<ITextSerializer>(new JsonTextSerializer());
             container.RegisterInstance<IWorkerRoleTracer>(this.tracer);
@@ -62,7 +62,11 @@ namespace Journey.Worker.Rebuilding
             container.RegisterInstance<ICommandProcessor>(commandProcessor);
             container.RegisterInstance<ICommandHandlerRegistry>(commandProcessor);
 
+            var bus = new InMemoryBus();
             container.RegisterInstance<IInMemoryBus>(bus);
+
+            var perfCounter = new EventStoreRebuilderPerfCounter(this.tracer, config.SystemTime);
+            container.RegisterInstance<IEventStoreRebuilderPerfCounter>(perfCounter);
 
             container.RegisterType(typeof(IEventStoreRebuilderEngine), typeof(EventStoreRebuilderEngine), new ContainerControlledLifetimeManager());
 
@@ -80,6 +84,12 @@ namespace Journey.Worker.Rebuilding
 
             foreach (var commandHandler in container.ResolveAll<ICommandHandler>())
                 commandHandlerRegistry.Register(commandHandler);
+        }
+
+
+        public IEventStoreRebuilderPerfCounter PerformanceCounter
+        {
+            get { return this.container.Resolve<IEventStoreRebuilderPerfCounter>(); }
         }
     }
 }

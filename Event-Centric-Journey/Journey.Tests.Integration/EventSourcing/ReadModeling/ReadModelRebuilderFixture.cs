@@ -141,7 +141,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
             this.itemGenerator = new ItemReadModelGenerator(this.generatorEngine);
             this.eventDispatcher = new SynchronousEventDispatcher(this.tracer);
             this.eventDispatcher.Register(itemGenerator);
-            this.sut = new ReadModelRebuilderEngine<ItemReadModelDbContext>(this.eventStoreContextFactory, this.serializer, this.eventDispatcher, rebuildContext);
+            this.sut = new ReadModelRebuilderEngine<ItemReadModelDbContext>(this.eventStoreContextFactory, this.serializer, this.eventDispatcher, rebuildContext, new Mock<IReadModelRebuilderPerfCounter>().Object);
         }
 
         [Fact]

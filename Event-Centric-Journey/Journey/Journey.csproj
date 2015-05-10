@@ -109,9 +109,14 @@
     <Compile Include="EventSourcing\Core\ISaga.cs" />
     <Compile Include="EventSourcing\Core\IVersionedEvent.cs" />
     <Compile Include="EventSourcing\Core\Implementation\SnapshotProvider.cs" />
+    <Compile Include="EventSourcing\EventStoreRebuilding\IEventStoreRebuilderPerfCounter.cs" />
+    <Compile Include="EventSourcing\EventStoreRebuilding\Implementation\EventStoreRebuilderPerfCounter.cs" />
     <Compile Include="EventSourcing\Handling\IDomainService.cs" />
     <Compile Include="EventSourcing\Handling\IHandlerOf.cs" />
     <Compile Include="EventSourcing\Handling\ISubscribedTo.cs" />
+    <Compile Include="EventSourcing\ReadModeling\IReadModelRebuilderPerfCounter.cs" />
+    <Compile Include="EventSourcing\RebuildPerfCounting\IRebuildPerfCounter.cs" />
+    <Compile Include="EventSourcing\RebuildPerfCounting\Implementation\RebuildPerfCounter.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ProjectedEvent.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\OldReadModelRebuilder.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ReadModelDbContext.cs" />
@@ -121,8 +126,9 @@
     <Compile Include="EventSourcing\ReadModeling\IReadModelGeneratorEngine.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ReadModelGeneratorEngine.cs" />
     <Compile Include="EventSourcing\ReadModeling\IReadModelRebuilderEngine.cs" />
-    <Compile Include="EventSourcing\EventStoreRebuilding\EventStoreRebuilderEngine.cs" />
+    <Compile Include="EventSourcing\EventStoreRebuilding\Implementation\EventStoreRebuilderEngine.cs" />
     <Compile Include="EventSourcing\EventStoreRebuilding\IEventStoreRebuilderEngine.cs" />
+    <Compile Include="EventSourcing\ReadModeling\Implementation\ReadModelRebuilderPerfCounter.cs" />
     <Compile Include="Messaging\Core\Envelope.cs" />
     <Compile Include="Messaging\Core\ICommand.cs" />
     <Compile Include="Messaging\Core\ICommandBus.cs" />

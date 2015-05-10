@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Journey.Utils.SystemTime;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,8 +11,14 @@ namespace Journey.Worker.Tracing
         private static readonly Queue<Notification> Notifications = new Queue<Notification>(50);
         private static int NotificationCountLimit = 50;
         private static volatile int NotificationCount = default(int);
+        private readonly ISystemTime time;
 
         private static object lockObject = new object();
+
+        public WebWorkerRoleTracer(ISystemTime time)
+        {
+            this.time = time;
+        }
 
         public void Notify(string info)
         {
@@ -28,7 +35,7 @@ namespace Journey.Worker.Tracing
                         Notifications.Enqueue(new Notification
                         {
                             id = ++NotificationCount,
-                            message = string.Format("{0} - {1}", DateTime.Now.ToString(), info)
+                            message = string.Format("{0} {1}", this.time.Now.ToString(), info)
                         });
 
                         // Publishing Notification

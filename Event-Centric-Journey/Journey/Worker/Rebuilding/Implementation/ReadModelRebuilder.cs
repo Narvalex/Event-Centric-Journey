@@ -34,10 +34,16 @@ namespace Journey.Worker.Rebuilding
 
                 Func<EventStoreDbContext> eventStoreContextFactory = () => new EventStoreDbContext(domainRegistry.Config.EventStoreConnectionString);
 
-                var engine = new ReadModelRebuilderEngine<T>(eventStoreContextFactory, serializer, complexEventProcessor, context);
+                var perfCounter = new ReadModelRebuilderPerfCounter(this.tracer, this.domainRegistry.Config.SystemTime);
+
+                var engine = new ReadModelRebuilderEngine<T>(eventStoreContextFactory, serializer, complexEventProcessor, context, perfCounter);
 
                 engine.Rebuild();
+
+                this.PerformanceCounter = perfCounter;
             }
         }
+
+        public IReadModelRebuilderPerfCounter PerformanceCounter { get; private set; }
     }
 }
