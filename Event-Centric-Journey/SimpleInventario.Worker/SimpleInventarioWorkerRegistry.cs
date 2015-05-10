@@ -1,6 +1,7 @@
 ﻿using Journey.EventSourcing.ReadModeling;
 using Journey.Messaging.Processing;
 using Journey.Worker;
+using Journey.Worker.Config;
 using Microsoft.Practices.Unity;
 using SimpleInventario.ReadModel;
 using SimpleInventario.ReadModeling;
@@ -33,6 +34,11 @@ namespace SimpleInventario.DomainRegistry
                     container.Resolve<IWorkerRoleTracer>()));
 
             liveEventProcessor.Register(container.Resolve<SimpleInventarioReadModelGenerator>());
+        }
+
+        protected override Journey.Worker.Config.IWorkerRoleConfig RegisterWorkerConfig()
+        {
+            return DefaultWorkerRoleConfigProvider.Configuration;
         }
     }
 }

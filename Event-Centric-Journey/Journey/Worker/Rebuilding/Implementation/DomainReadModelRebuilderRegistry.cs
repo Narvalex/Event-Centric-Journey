@@ -14,7 +14,7 @@ namespace Journey.Worker.Rebuilding
 
         public DomainReadModelRebuilderRegistry()
         {
-            this.config = DefaultWorkerRoleConfigProvider.Configuration;
+            this.config = this.RegisterConfig();
 
             this.registrationList = this.RegisterComplexEventProcessors();
             this.contextFactory = this.RegisterContextFactory();
@@ -34,6 +34,8 @@ namespace Journey.Worker.Rebuilding
         {
             get { return this.config; }
         }
+
+        protected abstract IReadModelRebuilderConfig RegisterConfig();
 
         protected abstract List<Action<T, IEventHandlerRegistry, IWorkerRoleTracer>> RegisterComplexEventProcessors();
 

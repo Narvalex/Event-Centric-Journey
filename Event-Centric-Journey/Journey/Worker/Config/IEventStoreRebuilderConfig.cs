@@ -1,4 +1,5 @@
-﻿namespace Journey.Worker.Config
+﻿using Journey.Utils.SystemTime;
+namespace Journey.Worker.Config
 {
     public interface IEventStoreRebuilderConfig
     {
@@ -7,5 +8,7 @@
         string NewMessageLogConnectionString { get; }
 
         string SourceMessageLogConnectionString { get; }
+
+        ISystemTime SystemTime { get; }
     }
 }

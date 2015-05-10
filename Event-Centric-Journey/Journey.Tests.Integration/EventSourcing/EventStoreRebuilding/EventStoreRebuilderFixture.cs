@@ -198,6 +198,11 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             {
                 get { throw new NotImplementedException(); }
             }
+
+            public ISystemTime SystemTime
+            {
+                get { throw new NotImplementedException(); }
+            }
         }
 
         #region Fake Domain

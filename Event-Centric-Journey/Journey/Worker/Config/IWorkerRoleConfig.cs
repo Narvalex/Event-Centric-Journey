@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Journey.Utils.SystemTime;
+using System;
 
 namespace Journey.Worker.Config
 {
@@ -21,5 +22,7 @@ namespace Journey.Worker.Config
         string EventBusTableName { get; }
 
         TimeSpan BusPollDelay { get; }
+
+        ISystemTime SystemTime { get; }
     }
 }

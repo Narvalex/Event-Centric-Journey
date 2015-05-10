@@ -57,7 +57,7 @@ namespace Journey.Worker
             container.RegisterInstance<IDomainWorkerRegistry>(domainRegistry);
 
             // Infrastructure
-            container.RegisterInstance<ISystemTime>(new LocalDateTime());
+            container.RegisterInstance<ISystemTime>(domainRegistry.Config.SystemTime);
             container.RegisterInstance<ITextSerializer>(new JsonTextSerializer());
             container.RegisterInstance<IMetadataProvider>(new StandardMetadataProvider());
             container.RegisterInstance<IWorkerRoleTracer>(_tracer);

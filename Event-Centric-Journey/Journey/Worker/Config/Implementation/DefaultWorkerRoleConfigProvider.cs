@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Journey.Utils.SystemTime;
+using System;
 using System.Configuration;
 
 namespace Journey.Worker.Config
@@ -12,6 +13,8 @@ namespace Journey.Worker.Config
         private const string connectionString = "connectionString";
         private const string busPollDelay = "busPollDelay";
         private const string numberOfProcessorThreads = "numberOfProcessorThreads";
+
+        private static LocalDateTime time = new LocalDateTime();
 
         private DefaultWorkerRoleConfigProvider()
         { }
@@ -77,6 +80,11 @@ namespace Journey.Worker.Config
         public string EventBusTableName
         {
             get { return "Bus.Events"; }
+        }
+
+        public ISystemTime SystemTime
+        {
+            get { return time; }
         }
     }
 }

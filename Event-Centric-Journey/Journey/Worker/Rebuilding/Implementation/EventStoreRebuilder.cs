@@ -39,18 +39,16 @@ namespace Journey.Worker.Rebuilding
 
             var config = this.domainRegistry.Config;
             container.RegisterInstance<IEventStoreRebuilderConfig>(config);
-
+            container.RegisterInstance<ISystemTime>(config.SystemTime);
             var commandProcessor = new InMemoryCommandProcessor(this.tracer);
             var eventProcessor = new SynchronousEventDispatcher(this.tracer);
-            var dateTime = new LocalDateTime();
 
             var bus = new InMemoryBus();
 
-            container.RegisterInstance<ISystemTime>(dateTime);
             container.RegisterInstance<ITextSerializer>(new JsonTextSerializer());
             container.RegisterInstance<IWorkerRoleTracer>(this.tracer);
 
-            var snapshoter = new InMemorySnapshotProvider("Snapshotter", container.Resolve<ISystemTime>());
+            var snapshoter = new InMemorySnapshotProvider("Snapshotter", config.SystemTime);
             container.RegisterInstance<ISnapshotProvider>(snapshoter);
 
 
