@@ -216,6 +216,7 @@
     <Compile Include="Worker\Rebuilding\Implementation\ReadModelRebuilder.cs" />
     <Compile Include="Worker\Portal\Implementation\ReadModelRebuilderWebPortal.cs" />
     <Compile Include="Worker\Tracing\Implementation\ConsoleWorkerRoleTracer.cs" />
+    <Compile Include="Worker\Tracing\Implementation\Notification.cs" />
     <Compile Include="Worker\Tracing\Implementation\PortalHub.cs" />
     <Compile Include="Worker\Tracing\Implementation\SignalRBase.cs" />
     <Compile Include="Worker\Tracing\Implementation\WebWorkerRoleTracer.cs" />

@@ -2,6 +2,7 @@
 using Journey.Utils.SystemTime;
 using Journey.Worker;
 using System;
+using System.Collections.Generic;
 
 namespace Journey.EventSourcing.EventStoreRebuilding
 {
@@ -16,25 +17,28 @@ namespace Journey.EventSourcing.EventStoreRebuilding
 
         protected override void OnStarting()
         {
-            this.tracer.Notify("===> STARTING EVENT STORE REBUILDING...");
+            this.tracer.Trace("===> STARTING EVENT STORE REBUILDING...");
         }
 
         public void OnOpeningEventStoreConnection()
         {
             this.openConnectionStartTime = time.Now;
-            this.tracer.Notify("===> Opening Event Store connection...");
+            this.tracer.Trace("===> Opening Event Store connection...");
         }
 
         public void OnEventStoreConnectionOpened()
         {
             this.openConnectionElapsedTime = time.Now - openConnectionStartTime;
-            this.tracer.Notify(string.Format("===> Event Store Connection opened. Time elapsed: {0} seconds", this.openConnectionElapsedTime.TotalSeconds.ToString()));
+            this.tracer.Trace(string.Format("===> Event Store Connection opened. Time elapsed: {0} seconds", this.openConnectionElapsedTime.TotalSeconds.ToString()));
         }
 
         protected override void OnShowingResults()
         {
-            this.tracer.Notify("=== EVENT STORE REBUILDING RESULTS ===");
-            this.tracer.Notify(string.Format("Event Store opening connection delay: {0} seconds", this.openConnectionElapsedTime.TotalSeconds.ToString()));
+            this.tracer.Notify(new List<string>
+            {
+                "=== EVENT STORE REBUILDING RESULTS ===",
+                string.Format("Event Store opening connection delay: {0} seconds", this.openConnectionElapsedTime.TotalSeconds.ToString())
+            }.ToArray());
         }
     }
 }

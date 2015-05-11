@@ -91,15 +91,15 @@ namespace Journey.Messaging.Processing
                     if (attempts >= 3)
                         throw;
 
-                    this.tracer.Notify(new string('-', 80));
-                    this.tracer.Notify(string.Format(
+                    this.tracer.Trace(new string('-', 80));
+                    this.tracer.Trace(string.Format(
                         "Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().Name, e));
-                    this.tracer.Notify(new string('-', 80)); 
+                    this.tracer.Trace(new string('-', 80)); 
                 }
             }
 
             
-            base.tracer.Notify("Command handled by " + handler.GetType().Name);
+            base.tracer.Trace("Command handled by " + handler.GetType().Name);
         }
 
         public void ProcessMessage(object payload)

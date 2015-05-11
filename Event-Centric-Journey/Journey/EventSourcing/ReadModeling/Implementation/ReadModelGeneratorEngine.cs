@@ -58,7 +58,7 @@ namespace Journey.EventSourcing.ReadModeling
                         .Any())
                     {
 
-                        tracer.Notify("Read model is up to date for event type: " + e.GetType().ToString());
+                        tracer.Trace("Read model is up to date for event type: " + e.GetType().ToString());
                         return;
                     }
 
@@ -93,7 +93,7 @@ namespace Journey.EventSourcing.ReadModeling
                         .Any())
                     {
 
-                        tracer.Notify("Read model is up to date for event type: " + e.GetType().ToString());
+                        tracer.Trace("Read model is up to date for event type: " + e.GetType().ToString());
                         return;
                     }
 
@@ -128,7 +128,7 @@ namespace Journey.EventSourcing.ReadModeling
                                 l.Version >= e.Version)
                             .Any())
                         {
-                            tracer.Notify(string.Format("Event {0} was already consumed by {1}", e.GetType().Name, typeof(Log).Name));
+                            tracer.Trace(string.Format("Event {0} was already consumed by {1}", e.GetType().Name, typeof(Log).Name));
                             return;
                         }
                     

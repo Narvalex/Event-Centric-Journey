@@ -100,15 +100,15 @@ namespace Journey.Messaging.Processing
             {
                 var body = this.Deserialize(args.Message.Body);
 
-                this.tracer.Notify(string.Format("Message received!"));
+                this.tracer.Trace(string.Format("Message received!"));
 
                 this.ProcessMessage(body, args.Message.CorrelationId);
             }
             catch (Exception e)
             {
-                this.tracer.Notify(string.Format("An exception happened while processing message through handler/s:\r\n{0}", e));
-                this.tracer.Notify("The message will be flagged as dead letter in the bus.");
-                this.tracer.Notify("Error will be ignored and message receiving will continue.");
+                this.tracer.Trace(string.Format("An exception happened while processing message through handler/s:\r\n{0}", e));
+                this.tracer.Trace("The message will be flagged as dead letter in the bus.");
+                this.tracer.Trace("Error will be ignored and message receiving will continue.");
 
                 throw;
             }

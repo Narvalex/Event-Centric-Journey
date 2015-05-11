@@ -20,14 +20,14 @@ namespace Journey.Messaging.Logging
         {
             var message = GetMessage(@event);
             context.Set<MessageLogEntity>().Add(message);
-            this.tracer.Notify(string.Format("Processing Event:\r\n{0}", message.Payload));
+            this.tracer.Trace(string.Format("Processing Event:\r\n{0}", message.Payload));
         }
 
         public void Log(ICommand command)
         {
             var message = GetMessage(command);
             context.Set<MessageLogEntity>().Add(message);
-            this.tracer.Notify(string.Format("Command processed!\r\n{0}", message.Payload));
+            this.tracer.Trace(string.Format("Command processed!\r\n{0}", message.Payload));
         }
 
         public bool IsDuplicateMessage(IEvent @event)

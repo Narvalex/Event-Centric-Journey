@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace Journey.Worker.Tracing
 {
@@ -20,46 +20,49 @@ namespace Journey.Worker.Tracing
             this.time = time;
         }
 
-        public void Notify(string info)
+        public void Trace(string info)
         {
-            Task.Factory.StartNew(() =>
-            {
-                try
-                {
-                    lock (lockObject)
-                    {
-                        // Adding New Notification
-                        if (Notifications.Count >= NotificationCountLimit)
-                            Notifications.Dequeue();
-
-                        Notifications.Enqueue(new Notification
-                        {
-                            id = ++NotificationCount,
-                            message = string.Format("{0} {1}", this.time.Now.ToString(), info)
-                        });
-
-                        // Publishing Notification
-                        if (Notifications.Any())
-                        {
-                            foreach (var notification in Notifications)
-                            {
-                                this.Hub.Clients.All.notify(notification);
-                            }
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    // we catch all exceptions in order to continue to provide information
-                }
-            }, TaskCreationOptions.PreferFairness);
-
+            ThreadPool.QueueUserWorkItem(x => this.Write(info));
         }
 
-        public class Notification
+        private void Write(string info)
         {
-            public int id { get; set; }
-            public string message { get; set; }
+            lock (lockObject)
+            {
+                // Adding New Notification
+                if (Notifications.Count >= NotificationCountLimit)
+                    Notifications.Dequeue();
+
+                Notifications.Enqueue(new Notification
+                {
+                    id = ++NotificationCount,
+                    message = string.Format("{0} {1}", this.time.Now.ToString(), info)
+                });
+
+                // Publishing Notification
+                if (Notifications.Any())
+                {
+                    foreach (var notification in Notifications)
+                    {
+                        this.Hub.Clients.All.notify(notification);
+                    }
+                }
+            }
+        }
+
+        public void Notify(string info)
+        {
+            ThreadPool.QueueUserWorkItem(x => this.Write(info));
+        }
+
+
+        public void Notify(IEnumerable<string> notifications)
+        {
+            ThreadPool.QueueUserWorkItem(x =>
+            {
+                foreach (var notification in notifications)
+                    this.Write(notification);
+            });
         }
     }
 }

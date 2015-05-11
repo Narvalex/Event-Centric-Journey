@@ -114,7 +114,7 @@ namespace Journey.EventSourcing
             if (events.Count() == 0)
             {
                 var noEventsMessage = string.Format("Aggregate {0} with Id {1} HAS NO EVENTS to be saved.", _sourceType, eventSourced.Id.ToString());
-                this.tracer.Notify(noEventsMessage);
+                this.tracer.Trace(noEventsMessage);
                 return;
             }
 

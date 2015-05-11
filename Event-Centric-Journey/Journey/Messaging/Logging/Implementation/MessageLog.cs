@@ -41,7 +41,7 @@ namespace Journey.Messaging.Logging
 
                 context.Set<MessageLogEntity>().Add(message);
 
-                this.tracer.Notify(string.Format("Processing Event:\r\n{0}", message.Payload));
+                this.tracer.Trace(string.Format("Processing Event:\r\n{0}", message.Payload));
 
                 context.SaveChanges();
             }
@@ -65,7 +65,7 @@ namespace Journey.Messaging.Logging
 
                 context.Set<MessageLogEntity>().Add(message);
 
-                this.tracer.Notify(string.Format("Command processed!\r\n{0}", message.Payload));
+                this.tracer.Trace(string.Format("Command processed!\r\n{0}", message.Payload));
 
                 context.SaveChanges();
             }

@@ -42,7 +42,7 @@ namespace Journey.Messaging.Processing
             }
 
             if (!wasHandled)
-                this.tracer.Notify(string.Format(CultureInfo.InvariantCulture, "Event{0} does not have any registered handler.", traceIdentifier));
+                this.tracer.Trace(string.Format(CultureInfo.InvariantCulture, "Event{0} does not have any registered handler.", traceIdentifier));
         }
 
         public void Register(IEventHandler handler)
@@ -134,12 +134,12 @@ namespace Journey.Messaging.Processing
             {
                 foreach (var handler in handlers)
                 {
-                    this.tracer.Notify(string.Format(CultureInfo.InvariantCulture,
+                    this.tracer.Trace(string.Format(CultureInfo.InvariantCulture,
                                 "Event {0} routed to handler '{1}' HashCode: {2}.", @event.GetHashCode(), handler.Item1.FullName, handler.GetHashCode()));
 
                     handler.Item2(envelope);
 
-                    this.tracer.Notify(string.Format(CultureInfo.InvariantCulture, "Event {0} handled by {1} HashCode: {2}.", @event.GetHashCode(), handler.Item1.FullName, handler.GetHashCode()));
+                    this.tracer.Trace(string.Format(CultureInfo.InvariantCulture, "Event {0} handled by {1} HashCode: {2}.", @event.GetHashCode(), handler.Item1.FullName, handler.GetHashCode()));
                 }
             }
         }
