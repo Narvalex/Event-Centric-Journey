@@ -7,5 +7,9 @@ namespace Journey.EventSourcing.ReadModeling
         void OnOpeningEventStoreConnection();
 
         void OnEventStoreConnectionOpened();
+
+        void OnStartingEventProcessing();
+
+        void OnEventStreamProcessingFinished();
     }
 }

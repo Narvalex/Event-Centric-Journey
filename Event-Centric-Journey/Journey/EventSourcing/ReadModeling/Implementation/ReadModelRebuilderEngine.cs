@@ -53,15 +53,19 @@ namespace Journey.EventSourcing.ReadModeling
                                 .OrderBy(e => e.CreationDate)
                                 .AsEnumerable()
                                 .Select(this.Deserialize)
-                                .AsCachedAnyEnumerable();
+                                .AsCachedAnyEnumerable();                           
 
                             if (events.Any())
                             {
+                                this.perfCounter.OnStartingEventProcessing();
+
                                 foreach (var e in events)
                                 {
                                     var @event = (IEvent)e;
                                     this.eventDispatcher.DispatchMessage(@event, null, @event.SourceId.ToString(), "");
                                 }
+
+                                this.perfCounter.OnEventStreamProcessingFinished();
                             }
 
                             this.readModelContext.SaveChanges();
