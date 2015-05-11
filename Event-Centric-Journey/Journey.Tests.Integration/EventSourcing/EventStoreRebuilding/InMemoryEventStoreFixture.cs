@@ -62,7 +62,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
-                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, new ConsoleWorkerRoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime()));
+                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime()));
 
                     this.aggregateId = Guid.NewGuid();
 
@@ -85,7 +85,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
-                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, new ConsoleWorkerRoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime()));
+                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime()));
                     
                     this.aggregateId = Guid.NewGuid();
 
@@ -115,7 +115,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
-                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, new ConsoleWorkerRoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime()));
+                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime()));
                     this.aggregateId = Guid.NewGuid();
 
                     var item = new Item { Id = 1, Name = "item1" };

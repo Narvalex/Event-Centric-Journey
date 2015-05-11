@@ -31,7 +31,7 @@ namespace SimpleInventario.DomainRegistry
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     contextFactory,
-                    container.Resolve<IWorkerRoleTracer>()));
+                    container.Resolve<ITracer>()));
 
             liveEventProcessor.Register(container.Resolve<SimpleInventarioReadModelGenerator>());
         }

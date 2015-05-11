@@ -24,7 +24,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
     {
         protected readonly IUnityContainer container;
 
-        protected readonly IWorkerRoleTracer tracer;
+        protected readonly ITracer tracer;
 
         protected readonly string eventStoreDbName;
         protected readonly string messageLogDbName;
@@ -41,7 +41,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
 
             this.serializer = new JsonTextSerializer();
-            this.tracer = new ConsoleWorkerRoleTracer();
+            this.tracer = new ConsoleTracer();
 
 
             // Event Store
@@ -85,7 +85,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
                 new MessageLog(
                     messageLogConnectionString,
                     this.serializer,
-                    new StandardMetadataProvider(), new ConsoleWorkerRoleTracer(), new LocalDateTime()));
+                    new StandardMetadataProvider(), new ConsoleTracer(), new LocalDateTime()));
 
             this.container = this.CreateContainer(messageLogConnectionString, eventStoreConnectionString);
         }
@@ -150,7 +150,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 
             container.RegisterInstance<ITextSerializer>(new JsonTextSerializer());
             container.RegisterInstance<ISystemTime>(new LocalDateTime());
-            container.RegisterInstance<IWorkerRoleTracer>(this.tracer);
+            container.RegisterInstance<ITracer>(this.tracer);
             var snapshoter = new InMemorySnapshotProvider("EventStoreCache", container.Resolve<ISystemTime>());
             container.RegisterInstance<ISnapshotProvider>(snapshoter);
 

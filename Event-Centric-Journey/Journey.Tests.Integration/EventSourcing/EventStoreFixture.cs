@@ -54,7 +54,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 Assert.Throws<InvalidCastException>(() => this.sut =
                     new EventStore<FakePretendingEventSourcedAggregate>(eventBusMock.Object, commandBusMock.Object, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleWorkerRoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime())));
+                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime())));
             }
 
             private static ITextSerializer CreateSerializer()
@@ -105,7 +105,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 Assert.Throws<InvalidCastException>(() => this.sut =
                     new EventStore<FakePretendingEventSourcedMementoAggregate>(eventBusMock.Object, commandBusMock.Object, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleWorkerRoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime())));
+                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime())));
             }
 
             private static ITextSerializer CreateSerializer()
@@ -163,7 +163,7 @@ namespace Journey.Tests.Integration.EventSourcing
 
                 this.sut =
                     new EventStore<FakeItemsAggregate>(this.eventBus, this.commandBus, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleWorkerRoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime()));
+                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime()));
             }
 
             [Fact]
@@ -327,7 +327,7 @@ DROP DATABASE [{0}]
 
                 this.sut =
                     new EventStore<FakeItemsSaga>(this.eventBus, this.commandBus, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleWorkerRoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime()));
+                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime()));
             }
 
             [Fact]

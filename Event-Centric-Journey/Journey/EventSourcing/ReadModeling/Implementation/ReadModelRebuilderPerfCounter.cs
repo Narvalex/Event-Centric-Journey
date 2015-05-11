@@ -10,26 +10,26 @@ namespace Journey.EventSourcing.ReadModeling
         private DateTime openConnectionStartTime;
         private TimeSpan openConnectionElapsedTime;
 
-        public ReadModelRebuilderPerfCounter(IWorkerRoleTracer tracer, ISystemTime time)
+        public ReadModelRebuilderPerfCounter(ITracer tracer, ISystemTime time)
             : base(tracer, time)
         { }
 
         protected override void OnStarting()
         {
-            this.tracer.Trace("===> STARTING READ MODEL REBUILDING...");
+            this.tracer.TraceAsync("===> STARTING READ MODEL REBUILDING...");
         }
 
         public void OnOpeningEventStoreConnection()
         {
             this.openConnectionStartTime = time.Now;
-            this.tracer.Trace("===> Opening Event Store connection...");
+            this.tracer.TraceAsync("===> Opening Event Store connection...");
         }
 
 
         public void OnEventStoreConnectionOpened()
         {
             this.openConnectionElapsedTime = time.Now - openConnectionStartTime;
-            this.tracer.Trace(string.Format("===> Event Store Connection opened. Time elapsed: {0} seconds", this.openConnectionElapsedTime.TotalSeconds.ToString()));
+            this.tracer.TraceAsync(string.Format("===> Event Store Connection opened. Time elapsed: {0} seconds", this.openConnectionElapsedTime.TotalSeconds.ToString()));
         }
 
         protected override void OnShowingResults()

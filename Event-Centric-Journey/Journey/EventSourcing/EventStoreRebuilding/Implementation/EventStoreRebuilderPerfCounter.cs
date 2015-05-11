@@ -11,25 +11,25 @@ namespace Journey.EventSourcing.EventStoreRebuilding
         private DateTime openConnectionStartTime;
         private TimeSpan openConnectionElapsedTime;
 
-        public EventStoreRebuilderPerfCounter(IWorkerRoleTracer tracer, ISystemTime time)
+        public EventStoreRebuilderPerfCounter(ITracer tracer, ISystemTime time)
             : base(tracer, time)
         { }
 
         protected override void OnStarting()
         {
-            this.tracer.Trace("===> STARTING EVENT STORE REBUILDING...");
+            this.tracer.TraceAsync("===> STARTING EVENT STORE REBUILDING...");
         }
 
         public void OnOpeningEventStoreConnection()
         {
             this.openConnectionStartTime = time.Now;
-            this.tracer.Trace("===> Opening Event Store connection...");
+            this.tracer.TraceAsync("===> Opening Event Store connection...");
         }
 
         public void OnEventStoreConnectionOpened()
         {
             this.openConnectionElapsedTime = time.Now - openConnectionStartTime;
-            this.tracer.Trace(string.Format("===> Event Store Connection opened. Time elapsed: {0} seconds", this.openConnectionElapsedTime.TotalSeconds.ToString()));
+            this.tracer.TraceAsync(string.Format("===> Event Store Connection opened. Time elapsed: {0} seconds", this.openConnectionElapsedTime.TotalSeconds.ToString()));
         }
 
         protected override void OnShowingResults()

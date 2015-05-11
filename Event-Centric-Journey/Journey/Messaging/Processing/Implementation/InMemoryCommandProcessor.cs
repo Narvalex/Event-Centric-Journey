@@ -11,7 +11,7 @@ namespace Journey.Messaging.Processing
     public class InMemoryCommandProcessor : ICommandHandlerRegistry, ICommandProcessor
     {
         private Dictionary<Type, ICommandHandler> handlers = new Dictionary<Type, ICommandHandler>();
-        private readonly IWorkerRoleTracer tracer;
+        private readonly ITracer tracer;
 
 
         /// <summary>
@@ -20,7 +20,7 @@ namespace Journey.Messaging.Processing
         /// <param name="receiver">The receiver to use. If the receiver is <see cref="IDisposable"/>, it will be
         ///  disposed.</param>
         /// <param name="serializer">The serializer to use for the message body.</param>
-        public InMemoryCommandProcessor(IWorkerRoleTracer tracer)
+        public InMemoryCommandProcessor(ITracer tracer)
         {
             this.tracer = tracer;
         }
@@ -84,15 +84,15 @@ namespace Journey.Messaging.Processing
                     if (attempts >= 3)
                         throw;
 
-                    this.tracer.Trace(new string('-', 80));
-                    this.tracer.Trace(string.Format(
+                    this.tracer.TraceAsync(new string('-', 80));
+                    this.tracer.TraceAsync(string.Format(
                         "Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().FullName, e));
-                    this.tracer.Trace(new string('-', 80));
+                    this.tracer.TraceAsync(new string('-', 80));
                 }
             }
 
 
-            this.tracer.Trace("Handled by " + handler.GetType().FullName);
+            this.tracer.TraceAsync("Handled by " + handler.GetType().FullName);
         }
     }
 }

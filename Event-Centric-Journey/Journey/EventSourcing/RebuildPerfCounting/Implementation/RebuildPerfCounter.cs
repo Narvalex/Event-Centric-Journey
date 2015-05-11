@@ -7,11 +7,11 @@ namespace Journey.EventSourcing.RebuildPerfCounting
     {
         private bool started;
 
-        protected readonly IWorkerRoleTracer tracer;
+        protected readonly ITracer tracer;
         protected readonly ISystemTime time;
 
 
-        public RebuildPerfCounter(IWorkerRoleTracer tracer, ISystemTime time)
+        public RebuildPerfCounter(ITracer tracer, ISystemTime time)
         {
             this.tracer = tracer;
             this.time = time;

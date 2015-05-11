@@ -8,7 +8,7 @@ namespace Journey.Worker.Rebuilding
 {
     public abstract class DomainReadModelRebuilderRegistry<T> : IDomainReadModelRebuilderRegistry<T> where T : ReadModelDbContext
     {
-        private readonly List<Action<T, IEventHandlerRegistry, IWorkerRoleTracer>> registrationList;
+        private readonly List<Action<T, IEventHandlerRegistry, ITracer>> registrationList;
         private readonly IReadModelRebuilderConfig config;
         private readonly Func<T> contextFactory;
 
@@ -20,7 +20,7 @@ namespace Journey.Worker.Rebuilding
             this.contextFactory = this.RegisterContextFactory();
         }
 
-        public List<Action<T, IEventHandlerRegistry, IWorkerRoleTracer>> RegistrationList
+        public List<Action<T, IEventHandlerRegistry, ITracer>> RegistrationList
         {
             get { return this.registrationList; }
         }
@@ -37,7 +37,7 @@ namespace Journey.Worker.Rebuilding
 
         protected abstract IReadModelRebuilderConfig RegisterConfig();
 
-        protected abstract List<Action<T, IEventHandlerRegistry, IWorkerRoleTracer>> RegisterComplexEventProcessors();
+        protected abstract List<Action<T, IEventHandlerRegistry, ITracer>> RegisterComplexEventProcessors();
 
         protected abstract Func<T> RegisterContextFactory();
     }

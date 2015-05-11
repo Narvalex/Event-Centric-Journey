@@ -10,11 +10,11 @@ namespace Journey.Messaging.Processing
 {
     public class SynchronousEventDispatcher : IEventDispatcher, IEventHandlerRegistry
     {
-        private IWorkerRoleTracer tracer;
+        private ITracer tracer;
         private Dictionary<Type, List<Tuple<Type, Action<Envelope>>>> handlersByEventType;
         private Dictionary<Type, Action<IEvent, string, string, string>> dispatchersByEventType;
 
-        public SynchronousEventDispatcher(IWorkerRoleTracer tracer)
+        public SynchronousEventDispatcher(ITracer tracer)
         {
             this.handlersByEventType = new Dictionary<Type, List<Tuple<Type, Action<Envelope>>>>();
             this.dispatchersByEventType = new Dictionary<Type, Action<IEvent, string, string, string>>();
@@ -42,7 +42,7 @@ namespace Journey.Messaging.Processing
             }
 
             if (!wasHandled)
-                this.tracer.Trace(string.Format(CultureInfo.InvariantCulture, "Event{0} does not have any registered handler.", traceIdentifier));
+                this.tracer.TraceAsync(string.Format(CultureInfo.InvariantCulture, "Event{0} does not have any registered handler.", traceIdentifier));
         }
 
         public void Register(IEventHandler handler)
@@ -134,12 +134,12 @@ namespace Journey.Messaging.Processing
             {
                 foreach (var handler in handlers)
                 {
-                    this.tracer.Trace(string.Format(CultureInfo.InvariantCulture,
+                    this.tracer.TraceAsync(string.Format(CultureInfo.InvariantCulture,
                                 "Event {0} routed to handler '{1}' HashCode: {2}.", @event.GetHashCode(), handler.Item1.FullName, handler.GetHashCode()));
 
                     handler.Item2(envelope);
 
-                    this.tracer.Trace(string.Format(CultureInfo.InvariantCulture, "Event {0} handled by {1} HashCode: {2}.", @event.GetHashCode(), handler.Item1.FullName, handler.GetHashCode()));
+                    this.tracer.TraceAsync(string.Format(CultureInfo.InvariantCulture, "Event {0} handled by {1} HashCode: {2}.", @event.GetHashCode(), handler.Item1.FullName, handler.GetHashCode()));
                 }
             }
         }

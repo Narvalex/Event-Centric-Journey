@@ -8,6 +8,6 @@ namespace Journey.Worker
 
         void Stop();
 
-        IWorkerRoleTracer Tracer { get; }
+        ITracer Tracer { get; }
     }
 }

@@ -11,10 +11,10 @@ namespace Journey.Worker.Rebuilding
     public class ReadModelRebuilder<T> : IReadModelRebuilder<T>
         where T : ReadModelDbContext
     {
-        private readonly IWorkerRoleTracer tracer;
+        private readonly ITracer tracer;
         private readonly IDomainReadModelRebuilderRegistry<T> domainRegistry;
 
-        public ReadModelRebuilder(IDomainReadModelRebuilderRegistry<T> domainRegistry, IWorkerRoleTracer tracer)
+        public ReadModelRebuilder(IDomainReadModelRebuilderRegistry<T> domainRegistry, ITracer tracer)
         {
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
             this.tracer = tracer;

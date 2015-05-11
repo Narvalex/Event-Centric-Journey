@@ -26,7 +26,7 @@ namespace SimpleInventario.Tests.ReadModeling.ReadModelingFixture
             this.contextFactory = () => new SimpleInventarioDbContext(this.connectionString);
 
             var generator = new ReadModelGeneratorEngine<SimpleInventarioDbContext>(
-                this.contextFactory, new ConsoleWorkerRoleTracer());
+                this.contextFactory, new ConsoleTracer());
 
             this.sut = new SimpleInventarioReadModelGenerator(generator);
 

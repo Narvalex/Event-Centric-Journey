@@ -23,7 +23,7 @@ namespace Journey.EventSourcing.EventStoreRebuilding
 
         private readonly IEventStoreRebuilderConfig config;
 
-        private readonly IWorkerRoleTracer tracer;
+        private readonly ITracer tracer;
 
         private readonly IInMemoryBus bus;
 
@@ -41,7 +41,7 @@ namespace Journey.EventSourcing.EventStoreRebuilding
             IInMemoryBus bus,
             ICommandProcessor commandProcessor, ICommandHandlerRegistry commandHandlerRegistry, IEventDispatcher eventDispatcher,
             ITextSerializer serializer, IMetadataProvider metadataProvider,
-            IWorkerRoleTracer tracer,
+            ITracer tracer,
             IEventStoreRebuilderConfig config,
             Func<EventStoreDbContext> eventStoreContextFactory,
             IEventStoreRebuilderPerfCounter perfCounter)

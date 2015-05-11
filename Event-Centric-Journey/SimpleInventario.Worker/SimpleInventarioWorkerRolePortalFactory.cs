@@ -17,7 +17,7 @@ namespace SimpleInventario.DomainRegistry
             // Implement Here you Own Domain Components.
             var workerRegistry = new SimpleInventarioWorkerRegistry();
 
-            var tracer = new WebWorkerRoleTracer(workerRegistry.Config.SystemTime);
+            var tracer = new WebTracer(workerRegistry.Config.SystemTime);
 
             var coordinator = new PortalTaskCoordinator();
 

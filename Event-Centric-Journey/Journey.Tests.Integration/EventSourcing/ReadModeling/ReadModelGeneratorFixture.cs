@@ -54,7 +54,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModelGeneratorFixture
 
         public GIVEN_live_generator()
         {
-            this.sut = new ReadModelGeneratorEngine<ItemReadModelDbContext>(() => new ItemReadModelDbContext(connectionString), new ConsoleWorkerRoleTracer());
+            this.sut = new ReadModelGeneratorEngine<ItemReadModelDbContext>(() => new ItemReadModelDbContext(connectionString), new ConsoleTracer());
         }
 
         [Fact]

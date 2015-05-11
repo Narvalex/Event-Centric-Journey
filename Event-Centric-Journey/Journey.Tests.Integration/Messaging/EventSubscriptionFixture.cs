@@ -9,7 +9,7 @@ namespace Journey.Tests.Integration.Messaging.EventSubscriptionFixture
 {
     public class GIVEN_dispatcher_with_multiple_handlers
     {
-        private AsynchronousEventDispatcher sut = new AsynchronousEventDispatcher(new ConsoleWorkerRoleTracer());
+        private AsynchronousEventDispatcher sut = new AsynchronousEventDispatcher(new ConsoleTracer());
         private TestableAggregateHandler handler = new TestableAggregateHandler();
 
         public GIVEN_dispatcher_with_multiple_handlers()

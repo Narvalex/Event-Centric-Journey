@@ -20,12 +20,12 @@ namespace Journey.Worker
         private readonly CancellationTokenSource cancellationTokenSource;
         private readonly IUnityContainer container;
         private readonly List<IMessageProcessor> processors;
-        private static IWorkerRoleTracer _tracer;
+        private static ITracer _tracer;
 
         /// <summary>
         /// Acepta aparte del dominio un tracer, que puede ser de consola o web, hasta el momento.
         /// </summary>
-        public WorkerRole(IDomainWorkerRegistry domainRegistry, IWorkerRoleTracer tracer)
+        public WorkerRole(IDomainWorkerRegistry domainRegistry, ITracer tracer)
         {
             _tracer = tracer;
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
@@ -39,7 +39,7 @@ namespace Journey.Worker
             this.RegisterSnapshoter(this.container);
 
             this.processors.ForEach(p => p.Start());
-            this.container.Resolve<IWorkerRoleTracer>().Trace("=== Worker Started ===");
+            this.container.Resolve<ITracer>().TraceAsync("=== Worker Started ===");
         }
 
         public void Stop()
@@ -47,7 +47,7 @@ namespace Journey.Worker
             this.cancellationTokenSource.Cancel();
 
             this.processors.ForEach(p => p.Stop());
-            this.container.Resolve<IWorkerRoleTracer>().Trace("=== Worker Stopped ===");
+            this.container.Resolve<ITracer>().TraceAsync("=== Worker Stopped ===");
         }
 
         private IUnityContainer CreateContainer(IDomainWorkerRegistry domainRegistry)
@@ -60,13 +60,13 @@ namespace Journey.Worker
             container.RegisterInstance<ISystemTime>(domainRegistry.Config.SystemTime);
             container.RegisterInstance<ITextSerializer>(new JsonTextSerializer());
             container.RegisterInstance<IMetadataProvider>(new StandardMetadataProvider());
-            container.RegisterInstance<IWorkerRoleTracer>(_tracer);
+            container.RegisterInstance<ITracer>(_tracer);
 
             var config = container.Resolve<IDomainWorkerRegistry>().Config;
 
             var serializer = container.Resolve<ITextSerializer>();
             var metadata = container.Resolve<IMetadataProvider>();
-            var tracer = container.Resolve<IWorkerRoleTracer>();
+            var tracer = container.Resolve<ITracer>();
             var dateTime = container.Resolve<ISystemTime>();
 
             var commandBus = new CommandBus(
@@ -117,7 +117,7 @@ namespace Journey.Worker
             container.RegisterInstance<ISnapshotProvider>(snapshoter);
         }
 
-        private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString, IWorkerRoleTracer tracer, ISystemTime dateTime)
+        private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString, ITracer tracer, ISystemTime dateTime)
         {
             //Database.SetInitializer<MessageLogDbContext>(null);
             container.RegisterType<IMessageAuditLog, MessageLog>(new InjectionConstructor(connectionString, serializer, metadata, tracer, dateTime));
@@ -148,7 +148,7 @@ namespace Journey.Worker
             this.cancellationTokenSource.Dispose();
         }
 
-        public IWorkerRoleTracer Tracer
+        public ITracer Tracer
         {
             get { return _tracer; }
         }

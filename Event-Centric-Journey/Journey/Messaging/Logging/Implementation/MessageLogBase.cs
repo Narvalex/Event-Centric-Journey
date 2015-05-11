@@ -11,10 +11,10 @@ namespace Journey.Messaging.Logging
     {
         protected readonly IMetadataProvider metadataProvider;
         protected readonly ITextSerializer serializer;
-        protected readonly IWorkerRoleTracer tracer;
+        protected readonly ITracer tracer;
         protected Func<string> lastUpdateTimeProvider;
 
-        public MessageLogBase(IMetadataProvider metadataProvider, ITextSerializer serializer, IWorkerRoleTracer tracer, ISystemTime dateTime)
+        public MessageLogBase(IMetadataProvider metadataProvider, ITextSerializer serializer, ITracer tracer, ISystemTime dateTime)
         {
             this.metadataProvider = metadataProvider;
             this.serializer = serializer;

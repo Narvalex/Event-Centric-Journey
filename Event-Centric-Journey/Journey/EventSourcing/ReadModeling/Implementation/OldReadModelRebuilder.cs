@@ -18,11 +18,11 @@ namespace Journey.EventSourcing.ReadModeling
     public abstract class OldReadModelRebuilder
     {
         protected readonly string connectionString;
-        protected readonly IWorkerRoleTracer tracer;
+        protected readonly ITracer tracer;
         private readonly ITextSerializer serializer;
         protected readonly IEventDispatcher eventDispatcher;
 
-        public OldReadModelRebuilder(string connectionString, IWorkerRoleTracer tracer)
+        public OldReadModelRebuilder(string connectionString, ITracer tracer)
         {
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
             this.connectionString = connectionString;
@@ -46,11 +46,11 @@ namespace Journey.EventSourcing.ReadModeling
         private void MaterializeEvents()
         {
             DateTime startTime;
-            this.tracer.Trace("====> Opening connection...");
+            this.tracer.TraceAsync("====> Opening connection...");
 
             using (var context = new EventStoreDbContext(this.connectionString))
             {
-                this.tracer.Trace("====> Loading events...");
+                this.tracer.TraceAsync("====> Loading events...");
                 var events = context.Set<Event>()
                     .OrderBy(e => e.CreationDate)
                     .AsEnumerable()
@@ -59,22 +59,22 @@ namespace Journey.EventSourcing.ReadModeling
 
                 // Setting the real datetime
                 startTime = DateTime.Now;
-                this.tracer.Trace(string.Empty);
-                this.tracer.Trace(string.Format("Starting at {0}", startTime.ToString()));
+                this.tracer.TraceAsync(string.Empty);
+                this.tracer.TraceAsync(string.Format("Starting at {0}", startTime.ToString()));
 
                 if (events.Any())
                 {
-                    this.tracer.Trace("====> Dispatching events...");
+                    this.tracer.TraceAsync("====> Dispatching events...");
                     foreach (var e in events)
                     {
                         var @event = (IEvent)e;
                         this.eventDispatcher.DispatchMessage(@event, null, @event.SourceId.ToString(), "");
                     }
-                    this.tracer.Trace("====> All events where dispatched.");
+                    this.tracer.TraceAsync("====> All events where dispatched.");
                 }
             }
 
-            this.tracer.Trace("====> Hitting the Database");
+            this.tracer.TraceAsync("====> Hitting the Database");
             var rowsAffected = this.Commit();
 
             #region Ending Message
@@ -84,22 +84,22 @@ namespace Journey.EventSourcing.ReadModeling
             var eventSpeed = this.EventsCount / timeElapsed.TotalSeconds;
             var dbSpeed = rowsAffected / timeElapsed.TotalSeconds;
 
-            this.tracer.Trace(string.Empty);
-            this.tracer.Trace(string.Format("Finished at {0}", endTime.ToString()));
-            this.tracer.Trace(string.Empty);
-            this.tracer.Trace(string.Format(
+            this.tracer.TraceAsync(string.Empty);
+            this.tracer.TraceAsync(string.Format("Finished at {0}", endTime.ToString()));
+            this.tracer.TraceAsync(string.Empty);
+            this.tracer.TraceAsync(string.Format(
                 "Time elapsed: {0} days, {1} hours, {2} minutes, {3} seconds",
                 timeElapsed.TotalDays.ToString(),
                 timeElapsed.TotalHours.ToString(),
                 timeElapsed.TotalMinutes.ToString(),
                 timeElapsed.TotalSeconds.ToString()));
                         
-            this.tracer.Trace(string.Empty);
-            this.tracer.Trace(string.Format("Events count: {0}", this.EventsCount));
-            this.tracer.Trace(string.Format("Average event processing speed: {0} events per second.", eventSpeed.ToString()));
-            this.tracer.Trace(string.Empty);
-            this.tracer.Trace(string.Format("Number of rows affected: {0} rows", rowsAffected));
-            this.tracer.Trace(string.Format("Database speed: {0} rows per second.", dbSpeed));
+            this.tracer.TraceAsync(string.Empty);
+            this.tracer.TraceAsync(string.Format("Events count: {0}", this.EventsCount));
+            this.tracer.TraceAsync(string.Format("Average event processing speed: {0} events per second.", eventSpeed.ToString()));
+            this.tracer.TraceAsync(string.Empty);
+            this.tracer.TraceAsync(string.Format("Number of rows affected: {0} rows", rowsAffected));
+            this.tracer.TraceAsync(string.Format("Database speed: {0} rows per second.", dbSpeed));
 
             #endregion
         }

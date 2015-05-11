@@ -12,7 +12,7 @@ namespace Journey.EventSourcing
         // Could potentially use DataAnnotations to get a friendly/unique name in case of collisions between BCs.
         protected static readonly string _sourceType = typeof(T).Name;
 
-        protected readonly IWorkerRoleTracer tracer;
+        protected readonly ITracer tracer;
         protected readonly ITextSerializer serializer;
         protected readonly ISystemTime dateTime;
         protected readonly ISnapshotProvider snapshoter;
@@ -23,7 +23,7 @@ namespace Journey.EventSourcing
         protected readonly Func<Guid, IMemento, IEnumerable<IVersionedEvent>, T> originatorEntityFactory;
         protected readonly Action<T> cacheMementoIfApplicable;
 
-        public EventStoreBase(IWorkerRoleTracer tracer, ITextSerializer serializer, ISystemTime dateTime, ISnapshotProvider snapshoter)
+        public EventStoreBase(ITracer tracer, ITextSerializer serializer, ISystemTime dateTime, ISnapshotProvider snapshoter)
         {
             this.tracer = tracer;
             this.serializer = serializer;

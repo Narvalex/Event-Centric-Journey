@@ -10,7 +10,7 @@ namespace Journey.Messaging.Logging
     {
         private readonly MessageLogDbContext context;
 
-        public InMemoryMessageLog(ITextSerializer serializer, IMetadataProvider metadataProvider, IWorkerRoleTracer tracer, MessageLogDbContext context, ISystemTime dateTime)
+        public InMemoryMessageLog(ITextSerializer serializer, IMetadataProvider metadataProvider, ITracer tracer, MessageLogDbContext context, ISystemTime dateTime)
             : base(metadataProvider, serializer, tracer, dateTime)
         {
             this.context = context;
@@ -20,14 +20,14 @@ namespace Journey.Messaging.Logging
         {
             var message = GetMessage(@event);
             context.Set<MessageLogEntity>().Add(message);
-            this.tracer.Trace(string.Format("Processing Event:\r\n{0}", message.Payload));
+            this.tracer.TraceAsync(string.Format("Processing Event:\r\n{0}", message.Payload));
         }
 
         public void Log(ICommand command)
         {
             var message = GetMessage(command);
             context.Set<MessageLogEntity>().Add(message);
-            this.tracer.Trace(string.Format("Command processed!\r\n{0}", message.Payload));
+            this.tracer.TraceAsync(string.Format("Command processed!\r\n{0}", message.Payload));
         }
 
         public bool IsDuplicateMessage(IEvent @event)

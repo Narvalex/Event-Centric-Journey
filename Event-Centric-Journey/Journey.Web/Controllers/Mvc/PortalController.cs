@@ -14,7 +14,7 @@ namespace Journey.Web.Controllers
 
         public ActionResult WorkerRoleStatus(string requester)
         {
-            WorkerRoleWebPortal.Instance.WorkerRole.Tracer.Trace("========== INCOMING STATUS CHECK BY: " + requester + " ==========");
+            WorkerRoleWebPortal.Instance.WorkerRole.Tracer.TraceAsync("========== INCOMING STATUS CHECK BY: " + requester + " ==========");
 
             return Content("Online");
         }

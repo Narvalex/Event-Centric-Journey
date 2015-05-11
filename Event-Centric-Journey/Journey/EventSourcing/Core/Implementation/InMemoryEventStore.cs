@@ -23,7 +23,7 @@ namespace Journey.EventSourcing
         private readonly EventStoreDbContext context;
 
 
-        public InMemoryEventStore(IInMemoryBus bus, ITextSerializer serializer, EventStoreDbContext context, IWorkerRoleTracer tracer, ISystemTime dateTime, ISnapshotProvider snapshoter)
+        public InMemoryEventStore(IInMemoryBus bus, ITextSerializer serializer, EventStoreDbContext context, ITracer tracer, ISystemTime dateTime, ISnapshotProvider snapshoter)
             : base(tracer, serializer, dateTime, snapshoter)
         {
             this.bus = bus;
@@ -67,7 +67,7 @@ namespace Journey.EventSourcing
             if (events.Count() == 0)
             {
                 var noEventsMessage = string.Format("Aggregate {0} with Id {1} HAS NO EVENTS to be saved.", _sourceType, eventSourced.Id.ToString());
-                this.tracer.Trace(noEventsMessage);
+                this.tracer.TraceAsync(noEventsMessage);
                 return;
             }
 

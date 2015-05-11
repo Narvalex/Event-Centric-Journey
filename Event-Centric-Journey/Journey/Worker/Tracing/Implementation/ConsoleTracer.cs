@@ -2,9 +2,9 @@
 
 namespace Journey.Worker
 {
-    public class ConsoleWorkerRoleTracer : IWorkerRoleTracer
+    public class ConsoleTracer : ITracer
     {
-        public void Trace(string info)
+        public void TraceAsync(string info)
         {
             Console.WriteLine(new string('-', 80));
             Console.WriteLine(info);

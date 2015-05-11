@@ -16,10 +16,10 @@ namespace Journey.Worker.Rebuilding
     public class EventStoreRebuilder : IEventStoreRebuilder
     {
         private readonly IUnityContainer container;
-        private readonly IWorkerRoleTracer tracer;
+        private readonly ITracer tracer;
         private readonly IDomainEventStoreRebuilderRegistry domainRegistry;
 
-        public EventStoreRebuilder(IDomainEventStoreRebuilderRegistry domainRegistry, IWorkerRoleTracer tracer)
+        public EventStoreRebuilder(IDomainEventStoreRebuilderRegistry domainRegistry, ITracer tracer)
         {
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
             this.domainRegistry = domainRegistry;
@@ -46,7 +46,7 @@ namespace Journey.Worker.Rebuilding
 
 
             container.RegisterInstance<ITextSerializer>(new JsonTextSerializer());
-            container.RegisterInstance<IWorkerRoleTracer>(this.tracer);
+            container.RegisterInstance<ITracer>(this.tracer);
 
             var snapshoter = new InMemorySnapshotProvider("Snapshotter", config.SystemTime);
             container.RegisterInstance<ISnapshotProvider>(snapshoter);

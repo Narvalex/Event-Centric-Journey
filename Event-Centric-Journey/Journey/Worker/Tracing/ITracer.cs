@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 namespace Journey.Worker
 {
-    public interface IWorkerRoleTracer
+    public interface ITracer
     {
-        void Trace(string info);
+        void TraceAsync(string info);
 
         void Notify(string info);
 

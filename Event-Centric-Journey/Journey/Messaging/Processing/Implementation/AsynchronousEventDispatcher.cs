@@ -11,11 +11,11 @@ namespace Journey.Messaging.Processing
 {
     public class AsynchronousEventDispatcher : IEventDispatcher
     {
-        private IWorkerRoleTracer tracer;
+        private ITracer tracer;
         private Dictionary<Type, List<Tuple<Type, Action<Envelope>>>> handlersByEventType;
         private Dictionary<Type, Action<IEvent, string, string, string>> dispatchersByEventType;
 
-        public AsynchronousEventDispatcher(IWorkerRoleTracer tracer)
+        public AsynchronousEventDispatcher(ITracer tracer)
         {
             this.handlersByEventType = new Dictionary<Type, List<Tuple<Type, Action<Envelope>>>>();
             this.dispatchersByEventType = new Dictionary<Type, Action<IEvent, string, string, string>>();
@@ -43,7 +43,7 @@ namespace Journey.Messaging.Processing
             }
 
             if (!wasHandled)
-                this.tracer.Trace(string.Format(CultureInfo.InvariantCulture, "Event{0} does not have any registered handler.", traceIdentifier));
+                this.tracer.TraceAsync(string.Format(CultureInfo.InvariantCulture, "Event{0} does not have any registered handler.", traceIdentifier));
         }
 
         public void Register(IEventHandler handler)
@@ -141,7 +141,7 @@ namespace Journey.Messaging.Processing
                     {
                         await Task.Factory.StartNew(() =>
                         {
-                            this.tracer.Trace(string.Format(CultureInfo.InvariantCulture,
+                            this.tracer.TraceAsync(string.Format(CultureInfo.InvariantCulture,
                                 "Event {0} routed to handler '{1}' HashCode: {2}.", @event.GetType().Name, handler.Item1.Name, handler.GetHashCode()));
 
 
@@ -160,13 +160,13 @@ namespace Journey.Messaging.Processing
                                     if (attempts >= 3)
                                         throw;
 
-                                    this.tracer.Trace(new string('-', 80));
-                                    this.tracer.Trace(string.Format("Dispatch Event attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.Item1.FullName, e));
-                                    this.tracer.Trace(new string('-', 80)); 
+                                    this.tracer.TraceAsync(new string('-', 80));
+                                    this.tracer.TraceAsync(string.Format("Dispatch Event attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.Item1.FullName, e));
+                                    this.tracer.TraceAsync(new string('-', 80)); 
                                 }
                             }
 
-                            this.tracer.Trace(string.Format(CultureInfo.InvariantCulture, "Event {0} handled by {1} HashCode: {2}.", @event.GetType().Name, handler.Item1.Name, handler.GetHashCode()));
+                            this.tracer.TraceAsync(string.Format(CultureInfo.InvariantCulture, "Event {0} handled by {1} HashCode: {2}.", @event.GetType().Name, handler.Item1.Name, handler.GetHashCode()));
                         }, TaskCreationOptions.LongRunning);
                     };
 

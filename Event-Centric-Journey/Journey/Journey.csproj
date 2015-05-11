@@ -215,17 +215,17 @@
     <Compile Include="Worker\Rebuilding\IReadModelRebuilder.cs" />
     <Compile Include="Worker\Rebuilding\Implementation\ReadModelRebuilder.cs" />
     <Compile Include="Worker\Portal\Implementation\ReadModelRebuilderWebPortal.cs" />
-    <Compile Include="Worker\Tracing\Implementation\ConsoleWorkerRoleTracer.cs" />
+    <Compile Include="Worker\Tracing\Implementation\ConsoleTracer.cs" />
     <Compile Include="Worker\Tracing\Implementation\Notification.cs" />
     <Compile Include="Worker\Tracing\Implementation\PortalHub.cs" />
     <Compile Include="Worker\Tracing\Implementation\SignalRBase.cs" />
-    <Compile Include="Worker\Tracing\Implementation\WebWorkerRoleTracer.cs" />
+    <Compile Include="Worker\Tracing\Implementation\WebTracer.cs" />
     <Compile Include="Worker\Core\Implementation\WorkerRole.cs" />
     <Compile Include="Worker\Portal\Implementation\WorkerRoleWebPortal.cs" />
     <Compile Include="Worker\Core\Implementation\WorkerRoleStatusUrlProvider.cs" />
     <Compile Include="Worker\Core\IWorkerRole.cs" />
     <Compile Include="Worker\Core\IWorkerRoleStatusUrlProvider.cs" />
-    <Compile Include="Worker\Tracing\IWorkerRoleTracer.cs" />
+    <Compile Include="Worker\Tracing\ITracer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

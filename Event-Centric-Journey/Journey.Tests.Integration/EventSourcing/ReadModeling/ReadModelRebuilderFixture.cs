@@ -22,7 +22,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
         protected string eventStoreConnectionString;
         protected Func<ItemReadModelDbContext> readModelContextFactory;
         protected Func<EventStoreDbContext> eventStoreContextFactory;
-        protected readonly IWorkerRoleTracer tracer;
+        protected readonly ITracer tracer;
         protected readonly IEventStore<ItemActor> eventStore;
         protected readonly ITextSerializer serializer;
 
@@ -31,7 +31,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
         {
             DbConfiguration.SetConfiguration(new TransientFaultHandlingDbConfiguration());
 
-            this.tracer = new ConsoleWorkerRoleTracer();
+            this.tracer = new ConsoleTracer();
             this.serializer = new JsonTextSerializer();
 
             this.readModelDbName = "ReadModelRebuilderFixture_ReadModel";

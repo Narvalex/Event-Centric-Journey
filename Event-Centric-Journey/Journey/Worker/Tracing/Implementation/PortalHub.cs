@@ -5,7 +5,7 @@ namespace Journey.Worker.Tracing
 {
     public class PortalHub : Hub
     {
-        private readonly IWorkerRoleTracer tracer;
+        private readonly ITracer tracer;
 
         public PortalHub()
         {
@@ -17,7 +17,7 @@ namespace Journey.Worker.Tracing
             Clients.All.newMessage(message);
 
             if (tracer != null)
-                this.tracer.Trace(message);
+                this.tracer.TraceAsync(message);
         }
     }
 }

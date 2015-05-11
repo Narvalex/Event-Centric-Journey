@@ -31,7 +31,7 @@ namespace Journey.EventSourcing
         private readonly Func<EventStoreDbContext> contextFactory;
         private readonly Func<EventStoreDbContext> queryContextFactory;
 
-        public EventStore(IEventBus eventBus, ICommandBus commandBus, ITextSerializer serializer, Func<EventStoreDbContext> contextFactory, IWorkerRoleTracer tracer, ISystemTime dateTime, ISnapshotProvider snapshoter)
+        public EventStore(IEventBus eventBus, ICommandBus commandBus, ITextSerializer serializer, Func<EventStoreDbContext> contextFactory, ITracer tracer, ISystemTime dateTime, ISnapshotProvider snapshoter)
             : base(tracer, serializer, dateTime, snapshoter)
         {
             this.eventBus = eventBus;
@@ -114,7 +114,7 @@ namespace Journey.EventSourcing
             if (events.Count() == 0)
             {
                 var noEventsMessage = string.Format("Aggregate {0} with Id {1} HAS NO EVENTS to be saved.", _sourceType, eventSourced.Id.ToString());
-                this.tracer.Trace(noEventsMessage);
+                this.tracer.TraceAsync(noEventsMessage);
                 return;
             }
 

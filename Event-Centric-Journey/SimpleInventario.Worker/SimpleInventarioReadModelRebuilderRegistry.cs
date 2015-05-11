@@ -12,9 +12,9 @@ namespace SimpleInventario.Worker
 {
     public class SimpleInventarioReadModelRebuilderRegistry : DomainReadModelRebuilderRegistry<SimpleInventarioDbContext>
     {
-        protected override List<Action<SimpleInventarioDbContext, IEventHandlerRegistry, IWorkerRoleTracer>> RegisterComplexEventProcessors()
+        protected override List<Action<SimpleInventarioDbContext, IEventHandlerRegistry, ITracer>> RegisterComplexEventProcessors()
         {
-            return new List<Action<SimpleInventarioDbContext, IEventHandlerRegistry, IWorkerRoleTracer>>
+            return new List<Action<SimpleInventarioDbContext, IEventHandlerRegistry, ITracer>>
             {
                 this.RegistrarUnicoBoundedContext
             };
@@ -25,7 +25,7 @@ namespace SimpleInventario.Worker
             return () => new SimpleInventarioDbContext(this.Config.ReadModelConnectionString);
         }
 
-        private void RegistrarUnicoBoundedContext(SimpleInventarioDbContext context, IEventHandlerRegistry rebuildEventProcessor, IWorkerRoleTracer tracer)
+        private void RegistrarUnicoBoundedContext(SimpleInventarioDbContext context, IEventHandlerRegistry rebuildEventProcessor, ITracer tracer)
         {
             var readModelGeneratorEngine = new ReadModelGeneratorEngine<SimpleInventarioDbContext>(context, tracer);
             var readModelGenerator = new SimpleInventarioReadModelGenerator(readModelGeneratorEngine);

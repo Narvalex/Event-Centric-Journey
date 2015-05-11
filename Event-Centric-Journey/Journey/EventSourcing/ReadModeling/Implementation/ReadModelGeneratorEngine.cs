@@ -9,7 +9,7 @@ namespace Journey.EventSourcing.ReadModeling
     {
         private readonly Func<T> liveContextFactory;
         private readonly ReadModelDbContext rebuildContext;
-        private readonly IWorkerRoleTracer tracer;
+        private readonly ITracer tracer;
         private readonly bool isLiveProjection;
 
         /// <summary>
@@ -17,7 +17,7 @@ namespace Journey.EventSourcing.ReadModeling
         /// </summary>
         /// <param name="liveContextFactory">The live context factory</param>
         /// <param name="tracer">The tracer</param>
-        public ReadModelGeneratorEngine(Func<T> liveContextFactory, IWorkerRoleTracer tracer)
+        public ReadModelGeneratorEngine(Func<T> liveContextFactory, ITracer tracer)
             : this(tracer)
         {
             this.isLiveProjection = true;
@@ -29,14 +29,14 @@ namespace Journey.EventSourcing.ReadModeling
         /// </summary>
         /// <param name="rebuildContext">The rebuild context instance</param>
         /// <param name="tracer">The tracer</param>
-        public ReadModelGeneratorEngine(ReadModelDbContext rebuildContext, IWorkerRoleTracer tracer)
+        public ReadModelGeneratorEngine(ReadModelDbContext rebuildContext, ITracer tracer)
             : this(tracer)
         {
             this.isLiveProjection = false;
             this.rebuildContext = rebuildContext;
         }
 
-        private ReadModelGeneratorEngine(IWorkerRoleTracer tracer)
+        private ReadModelGeneratorEngine(ITracer tracer)
         {
             this.tracer = tracer;
         }
@@ -58,7 +58,7 @@ namespace Journey.EventSourcing.ReadModeling
                         .Any())
                     {
 
-                        tracer.Trace("Read model is up to date for event type: " + e.GetType().ToString());
+                        tracer.TraceAsync("Read model is up to date for event type: " + e.GetType().ToString());
                         return;
                     }
 
@@ -93,7 +93,7 @@ namespace Journey.EventSourcing.ReadModeling
                         .Any())
                     {
 
-                        tracer.Trace("Read model is up to date for event type: " + e.GetType().ToString());
+                        tracer.TraceAsync("Read model is up to date for event type: " + e.GetType().ToString());
                         return;
                     }
 
@@ -128,7 +128,7 @@ namespace Journey.EventSourcing.ReadModeling
                                 l.Version >= e.Version)
                             .Any())
                         {
-                            tracer.Trace(string.Format("Event {0} was already consumed by {1}", e.GetType().Name, typeof(Log).Name));
+                            tracer.TraceAsync(string.Format("Event {0} was already consumed by {1}", e.GetType().Name, typeof(Log).Name));
                             return;
                         }
                     

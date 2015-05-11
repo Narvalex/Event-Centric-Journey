@@ -13,7 +13,7 @@ namespace Journey.Messaging.Logging
     {
         private string connectionString;
 
-        public MessageLog(string connectionString, ITextSerializer serializer, IMetadataProvider metadataProvider, IWorkerRoleTracer tracer, ISystemTime dateTime)
+        public MessageLog(string connectionString, ITextSerializer serializer, IMetadataProvider metadataProvider, ITracer tracer, ISystemTime dateTime)
             : base(metadataProvider, serializer, tracer, dateTime)
         {
             this.connectionString = connectionString;
@@ -41,7 +41,7 @@ namespace Journey.Messaging.Logging
 
                 context.Set<MessageLogEntity>().Add(message);
 
-                this.tracer.Trace(string.Format("Processing Event:\r\n{0}", message.Payload));
+                this.tracer.TraceAsync(string.Format("Processing Event:\r\n{0}", message.Payload));
 
                 context.SaveChanges();
             }
@@ -65,7 +65,7 @@ namespace Journey.Messaging.Logging
 
                 context.Set<MessageLogEntity>().Add(message);
 
-                this.tracer.Trace(string.Format("Command processed!\r\n{0}", message.Payload));
+                this.tracer.TraceAsync(string.Format("Command processed!\r\n{0}", message.Payload));
 
                 context.SaveChanges();
             }

@@ -11,7 +11,7 @@ namespace Journey.Messaging.Processing
     /// </summary>
     public abstract class MessageProcessor : IMessageProcessor, IDisposable
     {
-        protected readonly IWorkerRoleTracer tracer;
+        protected readonly ITracer tracer;
         private readonly IMessageReceiver receiver;
         private readonly ITextSerializer serializer;
         private readonly IMessagingSettings settings;
@@ -22,7 +22,7 @@ namespace Journey.Messaging.Processing
         /// <summary>
         /// Initializes a new instance of the <see cref="MessageProcessor"/> class.
         /// </summary>
-        public MessageProcessor(IMessageReceiver receiver, ITextSerializer serializer, IWorkerRoleTracer tracer)
+        public MessageProcessor(IMessageReceiver receiver, ITextSerializer serializer, ITracer tracer)
         {
             this.receiver = receiver;
             this.serializer = serializer;
@@ -100,15 +100,15 @@ namespace Journey.Messaging.Processing
             {
                 var body = this.Deserialize(args.Message.Body);
 
-                this.tracer.Trace(string.Format("Message received!"));
+                this.tracer.TraceAsync(string.Format("Message received!"));
 
                 this.ProcessMessage(body, args.Message.CorrelationId);
             }
             catch (Exception e)
             {
-                this.tracer.Trace(string.Format("An exception happened while processing message through handler/s:\r\n{0}", e));
-                this.tracer.Trace("The message will be flagged as dead letter in the bus.");
-                this.tracer.Trace("Error will be ignored and message receiving will continue.");
+                this.tracer.TraceAsync(string.Format("An exception happened while processing message through handler/s:\r\n{0}", e));
+                this.tracer.TraceAsync("The message will be flagged as dead letter in the bus.");
+                this.tracer.TraceAsync("Error will be ignored and message receiving will continue.");
 
                 throw;
             }

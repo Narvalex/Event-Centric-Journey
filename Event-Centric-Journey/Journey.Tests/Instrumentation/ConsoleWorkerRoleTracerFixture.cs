@@ -5,17 +5,17 @@ namespace Journey.Tests.Instrumentation.ConsoleWorkerRoleTracerFixture
 {
     public class GIVEN_tracer
     {
-        private ConsoleWorkerRoleTracer sut;
+        private ConsoleTracer sut;
 
         public GIVEN_tracer()
         {
-            this.sut = new ConsoleWorkerRoleTracer();
+            this.sut = new ConsoleTracer();
         }
 
         [Fact]
         public void WHEN_something_normal_occurs_THEN_trace_info()
         {
-            this.sut.Trace("algo normal ocurrio... nada que mirar aqui.");
+            this.sut.TraceAsync("algo normal ocurrio... nada que mirar aqui.");
         }
     }
 }
