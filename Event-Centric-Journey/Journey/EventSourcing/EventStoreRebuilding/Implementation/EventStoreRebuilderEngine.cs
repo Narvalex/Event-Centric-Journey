@@ -1,4 +1,5 @@
 ﻿using Journey.Database;
+using Journey.EventSourcing.RebuildPerfCounting;
 using Journey.Messaging;
 using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
@@ -35,7 +36,7 @@ namespace Journey.EventSourcing.EventStoreRebuilding
 
         private MessageLogHandler handler;
 
-        private readonly IEventStoreRebuilderPerfCounter perfCounter;
+        private readonly IRebuilderPerfCounter perfCounter;
 
         public EventStoreRebuilderEngine(
             IInMemoryBus bus,
@@ -44,7 +45,7 @@ namespace Journey.EventSourcing.EventStoreRebuilding
             ITracer tracer,
             IEventStoreRebuilderConfig config,
             Func<EventStoreDbContext> eventStoreContextFactory,
-            IEventStoreRebuilderPerfCounter perfCounter)
+            IRebuilderPerfCounter perfCounter)
         {
             this.bus = bus;
             this.eventStoreContextFactory = eventStoreContextFactory;
@@ -60,14 +61,14 @@ namespace Journey.EventSourcing.EventStoreRebuilding
 
         public void Rebuild()
         {
-            this.perfCounter.OnStartingRebuildProcess();
-            this.perfCounter.OnOpeningEventStoreConnection();
+            var rowsAffected = default(int);
+
+            this.perfCounter.OnStartingRebuildProcess(this.GetMessagesCount());
+            this.perfCounter.OnOpeningDbConnectionAndCleaning();
 
             using (var eventStoreContext = this.eventStoreContextFactory.Invoke())
             {
                 TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = true;
-
-                this.perfCounter.OnEventStoreConnectionOpened();
 
                 using (var eventStoreTransaction = eventStoreContext.Database.BeginTransaction())
                 {
@@ -92,7 +93,15 @@ namespace Journey.EventSourcing.EventStoreRebuilding
                                     {
                                         this.RegisterLogger(newAuditLogContext);
 
+                                        this.perfCounter.OnDbConnectionOpenedAndCleansed();
+
+                                        this.perfCounter.OnStartingStreamProcessing();
+
                                         this.ProcessMessages(messages);
+
+                                        this.perfCounter.OnStreamProcessingFinished();
+
+                                        this.perfCounter.OnStartingCommitting();
 
                                         // el borrado colocamos al final por si se este haciendo desde el mismo connection.
                                         newAuditLogContext.Database.ExecuteSqlCommand(@"
@@ -100,7 +109,8 @@ namespace Journey.EventSourcing.EventStoreRebuilding
                                                 DBCC CHECKIDENT ('[MessageLog].[Messages]', RESEED, 0)");
 
 
-                                        newAuditLogContext.SaveChanges();
+                                        rowsAffected = +newAuditLogContext.SaveChanges();
+
                                         auditLogTransaction.Commit();
                                     }
                                     catch (Exception)
@@ -112,8 +122,11 @@ namespace Journey.EventSourcing.EventStoreRebuilding
                             }
                         }
 
-                        eventStoreContext.SaveChanges();
+                        rowsAffected = +eventStoreContext.SaveChanges();
+
                         eventStoreTransaction.Commit();
+
+                        this.perfCounter.OnCommitted(rowsAffected);
                     }
                     catch (Exception)
                     {
@@ -126,6 +139,16 @@ namespace Journey.EventSourcing.EventStoreRebuilding
                     }
                 }
             }
+        }
+
+        private int GetMessagesCount()
+        {
+            var sql = new SqlCommandWrapper(config.SourceMessageLogConnectionString);
+            return sql.ExecuteReader(@"
+                        select count(*) as RwCnt 
+                        from MessageLog.Messages 
+                        ", r => r.SafeGetInt32(0))
+                         .FirstOrDefault();
         }
 
         private void RegisterLogger(MessageLogDbContext newContext)

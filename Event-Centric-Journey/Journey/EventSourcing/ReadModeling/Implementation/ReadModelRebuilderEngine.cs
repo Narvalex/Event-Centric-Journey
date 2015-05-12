@@ -1,4 +1,5 @@
 ﻿using Journey.Database;
+using Journey.EventSourcing.RebuildPerfCounting;
 using Journey.Messaging;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
@@ -15,9 +16,9 @@ namespace Journey.EventSourcing.ReadModeling
         private readonly IEventDispatcher eventDispatcher;
         private readonly Func<EventStoreDbContext> storeContextFactory;
         private readonly T readModelContext;
-        private readonly IReadModelRebuilderPerfCounter perfCounter;
+        private readonly IRebuilderPerfCounter perfCounter;
 
-        public ReadModelRebuilderEngine(Func<EventStoreDbContext> storeContextFactory, ITextSerializer serializer, IEventDispatcher synchronousEventDispatcher, T readModelContext, IReadModelRebuilderPerfCounter perfCounter)
+        public ReadModelRebuilderEngine(Func<EventStoreDbContext> storeContextFactory, ITextSerializer serializer, IEventDispatcher synchronousEventDispatcher, T readModelContext, IRebuilderPerfCounter perfCounter)
         {
             this.storeContextFactory = storeContextFactory;
             this.serializer = serializer;
@@ -32,8 +33,8 @@ namespace Journey.EventSourcing.ReadModeling
         /// </summary>
         public void Rebuild()
         {
-            this.perfCounter.OnStartingRebuildProcess();
-            this.perfCounter.OnOpeningEventStoreConnection();
+            this.perfCounter.OnStartingRebuildProcess(this.GetEventsCount());
+            this.perfCounter.OnOpeningDbConnectionAndCleaning();
 
             using (var context = this.storeContextFactory.Invoke())
             {
@@ -43,21 +44,21 @@ namespace Journey.EventSourcing.ReadModeling
 
                     using (var dbContextTransaction = this.readModelContext.Database.BeginTransaction())
                     {
-                        this.perfCounter.OnEventStoreConnectionOpened();
-
                         try
                         {
                             this.ClearDatabase();
+
+                            this.perfCounter.OnDbConnectionOpenedAndCleansed();
 
                             var events = context.Set<Event>()
                                 .OrderBy(e => e.CreationDate)
                                 .AsEnumerable()
                                 .Select(this.Deserialize)
-                                .AsCachedAnyEnumerable();                           
+                                .AsCachedAnyEnumerable();
 
                             if (events.Any())
                             {
-                                this.perfCounter.OnStartingEventProcessing();
+                                this.perfCounter.OnStartingStreamProcessing();
 
                                 foreach (var e in events)
                                 {
@@ -65,12 +66,16 @@ namespace Journey.EventSourcing.ReadModeling
                                     this.eventDispatcher.DispatchMessage(@event, null, @event.SourceId.ToString(), "");
                                 }
 
-                                this.perfCounter.OnEventStreamProcessingFinished();
+                                this.perfCounter.OnStreamProcessingFinished();
                             }
 
-                            this.readModelContext.SaveChanges();
+                            this.perfCounter.OnStartingCommitting();
+
+                            var rowsAffected = this.readModelContext.SaveChanges();
 
                             dbContextTransaction.Commit();
+
+                            this.perfCounter.OnCommitted(rowsAffected);
                         }
                         catch (Exception)
                         {
@@ -94,6 +99,22 @@ namespace Journey.EventSourcing.ReadModeling
                     TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = false;
                 }
             }
+        }
+
+        private int GetEventsCount()
+        {
+            string connectionString;
+            using (var context = this.storeContextFactory.Invoke())
+            {
+                connectionString = context.Database.Connection.ConnectionString;
+            }
+
+            var sql = new SqlCommandWrapper(connectionString);
+            return sql.ExecuteReader(@"
+                        select count(*) as RwCnt 
+                        from EventStore.Events 
+                        ", r => r.SafeGetInt32(0))
+                         .FirstOrDefault();
         }
 
         private IVersionedEvent Deserialize(Event @event)

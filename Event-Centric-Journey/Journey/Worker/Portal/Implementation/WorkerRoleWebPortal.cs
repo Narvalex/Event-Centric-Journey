@@ -1,5 +1,4 @@
-﻿using Journey.EventSourcing.EventStoreRebuilding;
-using Journey.EventSourcing.ReadModeling;
+﻿using Journey.EventSourcing.RebuildPerfCounting;
 using System;
 using System.Web.Hosting;
 
@@ -12,8 +11,8 @@ namespace Journey.Worker.Portal
 
         private static IPortalTaskCoordinator coordinator;
 
-        private static Func<IReadModelRebuilderPerfCounter> rebuildReadModel;
-        private static Func<IEventStoreRebuilderPerfCounter> rebuildEventStore;
+        private static Func<IRebuilderPerfCounter> rebuildReadModel;
+        private static Func<IRebuilderPerfCounter> rebuildEventStore;
 
         private WorkerRoleWebPortal()
         {
@@ -25,7 +24,7 @@ namespace Journey.Worker.Portal
             get { return instance; }
         }
 
-        public static WorkerRoleWebPortal CreateNew(IWorkerRole workerInstance, Func<IReadModelRebuilderPerfCounter> rebuildReadModel, Func<IEventStoreRebuilderPerfCounter> rebuildEventStore, IPortalTaskCoordinator coordinator)
+        public static WorkerRoleWebPortal CreateNew(IWorkerRole workerInstance, Func<IRebuilderPerfCounter> rebuildReadModel, Func<IRebuilderPerfCounter> rebuildEventStore, IPortalTaskCoordinator coordinator)
         {
             if (instance == null)
             {
@@ -85,28 +84,38 @@ namespace Journey.Worker.Portal
 
         public void RebuildReadModel()
         {
+            this.WorkerRole.Tracer.DisableTracing();
+
             this.StopWorking();
 
             rebuildReadModel
                 .Invoke()
                 .ShowResults();
 
+            this.WorkerRole.Tracer.EnableTracing();
+
             //this.StartWorking();
         }
 
         public void RebuildEventStore()
         {
+            this.WorkerRole.Tracer.DisableTracing();
+
             this.StopWorking();
 
             rebuildEventStore
                 .Invoke()
                 .ShowResults();
 
+            this.WorkerRole.Tracer.EnableTracing();
+
             //this.StartWorking();
         }
 
         public void RebuildEventStoreAndReadModel()
         {
+            this.WorkerRole.Tracer.DisableTracing();
+
             this.StopWorking();
 
             var eventStoreRebuildingResults = rebuildEventStore.Invoke();
@@ -114,6 +123,8 @@ namespace Journey.Worker.Portal
 
             readModelRebuildingResults.ShowResults();
             eventStoreRebuildingResults.ShowResults();
+
+            this.WorkerRole.Tracer.EnableTracing();
 
             //this.StartWorking();
         }

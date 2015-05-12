@@ -20,5 +20,16 @@ namespace Journey.Worker
         {
             throw new NotImplementedException();
         }
+
+
+        public void DisableTracing()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EnableTracing()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

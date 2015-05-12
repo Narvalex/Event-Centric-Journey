@@ -1,4 +1,5 @@
 ﻿using Journey.EventSourcing.ReadModeling;
+using Journey.EventSourcing.RebuildPerfCounting;
 using Journey.Worker.Rebuilding;
 using System;
 using System.Web.Hosting;
@@ -52,7 +53,7 @@ namespace Journey.Worker.Portal
             }
         }
 
-        public IReadModelRebuilderPerfCounter Rebuild()
+        public IRebuilderPerfCounter Rebuild()
         {
             try
             {

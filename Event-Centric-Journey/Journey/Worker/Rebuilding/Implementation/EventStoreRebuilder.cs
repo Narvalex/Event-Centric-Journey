@@ -1,6 +1,7 @@
 ﻿using Journey.Database;
 using Journey.EventSourcing;
 using Journey.EventSourcing.EventStoreRebuilding;
+using Journey.EventSourcing.RebuildPerfCounting;
 using Journey.Messaging;
 using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
@@ -66,7 +67,7 @@ namespace Journey.Worker.Rebuilding
             container.RegisterInstance<IInMemoryBus>(bus);
 
             var perfCounter = new EventStoreRebuilderPerfCounter(this.tracer, config.SystemTime);
-            container.RegisterInstance<IEventStoreRebuilderPerfCounter>(perfCounter);
+            container.RegisterInstance<IRebuilderPerfCounter>(perfCounter);
 
             container.RegisterType(typeof(IEventStoreRebuilderEngine), typeof(EventStoreRebuilderEngine), new ContainerControlledLifetimeManager());
 
@@ -87,9 +88,9 @@ namespace Journey.Worker.Rebuilding
         }
 
 
-        public IEventStoreRebuilderPerfCounter PerformanceCounter
+        public IRebuilderPerfCounter PerformanceCounter
         {
-            get { return this.container.Resolve<IEventStoreRebuilderPerfCounter>(); }
+            get { return this.container.Resolve<IRebuilderPerfCounter>(); }
         }
     }
 }

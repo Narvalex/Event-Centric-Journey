@@ -1,44 +1,78 @@
 ﻿using Journey.EventSourcing.RebuildPerfCounting;
 using Journey.Utils.SystemTime;
 using Journey.Worker;
-using System;
 using System.Collections.Generic;
 
 namespace Journey.EventSourcing.EventStoreRebuilding
 {
-    public class EventStoreRebuilderPerfCounter : RebuildPerfCounter, IEventStoreRebuilderPerfCounter
+    public class EventStoreRebuilderPerfCounter : RebuilderPerfCounter, IRebuilderPerfCounter
     {
-        private DateTime openConnectionStartTime;
-        private TimeSpan openConnectionElapsedTime;
-
         public EventStoreRebuilderPerfCounter(ITracer tracer, ISystemTime time)
             : base(tracer, time)
         { }
 
-        protected override void OnStarting()
+        public new void OnStartingRebuildProcess(int messageCount)
         {
-            this.tracer.TraceAsync("===> STARTING EVENT STORE REBUILDING...");
+            this.tracer.Notify("===> STARTING EVENT STORE REBUILDING...");
+            base.OnStartingRebuildProcess(messageCount);
         }
 
-        public void OnOpeningEventStoreConnection()
+        public new void OnOpeningDbConnectionAndCleaning()
         {
-            this.openConnectionStartTime = time.Now;
-            this.tracer.TraceAsync("===> Opening Event Store connection...");
+            this.tracer.Notify("===> Opening Event Store connection...");
+            base.OnOpeningDbConnectionAndCleaning();
         }
 
-        public void OnEventStoreConnectionOpened()
+        public new void OnDbConnectionOpenedAndCleansed()
         {
-            this.openConnectionElapsedTime = time.Now - openConnectionStartTime;
-            this.tracer.TraceAsync(string.Format("===> Event Store Connection opened. Time elapsed: {0} seconds", this.openConnectionElapsedTime.TotalSeconds.ToString()));
+            this.tracer.Notify(string.Format("===> Event Store Connection opened!"));
+            base.OnDbConnectionOpenedAndCleansed();
         }
 
-        protected override void OnShowingResults()
+        public new void OnStartingStreamProcessing()
         {
+            this.tracer.Notify("===> Starting message stream processing...");
+            base.OnStartingStreamProcessing();
+        }
+
+        public new void OnStreamProcessingFinished()
+        {
+            this.tracer.Notify("===> Message stream processing Finished!");
+            base.OnStreamProcessingFinished();
+        }
+
+        public new void OnStartingCommitting()
+        {
+            base.OnStartingCommitting();
+            this.tracer.Notify("===> Starting committing...");
+        }
+
+        public new void ShowResults()
+        {
+            base.ShowResults();
+
+
             this.tracer.Notify(new List<string>
             {
-                "=== EVENT STORE REBUILDING RESULTS ===",
-                string.Format("Event Store opening connection delay: {0} seconds", this.openConnectionElapsedTime.TotalSeconds.ToString())
-            }.ToArray());
+                "=======================================================",
+                "           EVENT STORE REBUILDING PERFORMANCE          ",
+                "=======================================================",
+                string.Format(
+                "Messages count:                            {0}", base.messageCount),
+                string.Format(
+                "Rows affected count:                       {0}", base.rowsAffected),
+                string.Format(
+                "Complex Message Processor speed:           {0}", base.messageProcessingSpeed),
+                string.Format(
+                "Database commit speed:                     {0}", base.dbCommitSpeed),
+                string.Format(
+                "Message Log opening and cleaning delay:    {0}", this.openingConnectionDelay.ToString(elapsedTimeFormat)),
+                string.Format(
+                "Message stream processing delay:           {0}", this.streamProcessingDelay.ToString(elapsedTimeFormat)),
+                string.Format(
+                "Total rebuild time:                        {0}", base.processDelay.ToString(elapsedTimeFormat))
+            }
+            .ToArray());
         }
     }
 }

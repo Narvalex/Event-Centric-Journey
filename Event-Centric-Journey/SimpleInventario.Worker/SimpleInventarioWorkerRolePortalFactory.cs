@@ -1,5 +1,6 @@
 ﻿using Journey.EventSourcing.EventStoreRebuilding;
 using Journey.EventSourcing.ReadModeling;
+using Journey.EventSourcing.RebuildPerfCounting;
 using Journey.Worker;
 using Journey.Worker.Portal;
 using Journey.Worker.Rebuilding;
@@ -26,7 +27,7 @@ namespace SimpleInventario.DomainRegistry
                 tracer);
 
             // Implement here your Own Domain Read Builder Components.
-            Func<IReadModelRebuilderPerfCounter> rebuildReadModel = () =>
+            Func<IRebuilderPerfCounter> rebuildReadModel = () =>
             {
                 var rebuilder = new ReadModelRebuilder<SimpleInventarioDbContext>(
                     new SimpleInventarioReadModelRebuilderRegistry(),
@@ -39,7 +40,7 @@ namespace SimpleInventario.DomainRegistry
 
             };
 
-            Func<IEventStoreRebuilderPerfCounter> rebuildEventStore = () =>
+            Func<IRebuilderPerfCounter> rebuildEventStore = () =>
             {
                 var eventStoreRebuilderPortal = EventStoreRebuilderWebPortal.CreateNew(
                     new EventStoreRebuilder(new SimpleInventarioEventStoreRebuilderRegistry(), tracer),

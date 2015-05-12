@@ -1,6 +1,7 @@
 ﻿using Journey.Database;
 using Journey.EventSourcing;
 using Journey.EventSourcing.ReadModeling;
+using Journey.EventSourcing.RebuildPerfCounting;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
 using System;
@@ -44,6 +45,6 @@ namespace Journey.Worker.Rebuilding
             }
         }
 
-        public IReadModelRebuilderPerfCounter PerformanceCounter { get; private set; }
+        public IRebuilderPerfCounter PerformanceCounter { get; private set; }
     }
 }

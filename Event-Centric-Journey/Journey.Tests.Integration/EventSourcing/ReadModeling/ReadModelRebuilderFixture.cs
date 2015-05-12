@@ -1,6 +1,7 @@
 ﻿using Journey.Database;
 using Journey.EventSourcing;
 using Journey.EventSourcing.ReadModeling;
+using Journey.EventSourcing.RebuildPerfCounting;
 using Journey.Messaging;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
@@ -141,7 +142,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
             this.itemGenerator = new ItemReadModelGenerator(this.generatorEngine);
             this.eventDispatcher = new SynchronousEventDispatcher(this.tracer);
             this.eventDispatcher.Register(itemGenerator);
-            this.sut = new ReadModelRebuilderEngine<ItemReadModelDbContext>(this.eventStoreContextFactory, this.serializer, this.eventDispatcher, rebuildContext, new Mock<IReadModelRebuilderPerfCounter>().Object);
+            this.sut = new ReadModelRebuilderEngine<ItemReadModelDbContext>(this.eventStoreContextFactory, this.serializer, this.eventDispatcher, rebuildContext, new Mock<IRebuilderPerfCounter>().Object);
         }
 
         [Fact]

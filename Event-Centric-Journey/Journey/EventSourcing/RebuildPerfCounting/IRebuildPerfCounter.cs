@@ -1,10 +1,15 @@
 ﻿
 namespace Journey.EventSourcing.RebuildPerfCounting
 {
-    public interface IRebuildPerfCounter
+    public interface IRebuilderPerfCounter
     {
-        void OnStartingRebuildProcess();
-
+        void OnStartingRebuildProcess(int messageCount);
+        void OnOpeningDbConnectionAndCleaning();
+        void OnDbConnectionOpenedAndCleansed();
+        void OnStartingStreamProcessing();
+        void OnStreamProcessingFinished();
+        void OnStartingCommitting();
+        void OnCommitted(int rowsAffected);
         void ShowResults();
     }
 }

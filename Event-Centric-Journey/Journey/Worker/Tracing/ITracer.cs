@@ -8,5 +8,9 @@ namespace Journey.Worker
         void Notify(string info);
 
         void Notify(IEnumerable<string> notifications);
+
+        void DisableTracing();
+
+        void EnableTracing();
     }
 }

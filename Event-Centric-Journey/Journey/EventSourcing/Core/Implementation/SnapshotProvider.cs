@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace Journey.EventSourcing
 {
@@ -27,32 +27,35 @@ namespace Journey.EventSourcing
 
             this.persistSnapshot = (partitionKey, memento, dateTime) =>
             {
-                using (var context = this.contextFactory.Invoke())
+                try
                 {
-                    lock (lockObject)
+                    using (var context = this.contextFactory.Invoke())
                     {
-                        try
-                        {
-                            var storedSnapshot = context
-                                .Snapshsots
-                                .Where(x => x.PartitionKey == partitionKey)
-                                .FirstOrDefault();
 
-                            if (storedSnapshot == null)
-                                context.AddToUnityOfWork(this.Serialize(partitionKey, memento, dateTime));
-                            else
+                        var storedSnapshot = context
+                            .Snapshsots
+                            .Where(x => x.PartitionKey == partitionKey)
+                            .FirstOrDefault();
+
+                        if (storedSnapshot == null)
+                        {
+                            context.AddToUnityOfWork(this.Serialize(partitionKey, memento, dateTime));
+                            context.SaveChanges();
+                        }
+                        else
+                        {
+                            lock (lockObject)
                             {
                                 storedSnapshot.Memento = this.Serialize(partitionKey, memento, dateTime).Memento;
                                 storedSnapshot.LastUpdateTime = dateTime;
                                 context.AddToUnityOfWork(storedSnapshot);
+                                context.SaveChanges();
                             }
-
-                            context.SaveChanges();
                         }
-                        catch (Exception)
-                        { }
                     }
                 }
+                catch (Exception)
+                { }
             };
         }
 
@@ -66,7 +69,7 @@ namespace Journey.EventSourcing
                 new Tuple<IMemento, DateTime?>(memento, dateTime),
                 new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(30) });
 
-            Task.Factory.StartNew(() => this.persistSnapshot(key, memento, dateTime));
+            ThreadPool.QueueUserWorkItem(x => this.persistSnapshot(key, memento, dateTime));
         }
 
         public Tuple<IMemento, DateTime?> GetMementoFromCache(Guid id, string sourceType)
