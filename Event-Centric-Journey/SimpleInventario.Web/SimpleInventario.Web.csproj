@@ -227,6 +227,13 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <None Include="Web.config-fecoprod" />
+    <None Include="Web.Debug.config-fecoprod">
+      <DependentUpon>Web.config-fecoprod</DependentUpon>
+    </None>
+    <None Include="Web.Release.config-fecoprod">
+      <DependentUpon>Web.config-fecoprod</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
