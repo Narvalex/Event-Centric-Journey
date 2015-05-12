@@ -160,7 +160,7 @@ namespace Journey.Messaging
                     }
                 }
 
-                
+
                 this.MessageReceived(this, new MessageReceivedEventArgs(message));
 
                 using (var command = connection.CreateCommand())

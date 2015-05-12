@@ -16,6 +16,10 @@ namespace Journey.Messaging.Processing
         private Dictionary<Type, List<Tuple<Type, Action<Envelope>>>> handlersByEventType;
         private Dictionary<Type, Action<IEvent, string, string, string>> dispatchersByEventType;
 
+        private static object contentionLockLevel1 = new object();
+        private static object contentionLockLevel2 = new object();
+        private static object contentionLockLevel3 = new object();
+
         public AsynchronousEventDispatcher(ITracer tracer)
         {
             this.handlersByEventType = new Dictionary<Type, List<Tuple<Type, Action<Envelope>>>>();
@@ -147,7 +151,8 @@ namespace Journey.Messaging.Processing
 
 
                             // Litle retry policy
-                            var attempts = 0;
+                            var attempts = default(int);
+                            var threshold = 10;
                             while (true)
                             {
                                 try
@@ -158,18 +163,28 @@ namespace Journey.Messaging.Processing
                                 catch (Exception e)
                                 {
                                     ++attempts;
-                                    if (attempts >= 3)
+                                    if (attempts >= threshold)
+                                    {
+                                        this.tracer.Notify(string.Format("Dispatch Event attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.Item1.FullName, e));
                                         throw;
-
-                                    this.tracer.Notify(new List<string>{
-                                        new string('-', 80),
-                                        string.Format("Dispatch Event attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.Item1.FullName, e),
-                                        new string('-', 80)
                                     }
-                                    .ToArray());
 
-                                    if (attempts > 1)
-                                        Thread.Sleep(attempts * 1000);
+                                    this.tracer.TraceAsync(string.Format("Dispatch Event attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.Item1.FullName, e));
+
+                                    if (attempts < 25)
+                                        lock (contentionLockLevel1)
+                                            Thread.Sleep(attempts * 50);
+                                    else if (attempts < 40)
+                                        lock (contentionLockLevel2)
+                                            Thread.Sleep(attempts * 70);
+                                    else
+                                    {
+                                        lock (contentionLockLevel3)
+                                        {
+                                            this.tracer.Notify(string.Format("Hight throughput detected! Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().Name, e));
+                                            Thread.Sleep(attempts * 100);
+                                        }
+                                    }
                                 }
                             }
 

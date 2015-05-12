@@ -15,6 +15,10 @@ namespace Journey.Messaging.Processing
         private Dictionary<Type, ICommandHandler> handlers = new Dictionary<Type, ICommandHandler>();
         private readonly ICommandBusTransientFaultDetector faultDetector;
 
+        private static object contentionLockLevel1 = new object();
+        private static object contentionLockLevel2 = new object();
+        private static object contentionLockLevel3 = new object();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandProcessor"/> class.
         /// </summary>
@@ -78,7 +82,8 @@ namespace Journey.Messaging.Processing
         private void HandleMessage(object payload, ICommandHandler handler)
         {
             // Litle retry policy
-            var attempts = 0;
+            var attempts = default(int);
+            var threshold = 50;
             while (true)
             {
                 try
@@ -89,20 +94,28 @@ namespace Journey.Messaging.Processing
                 catch (Exception e)
                 {
                     ++attempts;
-                    if (attempts >= 3)
-                        throw;
-
-                    this.tracer.Notify(new List<string>
+                    if (attempts >= threshold)
                     {
-                        new string('-', 80),
-                        string.Format(
-                        "Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().Name, e),
-                        new string('-', 80)
+                        this.tracer.Notify(string.Format("Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().Name, e));
+                        throw;
                     }
-                    .ToArray());
 
-                    if (attempts > 1)
-                        Thread.Sleep(attempts * 1000);
+                    this.tracer.TraceAsync(string.Format("Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().Name, e));
+
+                    if (attempts < 25)
+                        lock (contentionLockLevel1)
+                            Thread.Sleep(attempts * 50);
+                    else if (attempts < 40)
+                        lock (contentionLockLevel2)
+                            Thread.Sleep(attempts * 70);
+                    else
+                    {
+                        lock (contentionLockLevel3)
+                        {
+                            this.tracer.Notify(string.Format("Hight throughput detected! Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().Name, e));
+                            Thread.Sleep(attempts * 100);
+                        }
+                    }
                 }
             }
 
