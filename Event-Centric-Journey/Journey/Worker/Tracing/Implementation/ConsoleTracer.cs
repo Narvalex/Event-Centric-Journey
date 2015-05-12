@@ -31,5 +31,11 @@ namespace Journey.Worker
         {
             throw new NotImplementedException();
         }
+
+
+        public bool TracingIsOn
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 }

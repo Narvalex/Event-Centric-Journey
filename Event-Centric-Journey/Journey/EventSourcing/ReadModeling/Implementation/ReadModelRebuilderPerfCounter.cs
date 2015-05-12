@@ -47,6 +47,12 @@ namespace Journey.EventSourcing.ReadModeling
             this.tracer.Notify("===> Starting committing...");
         }
 
+        public new void OnCommitted(int rowsAffected)
+        {
+            this.tracer.Notify("===> Read Model Rebuild Commited!");
+            base.OnCommitted(rowsAffected);
+        }
+
         public new void ShowResults()
         {
             base.ShowResults();

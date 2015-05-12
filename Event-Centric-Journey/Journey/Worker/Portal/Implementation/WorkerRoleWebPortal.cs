@@ -119,5 +119,11 @@ namespace Journey.Worker.Portal
         public IWorkerRole WorkerRole { get { return worker; } }
 
         public bool IsWorking { get { return coordinator.WorkerIsWorking; } }
+
+
+        public ITracer Tracer
+        {
+            get { return worker.Tracer; }
+        }
     }
 }

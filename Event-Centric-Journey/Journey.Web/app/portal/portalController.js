@@ -14,6 +14,9 @@
         vm.rebuildEventStore = rebuildEventStore;
         vm.rebuildEventStoreAndReadModel = rebuildEventStoreAndReadModel;
 
+        vm.setTracingOn = setTracingOn;
+        vm.setTracingOff = setTracingOff;
+
         vm.portalHub = null;
 
         // indica si se detuvo el worker o si esta corriendo
@@ -22,9 +25,13 @@
         // para esconder todo el muenu de comandos, mientras esta ejecutando un proceso de reconstruccion
         vm.hideAll = false;
 
+        vm.tracingIsOn = false;
+
         activate();
 
         function activate() {
+
+            getTracingStatus();
 
             var Model = function () {
                 var self = this;
@@ -44,8 +51,8 @@
 
                     if (!entry) {
                         self.notifications.push(notification);
-                        self.messages.push(notification.id + '. ' + notification.message);
-
+                        //self.messages.push(notification.id + '. ' + notification.message);
+                        self.messages.push(notification.message);
                         scrollToBottom();
 
                     }
@@ -100,13 +107,13 @@
             vm.hideAll = true;
             // stopping...
 
-            toastr.warning("Stopping Engine for read model rebuild...")
+            toastr.info("Starting read model rebuild...")
             vm.portalHub.server.sendMessage('===> Stopping worker and starting read model rebuilding process...');
             return $http.get('/api/portal/rebuildReadModel')
                         .then(function (response) {
                             vm.isWorking = response.data;
                             vm.hideAll = false;
-                            toastr.info('Engine is now working again');
+                            toastr.success('Rebuild finished');
                         });
 
         }
@@ -115,13 +122,13 @@
             vm.hideAll = true;
             // stopping...
 
-            toastr.warning("Stopping Engine for event store rebuild...")
+            toastr.info("Starting event store rebuild...")
             vm.portalHub.server.sendMessage('===> Stopping worker and starting event store rebuilding process...');
             return $http.get('/api/portal/rebuildEventStore')
                         .then(function (response) {
                             vm.isWorking = response.data;
                             vm.hideAll = false;
-                            toastr.info('Engine is now working again');
+                            toastr.success('Rebuild finished');
                         });
         }
 
@@ -129,13 +136,13 @@
             vm.hideAll = true;
             // stopping...
 
-            toastr.warning("Stopping Engine for full rebuild...")
+            toastr.info("Starting full system rebuild...")
             vm.portalHub.server.sendMessage('===> Stopping worker and starting full rebuilding process...');
             return $http.get('/api/portal/rebuildEventStoreAndReadModel')
                         .then(function (response) {
                             vm.isWorking = response.data;
                             vm.hideAll = false;
-                            toastr.info('Engine is now working again');
+                            toastr.success('Rebuild finished!');
                         });
         }
 
@@ -152,6 +159,27 @@
                             else {
                                 vm.portalHub.server.sendMessage("Worker is down");
                             }
+                        });
+        }
+
+        function getTracingStatus() {
+            return $http.get('/api/portal/getTracingStatus')
+                        .then(function (response) {
+                            vm.tracingIsOn = response.data;
+                        });
+        }
+
+        function setTracingOn() {
+            return $http.get('/api/portal/setTracingOn')
+                        .then(function (response) {
+                            vm.tracingIsOn = response.data;
+                        });
+        }
+
+        function setTracingOff() {
+            return $http.get('/api/portal/setTracingOff')
+                        .then(function (response) {
+                            vm.tracingIsOn = response.data;
                         });
         }
     }

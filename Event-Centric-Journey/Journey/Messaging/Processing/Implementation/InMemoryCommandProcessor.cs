@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Journey.Messaging.Processing
 {
@@ -92,6 +93,9 @@ namespace Journey.Messaging.Processing
                         new string('-', 80)
                     }
                     .ToArray());
+
+                    if (attempts > 1)
+                        Thread.Sleep(attempts * 1000);
                 }
             }
 

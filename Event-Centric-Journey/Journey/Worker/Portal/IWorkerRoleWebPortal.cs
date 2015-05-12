@@ -14,5 +14,7 @@ namespace Journey.Worker.Portal
         void RebuildEventStoreAndReadModel();
 
         bool IsWorking { get; }
+
+        ITracer Tracer { get; }
     }
 }

@@ -50,7 +50,7 @@
                                href=""
                                class="dropdown-toggle animated fadeIn"
                                data-toggle="dropdown"
-                               style="font-family:Arial; font-size: 12px; color:#00ff90; font-weight:600;">
+                               style="font-size: 12px; color:#00ff90; font-weight:600;">
                                 <span class="glyphicon glyphicon-ok-sign" style="margin-right: 2px"></span>
                                 Worker is online
                                 <span class="glyphicon glyphicon-chevron-down" style="margin-left: 2px; color:#989898;"></span>
@@ -59,7 +59,7 @@
                                href=""
                                class="dropdown-toggle animated fadeIn"
                                data-toggle="dropdown"
-                               style="font-family:Arial; font-size: 12px; color:#f35454; font-weight:600;">
+                               style="font-size: 12px; color:#f35454; font-weight:600;">
                                 <span class="glyphicon glyphicon-alert" style="margin-right: 2px"></span>
                                 Worker is down
                                 <span class="glyphicon glyphicon-chevron-down" style="margin-left: 2px; color:#989898;"></span>
@@ -117,6 +117,24 @@
                                     </a>
                                 </li>
                             </ul>
+                        </li>
+                        <li>
+                            <a ng-show="tracingIsOn"
+                               ng-click="setTracingOff()"
+                               class="animated flash"
+                               href="" 
+                               style="font-size: 12px; color:#ffd800; font-weight:600;">
+                                Tracing is on
+                            </a>
+                        </li>
+                        <li>
+                            <a ng-show="!tracingIsOn"
+                               ng-click="setTracingOn()"
+                               class="animated fadeIn"
+                               href=""
+                               style="font-size: 12px; color:#989898; font-weight:600;">
+                                Tracing is off
+                            </a>
                         </li>
                     </ul>
                 </div>

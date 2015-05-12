@@ -58,5 +58,28 @@ namespace Journey.Web.Controllers.Api
             this.portal.RebuildEventStoreAndReadModel();
             return this.Ok(this.portal.IsWorking);
         }
+
+        [HttpGet]
+        [Route("api/portal/setTracingOn")]
+        public IHttpActionResult SetTracingOn()
+        {
+            this.portal.Tracer.EnableTracing();
+            return this.Ok(this.portal.Tracer.TracingIsOn);
+        }
+
+        [HttpGet]
+        [Route("api/portal/setTracingOff")]
+        public IHttpActionResult SetTracingOff()
+        {
+            this.portal.Tracer.DisableTracing();
+            return this.Ok(this.portal.Tracer.TracingIsOn);
+        }
+
+        [HttpGet]
+        [Route("api/portal/getTracingStatus")]
+        public IHttpActionResult GetTracingStatus()
+        {
+            return this.Ok(this.portal.Tracer.TracingIsOn);
+        }
     }
 }

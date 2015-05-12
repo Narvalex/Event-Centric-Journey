@@ -98,21 +98,16 @@ namespace Journey.Worker.Tracing
 
         public void DisableTracing()
         {
-            lock (lockObject)
-            {
-                this.DoDisableTracing();
-            }
-        }
-
-        private void DoDisableTracing()
-        {
-            Notifications = new Queue<Notification>(NotificationCountLimit);
             this.traceAsyncAction = this.traceAsyncDisabled;
+            TracingIsOn = false;
         }
 
         public void EnableTracing()
         {
             this.traceAsyncAction = this.traceAsyncEnabled;
+            this.TracingIsOn = true;
         }
+
+        public bool TracingIsOn { get; private set; }
     }
 }

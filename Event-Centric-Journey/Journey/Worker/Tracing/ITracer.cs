@@ -12,5 +12,7 @@ namespace Journey.Worker
         void DisableTracing();
 
         void EnableTracing();
+
+        bool TracingIsOn { get; }
     }
 }

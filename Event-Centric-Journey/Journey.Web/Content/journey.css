@@ -12,5 +12,6 @@ Source:  http://stackoverflow.com/questions/18599778/decreasing-height-of-bootst
 
 /* debido al navbar fixedtop */
 body {
-    margin: 50px
+    margin: 50px;
+    font-family: 'Segoe UI'
 }

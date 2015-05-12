@@ -47,6 +47,12 @@ namespace Journey.EventSourcing.EventStoreRebuilding
             this.tracer.Notify("===> Starting committing...");
         }
 
+        public new void OnCommitted(int rowsAffected)
+        {
+            this.tracer.Notify("===> Event Store Rebuild Commited!");
+            base.OnCommitted(rowsAffected);
+        }
+
         public new void ShowResults()
         {
             base.ShowResults();

@@ -1,7 +1,9 @@
 ﻿using Journey.Serialization;
 using Journey.Utils;
 using Journey.Utils.SystemTime;
+using Journey.Worker;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
@@ -17,45 +19,72 @@ namespace Journey.EventSourcing
         private readonly ITextSerializer serializer;
         private Action<string, IMemento, DateTime?> persistSnapshot;
         private static readonly object lockObject = new object();
+        private readonly ITracer tracer;
 
-        public SnapshotProvider(string name, ISystemTime time, Func<EventStoreDbContext> contextFactory, ITextSerializer serializer)
+        public SnapshotProvider(string name, ISystemTime time, Func<EventStoreDbContext> contextFactory, ITextSerializer serializer, ITracer tracer)
         {
             this.cache = new MemoryCache(name);
             this.time = time;
             this.contextFactory = contextFactory;
             this.serializer = serializer;
+            this.tracer = tracer;
 
             this.persistSnapshot = (partitionKey, memento, dateTime) =>
             {
-                try
+                var attempts = 0;
+                var sourceName = memento.GetType().FullName;
+                while (true)
                 {
-                    using (var context = this.contextFactory.Invoke())
+                    try
                     {
-
-                        var storedSnapshot = context
-                            .Snapshsots
-                            .Where(x => x.PartitionKey == partitionKey)
-                            .FirstOrDefault();
-
-                        if (storedSnapshot == null)
+                        using (var context = this.contextFactory.Invoke())
                         {
-                            context.AddToUnityOfWork(this.Serialize(partitionKey, memento, dateTime));
-                            context.SaveChanges();
-                        }
-                        else
-                        {
-                            lock (lockObject)
+
+                            var storedSnapshot = context
+                                .Snapshsots
+                                .Where(x => x.PartitionKey == partitionKey)
+                                .FirstOrDefault();
+
+                            if (storedSnapshot == null)
                             {
-                                storedSnapshot.Memento = this.Serialize(partitionKey, memento, dateTime).Memento;
-                                storedSnapshot.LastUpdateTime = dateTime;
-                                context.AddToUnityOfWork(storedSnapshot);
+                                context.AddToUnityOfWork(this.Serialize(partitionKey, memento, dateTime));
                                 context.SaveChanges();
+                                this.tracer.TraceAsync(string.Format("Saved new snapshot! Source: {0}. Version: {1}", sourceName, memento.Version));
+                                break;
+                            }
+                            else
+                            {
+                                lock (lockObject)
+                                {
+                                    storedSnapshot.Memento = this.Serialize(partitionKey, memento, dateTime).Memento;
+                                    storedSnapshot.LastUpdateTime = dateTime;
+                                    context.AddToUnityOfWork(storedSnapshot);
+                                    context.SaveChanges();
+                                    this.tracer.TraceAsync(string.Format("An snapshot has been uptaded! Source: {0}. Version: {1}", sourceName, memento.Version));
+                                    break;
+                                }
                             }
                         }
                     }
+                    catch (Exception e)
+                    {
+                        ++attempts;
+                        if (attempts >= 3)
+                            break;
+
+                        this.tracer.Notify(new List<string>
+                        {
+                            new string('-', 80),
+                            string.Format(
+                            "Persisting snapshot attempt number {0}. An exception happened while persisting snapshot {1} version {2}", attempts, sourceName, memento.Version),
+                            new string('-', 80)
+                        }
+                        .ToArray());
+
+                        if (attempts > 1)
+                            Thread.Sleep(attempts * 1000);
+                    }
                 }
-                catch (Exception)
-                { }
             };
         }
 

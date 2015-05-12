@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Journey.Messaging.Processing
@@ -166,6 +167,9 @@ namespace Journey.Messaging.Processing
                                         new string('-', 80)
                                     }
                                     .ToArray());
+
+                                    if (attempts > 1)
+                                        Thread.Sleep(attempts * 1000);
                                 }
                             }
 

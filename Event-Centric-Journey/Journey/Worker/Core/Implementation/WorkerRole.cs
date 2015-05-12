@@ -113,7 +113,7 @@ namespace Journey.Worker
         /// </summary>
         private void RegisterSnapshoter(IUnityContainer container)
         {
-            var snapshoter = new SnapshotProvider("Snapshoter", container.Resolve<ISystemTime>(), container.Resolve<Func<EventStoreDbContext>>(), container.Resolve<ITextSerializer>());
+            var snapshoter = new SnapshotProvider("Snapshoter", container.Resolve<ISystemTime>(), container.Resolve<Func<EventStoreDbContext>>(), container.Resolve<ITextSerializer>(), this.Tracer);
             container.RegisterInstance<ISnapshotProvider>(snapshoter);
         }
 

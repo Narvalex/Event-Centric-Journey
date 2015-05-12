@@ -71,7 +71,7 @@ namespace Journey.EventSourcing.RebuildPerfCounting
             this.commitStartTime = time.Now;
         }
 
-        public void OnCommitted(int rowsAffected)
+        protected void OnCommitted(int rowsAffected)
         {
             var now = this.time.Now;
             this.committingDelay = now - this.commitStartTime;
