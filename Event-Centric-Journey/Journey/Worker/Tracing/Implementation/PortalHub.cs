@@ -17,7 +17,7 @@ namespace Journey.Worker.Tracing
             Clients.All.newMessage(message);
 
             if (tracer != null)
-                this.tracer.TraceAsync(message);
+                this.tracer.Notify(message);
         }
     }
 }

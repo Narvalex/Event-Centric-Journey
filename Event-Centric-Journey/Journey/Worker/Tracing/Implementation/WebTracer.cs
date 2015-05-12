@@ -26,13 +26,14 @@ namespace Journey.Worker.Tracing
                                     {
                                         lock (lockObject)
                                         {
-                                            this.Write(info);
+                                            this.PrepareNotification(info);
+                                            this.PublishNotifications();
                                         }
                                     });
 
             this.traceAsyncDisabled = (info) => { };
 
-            this.EnableTracing();
+            this.DisableTracing();
         }
 
         public void TraceAsync(string info)
@@ -44,7 +45,8 @@ namespace Journey.Worker.Tracing
         {
             lock (lockObject)
             {
-                this.Write(info);
+                this.PrepareNotification(info);
+                this.PublishNotifications();
             }
         }
 
@@ -54,30 +56,44 @@ namespace Journey.Worker.Tracing
             lock (lockObject)
             {
                 foreach (var notification in notifications)
-                    this.Write(notification);
+                    this.PrepareNotification(notification, false);
+
+                this.PublishNotifications();
             }
         }
 
-        private void Write(string info)
+        private void PrepareNotification(string info)
+        {
+            this.EnqueueNotification(new Notification
+            {
+                id = ++NotificationCount,
+                message = string.Format("{0} {1}", this.time.Now.ToString(), info)
+            });
+        }
+
+        private void PrepareNotification(string info, bool showTime)
+        {
+            this.EnqueueNotification(new Notification
+            {
+                id = ++NotificationCount,
+                message = info
+            });
+        }
+
+        private void PublishNotifications()
+        {
+            if (Notifications.Any())
+                foreach (var notification in Notifications)
+                    this.Hub.Clients.All.notify(notification);
+        }
+
+        private void EnqueueNotification(Notification notification)
         {
             // Adding New Notification
             if (Notifications.Count >= NotificationCountLimit)
                 Notifications.Dequeue();
 
-            Notifications.Enqueue(new Notification
-            {
-                id = ++NotificationCount,
-                message = string.Format("{0} {1}", this.time.Now.ToString(), info)
-            });
-
-            // Publishing Notification
-            if (Notifications.Any())
-            {
-                foreach (var notification in Notifications)
-                {
-                    this.Hub.Clients.All.notify(notification);
-                }
-            }
+            Notifications.Enqueue(notification);
         }
 
         public void DisableTracing()

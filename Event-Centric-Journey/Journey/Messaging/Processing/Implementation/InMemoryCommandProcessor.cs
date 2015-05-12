@@ -84,10 +84,14 @@ namespace Journey.Messaging.Processing
                     if (attempts >= 3)
                         throw;
 
-                    this.tracer.TraceAsync(new string('-', 80));
-                    this.tracer.TraceAsync(string.Format(
-                        "Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().FullName, e));
-                    this.tracer.TraceAsync(new string('-', 80));
+                    this.tracer.Notify(new List<string>
+                    {
+                        new string('-', 80),
+                        string.Format(
+                        "Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().Name, e),
+                        new string('-', 80)
+                    }
+                    .ToArray());
                 }
             }
 

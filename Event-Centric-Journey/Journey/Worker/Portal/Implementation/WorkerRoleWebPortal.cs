@@ -84,38 +84,24 @@ namespace Journey.Worker.Portal
 
         public void RebuildReadModel()
         {
-            this.WorkerRole.Tracer.DisableTracing();
-
             this.StopWorking();
 
             rebuildReadModel
                 .Invoke()
                 .ShowResults();
-
-            this.WorkerRole.Tracer.EnableTracing();
-
-            //this.StartWorking();
         }
 
         public void RebuildEventStore()
         {
-            this.WorkerRole.Tracer.DisableTracing();
-
             this.StopWorking();
 
             rebuildEventStore
                 .Invoke()
                 .ShowResults();
-
-            this.WorkerRole.Tracer.EnableTracing();
-
-            //this.StartWorking();
         }
 
         public void RebuildEventStoreAndReadModel()
         {
-            this.WorkerRole.Tracer.DisableTracing();
-
             this.StopWorking();
 
             var eventStoreRebuildingResults = rebuildEventStore.Invoke();
@@ -123,10 +109,6 @@ namespace Journey.Worker.Portal
 
             readModelRebuildingResults.ShowResults();
             eventStoreRebuildingResults.ShowResults();
-
-            this.WorkerRole.Tracer.EnableTracing();
-
-            //this.StartWorking();
         }
 
         public void Dispose()

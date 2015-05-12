@@ -39,7 +39,7 @@ namespace Journey.Worker
             this.RegisterSnapshoter(this.container);
 
             this.processors.ForEach(p => p.Start());
-            this.container.Resolve<ITracer>().TraceAsync("=== Worker Started ===");
+            this.container.Resolve<ITracer>().Notify("=== Worker Started ===");
         }
 
         public void Stop()
@@ -47,7 +47,7 @@ namespace Journey.Worker
             this.cancellationTokenSource.Cancel();
 
             this.processors.ForEach(p => p.Stop());
-            this.container.Resolve<ITracer>().TraceAsync("=== Worker Stopped ===");
+            this.container.Resolve<ITracer>().Notify("=== Worker Stopped ===");
         }
 
         private IUnityContainer CreateContainer(IDomainWorkerRegistry domainRegistry)

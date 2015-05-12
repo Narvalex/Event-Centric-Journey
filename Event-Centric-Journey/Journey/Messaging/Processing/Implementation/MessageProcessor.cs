@@ -1,6 +1,7 @@
 ﻿using Journey.Serialization;
 using Journey.Worker;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Journey.Messaging.Processing
@@ -106,9 +107,13 @@ namespace Journey.Messaging.Processing
             }
             catch (Exception e)
             {
-                this.tracer.TraceAsync(string.Format("An exception happened while processing message through handler/s:\r\n{0}", e));
-                this.tracer.TraceAsync("The message will be flagged as dead letter in the bus.");
-                this.tracer.TraceAsync("Error will be ignored and message receiving will continue.");
+                this.tracer.Notify(new List<string>
+                {
+                    string.Format("An exception happened while processing message through handler/s:\r\n{0}", e),
+                    "The message will be flagged as dead letter in the bus.",
+                    "Error will be ignored and message receiving will continue."
+                }
+                .ToArray());
 
                 throw;
             }

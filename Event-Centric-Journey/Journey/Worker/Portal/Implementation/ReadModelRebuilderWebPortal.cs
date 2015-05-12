@@ -48,7 +48,7 @@ namespace Journey.Worker.Portal
             }
             catch (Exception ex)
             {
-                WorkerRoleWebPortal.Instance.WorkerRole.Tracer.TraceAsync(ex.Message);
+                WorkerRoleWebPortal.Instance.WorkerRole.Tracer.Notify(ex.Message);
                 throw;
             }
         }
@@ -78,7 +78,7 @@ namespace Journey.Worker.Portal
             catch (Exception ex)
             {
                 coordinator.SetPortalIsNotRebuilding();
-                WorkerRoleWebPortal.Instance.WorkerRole.Tracer.TraceAsync(ex.Message);
+                WorkerRoleWebPortal.Instance.WorkerRole.Tracer.Notify(ex.Message);
                 throw;
             }
             finally

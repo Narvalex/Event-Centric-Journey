@@ -37,7 +37,7 @@ namespace Journey.Messaging.Processing
             if (this.dispatchersByEventType.TryGetValue(@event.GetType(), out dispatch))
             {
                 dispatch(@event, messageId, correlationId, traceIdentifier);
-                
+
                 if (!wasHandled)
                     wasHandled = true;
             }
@@ -160,9 +160,12 @@ namespace Journey.Messaging.Processing
                                     if (attempts >= 3)
                                         throw;
 
-                                    this.tracer.TraceAsync(new string('-', 80));
-                                    this.tracer.TraceAsync(string.Format("Dispatch Event attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.Item1.FullName, e));
-                                    this.tracer.TraceAsync(new string('-', 80)); 
+                                    this.tracer.Notify(new List<string>{
+                                        new string('-', 80),
+                                        string.Format("Dispatch Event attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.Item1.FullName, e),
+                                        new string('-', 80)
+                                    }
+                                    .ToArray());
                                 }
                             }
 
