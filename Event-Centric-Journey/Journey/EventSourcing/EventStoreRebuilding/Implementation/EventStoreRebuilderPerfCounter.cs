@@ -76,6 +76,8 @@ namespace Journey.EventSourcing.EventStoreRebuilding
                 string.Format(
                 "Message stream processing delay:           {0}", this.streamProcessingDelay.ToString(elapsedTimeFormat)),
                 string.Format(
+                "Database commit delay:                     {0}", this.dbCommittingDelay.ToString(elapsedTimeFormat)),
+                string.Format(
                 "Total rebuild time:                        {0}", base.processDelay.ToString(elapsedTimeFormat))
             }
             .ToArray());

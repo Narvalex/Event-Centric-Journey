@@ -215,24 +215,24 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Web.config" />
-    <Content Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
+    <None Include="Web.config.casa" />
+    <None Include="Web.config.Debug.casa">
+      <DependentUpon>Web.config.casa</DependentUpon>
+    </None>
+    <None Include="Web.config.Release.casa">
+      <DependentUpon>Web.config.casa</DependentUpon>
+    </None>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <None Include="Web.config-fecoprod" />
-    <None Include="Web.Debug.config-fecoprod">
-      <DependentUpon>Web.config-fecoprod</DependentUpon>
+    <None Include="Web.config" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
     </None>
-    <None Include="Web.Release.config-fecoprod">
-      <DependentUpon>Web.config-fecoprod</DependentUpon>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup />

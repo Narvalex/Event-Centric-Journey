@@ -7,6 +7,7 @@ using Journey.Worker;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using System.Linq;
 
@@ -55,14 +56,15 @@ namespace Journey.EventSourcing
         public override T Find(Guid id)
         {
             var cachedMemento = this.getMementoFromCache(id);
-            if (cachedMemento != null && cachedMemento.Item1 != null)
+
+            using (var context = this.queryContextFactory.Invoke())
             {
-                // NOTE: if we had a guarantee that this is running in a single process, there is
-                // no need to check if there are new events after the cached version.
-                IEnumerable<IVersionedEvent> deserialized;
-                if (!cachedMemento.Item2.HasValue || cachedMemento.Item2.Value < this.dateTime.Now.AddMinutes(-30))
+                if (cachedMemento != null && cachedMemento.Item1 != null)
                 {
-                    using (var context = this.queryContextFactory.Invoke())
+                    // NOTE: if we had a guarantee that this is running in a single process, there is
+                    // no need to check if there are new events after the cached version.
+                    IEnumerable<IVersionedEvent> deserialized;
+                    if (!cachedMemento.Item2.HasValue || cachedMemento.Item2.Value < this.dateTime.Now.AddMinutes(-30))
                     {
                         deserialized = context.Set<Event>()
                             .Where(x => x.SourceId == id && x.SourceType == _sourceType && x.Version > cachedMemento.Item1.Version)
@@ -70,26 +72,20 @@ namespace Journey.EventSourcing
                             .AsEnumerable()
                             .Select(this.Deserialize)
                             .AsCachedAnyEnumerable();
-
-                        if (deserialized.Any())
-                            return entityFactory.Invoke(id, deserialized);
                     }
+                    else
+                    {
+                        // if the cache entry was updated in the last seconds, then there is a high possibility that it is not stale
+                        // (because we typically have a single writer for high contention aggregates). This is why we optimistically avoid
+                        // getting the new events from the EventStore since the last memento was created. In the low probable case
+                        // where we get an exception on save, then we mark the cache item as stale so when the command gets
+                        // reprocessed, this time we get the new events from the EventStore.
+                        deserialized = Enumerable.Empty<IVersionedEvent>();
+                    }
+
+                    return this.originatorEntityFactory.Invoke(id, cachedMemento.Item1, deserialized);
                 }
                 else
-                {
-                    // if the cache entry was updated in the last seconds, then there is a high possibility that it is not stale
-                    // (because we typically have a single writer for high contention aggregates). This is why we optimistically avoid
-                    // getting the new events from the EventStore since the last memento was created. In the low probable case
-                    // where we get an exception on save, then we mark the cache item as stale so when the command gets
-                    // reprocessed, this time we get the new events from the EventStore.
-                    deserialized = Enumerable.Empty<IVersionedEvent>();
-                }
-
-                return this.originatorEntityFactory.Invoke(id, cachedMemento.Item1, deserialized);
-            }
-            else
-            {
-                using (var context = this.queryContextFactory.Invoke())
                 {
                     var deserialized = context.Set<Event>()
                         .Where(x => x.SourceId == id && x.SourceType == _sourceType)
@@ -99,13 +95,11 @@ namespace Journey.EventSourcing
                         .AsCachedAnyEnumerable();
 
                     if (deserialized.Any())
-                    {
                         return entityFactory.Invoke(id, deserialized);
-                    }
-
-                    return null;
                 }
             }
+
+            return null;
         }
 
         public override void Save(T eventSourced, Guid correlationId, DateTime creationDate)
@@ -159,16 +153,22 @@ namespace Journey.EventSourcing
 
                             this.cacheMementoIfApplicable.Invoke(eventSourced);
                         }
-                        catch (Exception)
+                        catch (EventStoreConcurrencyException)
                         {
-                            try
-                            {
-                                dbContextTransaction.Rollback();
-                                this.markCacheAsStale(eventSourced.Id);
-                            }
-                            catch (Exception)
-                            { }
+                            try { this.RollbackEventAppending(eventSourced, dbContextTransaction); }
+                            catch (Exception) { }
                             throw;
+                        }
+                        catch (DbUpdateException e)
+                        {
+                            try { this.RollbackEventAppending(eventSourced, dbContextTransaction); }
+                            catch (Exception) { }
+                            finally
+                            {
+                                throw new EventStoreConcurrencyException(
+                                string.Format("Exeption on appending events to store. See inner message. {0}", e.Message),
+                                e.InnerException);
+                            }
                         }
                     }
                 }
@@ -181,6 +181,12 @@ namespace Journey.EventSourcing
                     TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = false;
                 }
             }
+        }
+
+        private void RollbackEventAppending(T eventSourced, System.Data.Entity.DbContextTransaction dbContextTransaction)
+        {
+            dbContextTransaction.Rollback();
+            this.markCacheAsStale(eventSourced.Id);
         }
 
         /// <summary>
@@ -207,7 +213,7 @@ e
 
 
             if (lastCommitedVersion + 1 != events[0].Version)
-                throw new EventStoreConcurrencyException();
+                throw new EventStoreConcurrencyException("Exception on 'Guarantee Incremental Event Version Storing' operation");
         }
     }
 }

@@ -51,7 +51,9 @@ namespace Journey.EventSourcing.ReadModeling
                             this.perfCounter.OnDbConnectionOpenedAndCleansed();
 
                             var events = context.Set<Event>()
-                                .OrderBy(e => e.CreationDate)
+                                .OrderBy(e => e.SourceId)
+                                .ThenBy(e => e.SourceType)
+                                .ThenBy(e => e.Version)
                                 .AsEnumerable()
                                 .Select(this.Deserialize)
                                 .AsCachedAnyEnumerable();

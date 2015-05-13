@@ -240,14 +240,14 @@
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="Scripts\_references.js" />
-    <None Include="Web.config.disabled">
+    <None Include="Web.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Web.config.Debug.disabled">
-      <DependentUpon>Web.config.disabled</DependentUpon>
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
     </None>
-    <None Include="Web.config.Release.disabled">
-      <DependentUpon>Web.config.disabled</DependentUpon>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
     </None>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
@@ -255,15 +255,15 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Portal\Index.cshtml" />
-    <Content Include="Web.config">
+    <None Include="Web.config.casa">
       <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
+    </None>
+    <None Include="Web.config.Debug.casa">
+      <DependentUpon>Web.config.casa</DependentUpon>
+    </None>
+    <None Include="Web.config.Release.casa">
+      <DependentUpon>Web.config.casa</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

@@ -19,7 +19,7 @@ namespace Journey.EventSourcing.RebuildPerfCounting
         protected TimeSpan processDelay;
         protected TimeSpan openingConnectionDelay;
         protected TimeSpan streamProcessingDelay;
-        protected TimeSpan committingDelay;
+        protected TimeSpan dbCommittingDelay;
 
         protected double messageProcessingSpeed;
         protected double dbCommitSpeed;
@@ -74,10 +74,10 @@ namespace Journey.EventSourcing.RebuildPerfCounting
         protected void OnCommitted(int rowsAffected)
         {
             var now = this.time.Now;
-            this.committingDelay = now - this.commitStartTime;
+            this.dbCommittingDelay = now - this.commitStartTime;
             this.processDelay = now - this.RebuildProcessStartTime;
             this.rowsAffected = rowsAffected;
-            this.dbCommitSpeed = this.rowsAffected / this.committingDelay.TotalSeconds;
+            this.dbCommitSpeed = this.rowsAffected / this.dbCommittingDelay.TotalSeconds;
         }
 
         protected void ShowResults()

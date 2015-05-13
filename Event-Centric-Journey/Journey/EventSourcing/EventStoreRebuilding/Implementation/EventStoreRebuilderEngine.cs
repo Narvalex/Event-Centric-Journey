@@ -94,13 +94,11 @@ namespace Journey.EventSourcing.EventStoreRebuilding
                                         this.RegisterLogger(newAuditLogContext);
 
                                         this.perfCounter.OnDbConnectionOpenedAndCleansed();
-
                                         this.perfCounter.OnStartingStreamProcessing();
 
                                         this.ProcessMessages(messages);
 
                                         this.perfCounter.OnStreamProcessingFinished();
-
                                         this.perfCounter.OnStartingCommitting();
 
                                         // el borrado colocamos al final por si se este haciendo desde el mismo connection.

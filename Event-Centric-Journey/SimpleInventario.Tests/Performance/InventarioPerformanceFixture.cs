@@ -24,7 +24,7 @@ namespace SimpleInventario.Tests.Performance.InventarioPerformanceFixture
         public void CUANDO_se_envian_comandos_masivamente_ENTONCES_se_procesan_rapidamente()
         {
             var guid = new SequentialGuid();
-            var commandsToSendCount = 1000;
+            var commandsToSendCount = 100;
 
             var commands = new List<ICommand>();
             for (int i = 0; i < commandsToSendCount; i++)
@@ -35,8 +35,24 @@ namespace SimpleInventario.Tests.Performance.InventarioPerformanceFixture
                         Guid.Parse("00000000-0000-0000-0000-000000000000"),
                         Guid.Parse("00000000-0000-0000-0000-000000000005"),
                         1,
-                        2012
+                        2015
                     ));
+                commands.Add(new AgregarAnimales(
+                        guid.NewGuid(),
+                        Guid.Empty,
+                        Guid.Parse("00000000-0000-0000-0000-000000000000"),
+                        Guid.Parse("00000000-0000-0000-0000-000000000005"),
+                        -1,
+                        2015
+                    ));
+                commands.Add(new AgregarAnimales(
+                        guid.NewGuid(),
+                        Guid.Empty,
+                        Guid.Parse("00000000-0000-0000-0000-000000000000"),
+                        Guid.Parse("00000000-0000-0000-0000-000000000005"),
+                        1,
+                        2014
+                ));
             }
 
             this.bus.Send(commands);

@@ -187,7 +187,8 @@ namespace Journey.Messaging
                         command.CommandText = this.setDeadLetterQuery;
                         ((SqlCommand)command).Parameters.Add("@Id", SqlDbType.BigInt).Value = messageId;
                         ((SqlCommand)command).Parameters.Add("@TraceInfo", SqlDbType.NVarChar).Value =
-                            string.Format("Exception Type: {0}. Exception Message: {1} Inner Exception Message: {2} StackTrace: {3}", e.GetType().Name, e.Message, e.InnerException, e.StackTrace);
+                            string.Format("Exception Type: {0}. Exception Message: {1} Inner Exception Type: {2}. Inner Exception Message: {3} StackTrace: {4}",
+                                            e.GetType().Name, e.Message, e.InnerException.GetType(), e.InnerException.Message, e.StackTrace);
 
                         command.ExecuteNonQuery();
                     }

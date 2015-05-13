@@ -1,4 +1,5 @@
-﻿using Journey.Serialization;
+﻿using Journey.EventSourcing;
+using Journey.Serialization;
 using Journey.Worker;
 using System;
 using System.Collections.Generic;
@@ -14,10 +15,7 @@ namespace Journey.Messaging.Processing
     {
         private Dictionary<Type, ICommandHandler> handlers = new Dictionary<Type, ICommandHandler>();
         private readonly ICommandBusTransientFaultDetector faultDetector;
-
-        private static object contentionLockLevel1 = new object();
-        private static object contentionLockLevel2 = new object();
-        private static object contentionLockLevel3 = new object();
+        private readonly CommandingConcurrencyResolver resolver;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandProcessor"/> class.
@@ -29,6 +27,8 @@ namespace Journey.Messaging.Processing
             : base(receiver, serializer, tracer)
         {
             this.faultDetector = faultDetector;
+            this.resolver = new CommandingConcurrencyResolver();
+            CommandingConcurrencyResolver.ThrottlingDetected = false;
         }
 
         /// <summary>
@@ -83,42 +83,36 @@ namespace Journey.Messaging.Processing
         {
             // Litle retry policy
             var attempts = default(int);
-            var threshold = 50;
+            var threshold = 10;
             while (true)
             {
                 try
                 {
+                    if (CommandingConcurrencyResolver.ThrottlingDetected)
+                        if (this.resolver.HandlerIsThrottled(handler))
+                            resolver.HandleConcurrentMessage(payload, handler);
+
                     ((dynamic)handler).Handle((dynamic)payload);
                     break;
                 }
-                catch (Exception e)
+                catch (EventStoreConcurrencyException e)
                 {
                     ++attempts;
-                    if (attempts >= threshold)
+                    if (attempts > threshold)
                     {
-                        this.tracer.Notify(string.Format("Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().Name, e));
-                        throw;
+                        this.tracer.TraceAsync(string.Format("High throughput detected in command handler: {0}\r\n{1}\r\n{2}", handler.GetType().Name, e, e.StackTrace));
+                        this.resolver.HandleConcurrentMessage(payload, handler);
                     }
 
                     this.tracer.TraceAsync(string.Format("Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().Name, e));
 
-                    if (attempts < 25)
-                        lock (contentionLockLevel1)
-                            Thread.Sleep(attempts * 50);
-                    else if (attempts < 40)
-                        lock (contentionLockLevel2)
-                            Thread.Sleep(attempts * 70);
-                    else
-                    {
-                        lock (contentionLockLevel3)
-                        {
-                            this.tracer.Notify(string.Format("Hight throughput detected! Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().Name, e));
-                            Thread.Sleep(attempts * 100);
-                        }
-                    }
+                    Thread.Sleep(50 * attempts);
+                }
+                catch (Exception)
+                {
+                    throw;
                 }
             }
-
 
             base.tracer.TraceAsync("Command handled by " + handler.GetType().Name);
         }

@@ -25,7 +25,7 @@ namespace Journey.EventSourcing.ReadModeling
 
         public new void OnDbConnectionOpenedAndCleansed()
         {
-            this.tracer.Notify(string.Format("===> Event Store Connection is opean. All data of read model are now deleted."));
+            this.tracer.Notify(string.Format("===> Event Store Connection is now open. All read model data will be deleted."));
             base.OnDbConnectionOpenedAndCleansed();
         }
 
@@ -74,6 +74,8 @@ namespace Journey.EventSourcing.ReadModeling
                 "Opening and cleaning delay:            {0}", this.openingConnectionDelay.ToString(elapsedTimeFormat)),
                 string.Format(
                 "Event processing delay:                {0}", this.streamProcessingDelay.ToString(elapsedTimeFormat)),
+                string.Format(
+                "Database commit delay:                 {0}", this.dbCommittingDelay.ToString(elapsedTimeFormat)),
                 string.Format(
                 "Total rebuild time:                    {0}", base.processDelay.ToString(elapsedTimeFormat))
             }
