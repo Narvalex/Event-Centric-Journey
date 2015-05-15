@@ -146,44 +146,48 @@ namespace Journey.Messaging.Processing
                     {
                         await Task.Factory.StartNew(() =>
                         {
-                            this.tracer.TraceAsync(string.Format(CultureInfo.InvariantCulture,
-                                "Event {0} routed to handler '{1}' HashCode: {2}.", @event.GetType().Name, handler.Item1.Name, handler.GetHashCode()));
-
-
-                            // Litle retry policy
-                            var attempts = default(int);
-                            var threshold = 10;
-                            while (true)
+                            lock (handler)
                             {
-                                try
-                                {
-                                    if (EventingConcurrencyResolver.ThrottlingDetected)
-                                        if (this.resolver.HandlerIsThrottled(handler))
-                                            resolver.HandleConcurrentMessage(handler, envelope);
+                                this.tracer.TraceAsync(string.Format(CultureInfo.InvariantCulture,
+                                                        "Event {0} routed to handler '{1}' HashCode: {2}.", @event.GetType().Name, handler.Item1.Name, handler.GetHashCode()));
 
-                                    handler.Item2(envelope);
-                                    break;
-                                }
-                                catch (EventStoreConcurrencyException e)
+
+                                // Litle retry policy
+                                var attempts = default(int);
+                                var threshold = 10;
+                                while (true)
                                 {
-                                    ++attempts;
-                                    if (attempts >= threshold)
+                                    try
                                     {
-                                        this.tracer.TraceAsync(string.Format("High throughput detected in event handling. {0}\r\n{1}\r\n{2}", handler.Item1.Name, e, e.StackTrace));
-                                        this.resolver.HandleConcurrentMessage(handler, envelope);
+                                        //if (EventingConcurrencyResolver.ThrottlingDetected)
+                                        //    if (this.resolver.HandlerIsThrottled(handler))
+                                        //        resolver.HandleConcurrentMessage(handler, envelope);
+
+                                        handler.Item2(envelope);
+                                        break;
                                     }
+                                    catch (EventStoreConcurrencyException e)
+                                    {
+                                        ++attempts;
+                                        if (attempts > threshold)
+                                        {
+                                            //this.tracer.TraceAsync(string.Format("High throughput detected in event handling. {0}\r\n{1}\r\n{2}", handler.Item1.Name, e, e.StackTrace));
+                                            //this.resolver.HandleConcurrentMessage(handler, envelope);
+                                            throw;
+                                        }
 
-                                    this.tracer.TraceAsync(string.Format("Dispatch Event attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.Item1.FullName, e));
+                                        this.tracer.TraceAsync(string.Format("Dispatch Event attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.Item1.FullName, e));
 
-                                    Thread.Sleep(50 * attempts);
+                                        Thread.Sleep(50 * attempts);
+                                    }
+                                    catch (Exception)
+                                    {
+                                        throw;
+                                    }
                                 }
-                                catch (Exception)
-                                {
-                                    throw;
-                                }
+
+                                this.tracer.TraceAsync(string.Format(CultureInfo.InvariantCulture, "Event {0} handled by {1} HashCode: {2}.", @event.GetType().Name, handler.Item1.Name, handler.GetHashCode()));
                             }
-
-                            this.tracer.TraceAsync(string.Format(CultureInfo.InvariantCulture, "Event {0} handled by {1} HashCode: {2}.", @event.GetType().Name, handler.Item1.Name, handler.GetHashCode()));
                         }, TaskCreationOptions.LongRunning);
                     };
 

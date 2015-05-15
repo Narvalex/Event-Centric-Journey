@@ -59,23 +59,29 @@ namespace Journey.Messaging.Processing
         protected override void ProcessMessage(object payload, string correlationId)
         {
             ICommandHandler handler = null;
+            var commandType = payload.GetType();
 
-            // Esto es util por si el comando no se borro todavia, pero se proceso en el event store
-            // If command was already processed, then no op in processing, but maybe we can log it
-            if (!this.faultDetector.CommandWasAlreadyProcessed(payload))
+            if (this.handlers.TryGetValue(commandType, out handler))
             {
-                var commandType = payload.GetType();
-                if (this.handlers.TryGetValue(commandType, out handler))
-                    // Actualy handling the message
-                    this.HandleMessage(payload, handler);
-            }
+
+                lock (handler)
+                {
+                    // Esto es util por si el comando no se borro todavia, pero se proceso en el event store
+                    // If command was already processed, then no op in processing, but maybe we can log it
+                    if (!this.faultDetector.CommandWasAlreadyProcessed(payload))
+                    {
+                        // Actualy handling the message
+                        this.HandleMessage(payload, handler);
+                    }
 
 
-            // There can be a generic logging/tracing/auditing handlers
-            // El message log verifica que no existe el comando en el log
-            if (this.handlers.TryGetValue(typeof(ICommand), out handler))
-            {
-                this.HandleMessage(payload, handler);
+                    // There can be a generic logging/tracing/auditing handlers
+                    // El message log verifica que no existe el comando en el log
+                    if (this.handlers.TryGetValue(typeof(ICommand), out handler))
+                    {
+                        this.HandleMessage(payload, handler);
+                    }
+                }
             }
         }
 
@@ -88,9 +94,9 @@ namespace Journey.Messaging.Processing
             {
                 try
                 {
-                    if (CommandingConcurrencyResolver.ThrottlingDetected)
-                        if (this.resolver.HandlerIsThrottled(handler))
-                            resolver.HandleConcurrentMessage(payload, handler);
+                    //if (CommandingConcurrencyResolver.ThrottlingDetected)
+                    //    if (this.resolver.HandlerIsThrottled(handler))
+                    //        resolver.HandleConcurrentMessage(payload, handler);
 
                     ((dynamic)handler).Handle((dynamic)payload);
                     break;
@@ -100,8 +106,9 @@ namespace Journey.Messaging.Processing
                     ++attempts;
                     if (attempts > threshold)
                     {
-                        this.tracer.TraceAsync(string.Format("High throughput detected in command handler: {0}\r\n{1}\r\n{2}", handler.GetType().Name, e, e.StackTrace));
-                        this.resolver.HandleConcurrentMessage(payload, handler);
+                        //this.tracer.TraceAsync(string.Format("High throughput detected in command handler: {0}\r\n{1}\r\n{2}", handler.GetType().Name, e, e.StackTrace));
+                        //this.resolver.HandleConcurrentMessage(payload, handler);
+                        throw;
                     }
 
                     this.tracer.TraceAsync(string.Format("Handle command attempt number {0}. An exception happened while processing message through handler: {1}\r\n{2}", attempts, handler.GetType().Name, e));

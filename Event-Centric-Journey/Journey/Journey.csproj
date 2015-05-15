@@ -175,7 +175,6 @@
     <Compile Include="Messaging\Processing\Implementation\AsynchronousEventDispatcher.cs" />
     <Compile Include="Messaging\Processing\Implementation\ComandingConcurrencyResolver.cs" />
     <Compile Include="Messaging\Processing\Implementation\CommandProcessor.cs" />
-    <Compile Include="Messaging\Processing\Implementation\ConcurrencyResolver.cs" />
     <Compile Include="Messaging\Processing\Implementation\EventingConcurrencyResolver.cs" />
     <Compile Include="Messaging\Processing\Implementation\EventProcessor.cs" />
     <Compile Include="Messaging\Processing\Implementation\InMemoryCommandProcessor.cs" />
