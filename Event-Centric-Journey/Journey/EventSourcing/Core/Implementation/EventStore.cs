@@ -1,5 +1,6 @@
 ﻿using Journey.Database;
 using Journey.Messaging;
+using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
 using Journey.Utils;
 using Journey.Utils.SystemTime;
@@ -32,8 +33,8 @@ namespace Journey.EventSourcing
         private readonly Func<EventStoreDbContext> contextFactory;
         private readonly Func<EventStoreDbContext> queryContextFactory;
 
-        public EventStore(IEventBus eventBus, ICommandBus commandBus, ITextSerializer serializer, Func<EventStoreDbContext> contextFactory, ITracer tracer, ISystemTime dateTime, ISnapshotProvider snapshoter)
-            : base(tracer, serializer, dateTime, snapshoter)
+        public EventStore(IEventBus eventBus, ICommandBus commandBus, ITextSerializer serializer, Func<EventStoreDbContext> contextFactory, ITracer tracer, ISystemTime dateTime, ISnapshotProvider snapshoter, IMetadataProvider metadataProvider)
+            : base(tracer, serializer, dateTime, snapshoter, metadataProvider)
         {
             this.eventBus = eventBus;
             this.commandBus = commandBus;
@@ -102,8 +103,10 @@ namespace Journey.EventSourcing
             return null;
         }
 
-        public override void Save(T eventSourced, Guid correlationId, DateTime creationDate)
+        public override void Save(T eventSourced, IMessage message)
         {
+
+
             var events = eventSourced.Events.ToArray();
             if (events.Count() == 0)
             {

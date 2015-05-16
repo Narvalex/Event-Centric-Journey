@@ -1,4 +1,6 @@
-﻿using Journey.Serialization;
+﻿using Journey.Messaging;
+using Journey.Messaging.Logging.Metadata;
+using Journey.Serialization;
 using Journey.Utils.SystemTime;
 using Journey.Worker;
 using System;
@@ -17,18 +19,20 @@ namespace Journey.EventSourcing
         protected readonly ISystemTime dateTime;
         protected readonly ISnapshotProvider snapshoter;
         protected readonly Func<Guid, IEnumerable<IVersionedEvent>, T> entityFactory;
+        private readonly IMetadataProvider metadataProvider;
 
         protected readonly Func<Guid, Tuple<IMemento, DateTime?>> getMementoFromCache;
         protected readonly Action<Guid> markCacheAsStale;
         protected readonly Func<Guid, IMemento, IEnumerable<IVersionedEvent>, T> originatorEntityFactory;
         protected readonly Action<T> cacheMementoIfApplicable;
 
-        public EventStoreBase(ITracer tracer, ITextSerializer serializer, ISystemTime dateTime, ISnapshotProvider snapshoter)
+        public EventStoreBase(ITracer tracer, ITextSerializer serializer, ISystemTime dateTime, ISnapshotProvider snapshoter, IMetadataProvider metadataProvider)
         {
             this.tracer = tracer;
             this.serializer = serializer;
             this.dateTime = dateTime;
             this.snapshoter = snapshoter;
+            this.metadataProvider = metadataProvider;
 
             // TODO: could be replaced with a compiled lambda
             var constructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IEnumerable<IVersionedEvent>) });
@@ -70,7 +74,19 @@ namespace Journey.EventSourcing
             return entity;
         }
 
-        public abstract void Save(T eventSourced, Guid correlationId, DateTime creationDate);
+        public void Save(T eventSourced, IMessage message)
+        {
+            var metadata = this.metadataProvider.GetMetadata(message);
+
+            switch (metadata[StandardMetadata.Kind])
+            {
+                case StandardMetadata.EventKind:
+                    break;
+
+                case StandardMetadata.CommandKind:
+                    break;
+            }
+        }
 
         public abstract T Find(Guid id);
 
