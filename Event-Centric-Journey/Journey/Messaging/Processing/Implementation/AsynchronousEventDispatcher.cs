@@ -17,14 +17,11 @@ namespace Journey.Messaging.Processing
         private Dictionary<Type, List<Tuple<Type, Action<Envelope>>>> handlersByEventType;
         private Dictionary<Type, Action<IEvent, string, string, string>> dispatchersByEventType;
 
-        private readonly EventingConcurrencyResolver resolver;
-
         public AsynchronousEventDispatcher(ITracer tracer)
         {
             this.handlersByEventType = new Dictionary<Type, List<Tuple<Type, Action<Envelope>>>>();
             this.dispatchersByEventType = new Dictionary<Type, Action<IEvent, string, string, string>>();
             this.tracer = tracer;
-            this.resolver = new EventingConcurrencyResolver();
         }
 
         public void DispatchMessage(IEvent @event, string messageId, string correlationId, string traceIdentifier)

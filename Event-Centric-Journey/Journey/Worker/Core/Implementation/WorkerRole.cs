@@ -120,7 +120,7 @@ namespace Journey.Worker
         private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString, ITracer tracer, ISystemTime dateTime)
         {
             //Database.SetInitializer<MessageLogDbContext>(null);
-            container.RegisterType<IMessageAuditLog, MessageLog>(new InjectionConstructor(connectionString, serializer, metadata, tracer, dateTime));
+            container.RegisterType<IMessageAuditLog, OldMessageLog>(new InjectionConstructor(connectionString, serializer, metadata, tracer, dateTime));
             container.RegisterType<IEventHandler, MessageLogHandler>("MessageLogHandler");
             container.RegisterType<ICommandHandler, MessageLogHandler>("MessageLogHandler");
             eventProcessor.Register(container.Resolve<MessageLogHandler>());

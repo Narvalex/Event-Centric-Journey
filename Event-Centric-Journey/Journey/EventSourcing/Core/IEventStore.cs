@@ -21,7 +21,7 @@ namespace Journey.EventSourcing
 
         /// <summary>
         /// Saves the event sourced entity in a distributed transaction that wraps 
-        /// the database update and the message publishing.
+        /// the database update, the database log and the message publishing.
         /// </summary>
         /// <param name="eventSourced">The entity.</param>
         /// <param name="correlationId">A correlation id to use when publishing events. It could be either a command id or an event sourced aggregate id that raised an event.</param>

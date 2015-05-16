@@ -116,7 +116,6 @@
     <Compile Include="EventSourcing\RebuildPerfCounting\IRebuildPerfCounter.cs" />
     <Compile Include="EventSourcing\RebuildPerfCounting\Implementation\RebuildPerfCounter.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ProjectedEvent.cs" />
-    <Compile Include="EventSourcing\ReadModeling\Implementation\OldReadModelRebuilder.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ReadModelDbContext.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\ReadModelRebuilderEngine.cs" />
     <Compile Include="EventSourcing\ReadModeling\Implementation\TableInfo.cs" />
@@ -155,7 +154,7 @@
     <Compile Include="Messaging\Logging\IEventLogReader.cs" />
     <Compile Include="Messaging\Logging\IMessageAuditLog.cs" />
     <Compile Include="Messaging\Logging\Implementation\InMemoryMessageLog.cs" />
-    <Compile Include="Messaging\Logging\Implementation\MessageLog.cs" />
+    <Compile Include="Messaging\Logging\Implementation\OldMessageLog.cs" />
     <Compile Include="Messaging\Logging\Implementation\MessageLogDbContext.cs" />
     <Compile Include="Messaging\Logging\Implementation\MessageLogEntity.cs" />
     <Compile Include="Messaging\Logging\Implementation\MessageLogHandler.cs" />
@@ -173,9 +172,7 @@
     <Compile Include="Messaging\Processing\IEventHandlerRegistry.cs" />
     <Compile Include="Messaging\Processing\IMessageProcessor.cs" />
     <Compile Include="Messaging\Processing\Implementation\AsynchronousEventDispatcher.cs" />
-    <Compile Include="Messaging\Processing\Implementation\ComandingConcurrencyResolver.cs" />
     <Compile Include="Messaging\Processing\Implementation\CommandProcessor.cs" />
-    <Compile Include="Messaging\Processing\Implementation\EventingConcurrencyResolver.cs" />
     <Compile Include="Messaging\Processing\Implementation\EventProcessor.cs" />
     <Compile Include="Messaging\Processing\Implementation\InMemoryCommandProcessor.cs" />
     <Compile Include="Messaging\Processing\Implementation\MessageProcessor.cs" />

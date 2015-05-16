@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using Journey.Messaging.Logging;
+using System.Data.Entity;
 
 namespace Journey.EventSourcing
 {
@@ -7,9 +8,12 @@ namespace Journey.EventSourcing
     /// </summary>
     public class EventStoreDbContext : DbContext
     {
-        public const string SchemaName = "EventStore";
-        public const string EventsTableName = "Events";
-        public const string SnapshotsTableName = "Snapshots";
+        internal const string EventStoreSchemaName = "EventStore";
+        internal const string EventsTableName = "Events";
+        private const string SnapshotsTableName = "Snapshots";
+
+        private const string LogSchemaName = "MessageLog";
+        private const string LogTableName = "Messages";
 
         static EventStoreDbContext()
         {
@@ -32,11 +36,14 @@ namespace Journey.EventSourcing
 
             modelBuilder.Entity<Event>()
                 .HasKey(x => new { SourceId = x.SourceId, SourceType = x.SourceType, x.Version })
-                .ToTable(EventsTableName, SchemaName);
+                .ToTable(EventsTableName, EventStoreSchemaName);
 
             modelBuilder.Entity<RollingSnapshot>()
                 .HasKey(x => x.PartitionKey)
-                .ToTable(SnapshotsTableName, SchemaName);
+                .ToTable(SnapshotsTableName, EventStoreSchemaName);
+
+            modelBuilder.Entity<MessageLogEntity>().ToTable(LogTableName, LogSchemaName);
+            modelBuilder.Entity<MessageLogEntity>().HasKey(m => m.Id);
         }
     }
 }

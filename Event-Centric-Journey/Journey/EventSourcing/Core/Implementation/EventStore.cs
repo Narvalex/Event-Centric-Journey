@@ -206,7 +206,7 @@ FROM [{0}].[{1}] WITH (READPAST)
 WHERE SourceId = @SourceId
 	AND SourceType = @SourceType)
 e
-", EventStoreDbContext.SchemaName, EventStoreDbContext.EventsTableName),
+", EventStoreDbContext.EventStoreSchemaName, EventStoreDbContext.EventsTableName),
             new SqlParameter("@SourceId", eventSourced.Id),
             new SqlParameter("@SourceType", _sourceType))
             .FirstOrDefault() as int? ?? default(int);

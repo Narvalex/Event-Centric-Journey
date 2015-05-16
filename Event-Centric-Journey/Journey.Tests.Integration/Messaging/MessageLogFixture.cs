@@ -17,7 +17,7 @@ namespace Journey.Tests.Integration.Messaging.MessageLogFixture
     public class GIVEN_a_sql_log_with_three_events : IDisposable
     {
         private string dbName = "EventLogFixture";
-        private MessageLog sut;
+        private OldMessageLog sut;
         private Mock<IMetadataProvider> metadata;
         private EventA eventA;
         private EventB eventB;
@@ -70,7 +70,7 @@ namespace Journey.Tests.Integration.Messaging.MessageLogFixture
                 });
 
             this.metadata = Mock.Get(metadata);
-            this.sut = new MessageLog(this.dbName, new JsonTextSerializer(), metadata, new ConsoleTracer(), new LocalDateTime());
+            this.sut = new OldMessageLog(this.dbName, new JsonTextSerializer(), metadata, new ConsoleTracer(), new LocalDateTime());
             this.sut.Log(eventA);
             this.sut.Log(eventB);
             this.sut.Log(eventC);
@@ -315,7 +315,7 @@ DROP DATABASE [{0}]
     public class GIVEN_a_sql_log_with_commands : IDisposable
     {
         private string dbName = "EventLogFixture";
-        private MessageLog sut;
+        private OldMessageLog sut;
         private Mock<IMetadataProvider> metadata;
         private EventA eventA;
         private EventB eventB;
@@ -356,7 +356,7 @@ DROP DATABASE [{0}]
                 });
 
             this.metadata = Mock.Get(metadata);
-            this.sut = new MessageLog(this.dbName, new JsonTextSerializer(), metadata, new ConsoleTracer(), new LocalDateTime());
+            this.sut = new OldMessageLog(this.dbName, new JsonTextSerializer(), metadata, new ConsoleTracer(), new LocalDateTime());
             this.sut.Log(eventA);
             this.sut.Log(eventB);
         }

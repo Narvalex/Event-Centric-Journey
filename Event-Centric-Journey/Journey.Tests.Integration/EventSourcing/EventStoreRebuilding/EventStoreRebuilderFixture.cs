@@ -82,7 +82,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
 
             // MessageLogger
             this.logger = new MessageLogHandler(
-                new MessageLog(
+                new OldMessageLog(
                     messageLogConnectionString,
                     this.serializer,
                     new StandardMetadataProvider(), new ConsoleTracer(), new LocalDateTime()));

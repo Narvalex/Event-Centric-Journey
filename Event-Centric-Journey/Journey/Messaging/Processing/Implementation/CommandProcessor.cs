@@ -15,7 +15,6 @@ namespace Journey.Messaging.Processing
     {
         private Dictionary<Type, ICommandHandler> handlers = new Dictionary<Type, ICommandHandler>();
         private readonly ICommandBusTransientFaultDetector faultDetector;
-        private readonly CommandingConcurrencyResolver resolver;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandProcessor"/> class.
@@ -27,8 +26,6 @@ namespace Journey.Messaging.Processing
             : base(receiver, serializer, tracer)
         {
             this.faultDetector = faultDetector;
-            this.resolver = new CommandingConcurrencyResolver();
-            CommandingConcurrencyResolver.ThrottlingDetected = false;
         }
 
         /// <summary>
