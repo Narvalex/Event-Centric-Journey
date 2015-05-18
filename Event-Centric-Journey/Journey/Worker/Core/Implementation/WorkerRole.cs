@@ -79,7 +79,7 @@ namespace Journey.Worker
                 new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.CommandBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer, new CommandBusTransientFaultDetector(config.EventStoreConnectionString));
 
             var liveEventProcessor = new EventProcessor(
-                new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.EventBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer);
+                new MessageReceiver(System.Data.Entity.Database.DefaultConnectionFactory, config.EventStoreConnectionString, config.EventBusTableName, config.BusPollDelay, config.NumberOfProcessorsThreads, dateTime), serializer, tracer, new AsynchronousEventDispatcher(tracer));
 
             container.RegisterInstance<ICommandBus>(commandBus);
             container.RegisterInstance<IEventBus>(eventBus);
@@ -90,7 +90,7 @@ namespace Journey.Worker
 
             var indentedSerializer = new JsonTextSerializer();
             // Event log database and handler
-            this.RegisterMessageLogger(container, indentedSerializer, metadata, liveEventProcessor, config.MessageLogConnectionString, tracer, dateTime);
+            //this.RegisterMessageLogger(container, indentedSerializer, metadata, liveEventProcessor, config.MessageLogConnectionString, tracer, dateTime);
 
             // Event Store
             container.RegisterType<EventStoreDbContext>(new TransientLifetimeManager(), new InjectionConstructor(config.EventStoreConnectionString));
@@ -117,14 +117,14 @@ namespace Journey.Worker
             container.RegisterInstance<ISnapshotProvider>(snapshoter);
         }
 
-        private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString, ITracer tracer, ISystemTime dateTime)
-        {
-            //Database.SetInitializer<MessageLogDbContext>(null);
-            container.RegisterType<IMessageAuditLog, OldMessageLog>(new InjectionConstructor(connectionString, serializer, metadata, tracer, dateTime));
-            container.RegisterType<IEventHandler, MessageLogHandler>("MessageLogHandler");
-            container.RegisterType<ICommandHandler, MessageLogHandler>("MessageLogHandler");
-            eventProcessor.Register(container.Resolve<MessageLogHandler>());
-        }
+        //private void RegisterMessageLogger(UnityContainer container, ITextSerializer serializer, IMetadataProvider metadata, EventProcessor eventProcessor, string connectionString, ITracer tracer, ISystemTime dateTime)
+        //{
+        //    //Database.SetInitializer<MessageLogDbContext>(null);
+        //    container.RegisterType<IMessageAuditLog, OldMessageLog>(new InjectionConstructor(connectionString, serializer, metadata, tracer, dateTime));
+        //    container.RegisterType<IEventHandler, MessageLogHandler>("MessageLogHandler");
+        //    container.RegisterType<ICommandHandler, MessageLogHandler>("MessageLogHandler");
+        //    eventProcessor.Register(container.Resolve<MessageLogHandler>());
+        //}
 
         private void RegisterCommandHandlers(IUnityContainer container)
         {

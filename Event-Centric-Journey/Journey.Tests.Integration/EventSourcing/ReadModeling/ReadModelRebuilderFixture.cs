@@ -3,8 +3,10 @@ using Journey.EventSourcing;
 using Journey.EventSourcing.ReadModeling;
 using Journey.EventSourcing.RebuildPerfCounting;
 using Journey.Messaging;
+using Journey.Messaging.Logging.Metadata;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
+using Journey.Tests.Integration.EventSourcing.Helpers;
 using Journey.Utils.Guids;
 using Journey.Utils.SystemTime;
 using Journey.Worker;
@@ -70,7 +72,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
             }
 
             this.eventStore = new EventStore<ItemActor>(
-                new Mock<ISqlBus>().As<IEventBus>().Object, new Mock<ISqlBus>().As<ICommandBus>().Object, this.serializer, this.eventStoreContextFactory, this.tracer, new LocalDateTime(), new Mock<ISnapshotProvider>().Object);
+                new Mock<ISqlBus>().As<IEventBus>().Object, new Mock<ISqlBus>().As<ICommandBus>().Object, this.serializer, this.eventStoreContextFactory, this.tracer, new LocalDateTime(), new Mock<ISnapshotProvider>().Object, new StandardMetadataProvider());
 
         }
 
@@ -88,7 +90,7 @@ namespace Journey.Tests.Integration.EventSourcing.ReadModeling.ReadModelRebuilde
             var id = SequentialGuid.GenerateNewGuid();
             var actor = new ItemActor(id);
             actor.HandleCommands();
-            this.eventStore.Save(actor, id, new DateTime());
+            this.eventStore.Save(actor, new FakeCommand(id));
 
             using (var context = this.readModelContextFactory.Invoke())
             {

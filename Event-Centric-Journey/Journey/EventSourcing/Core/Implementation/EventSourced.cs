@@ -47,21 +47,21 @@ namespace Journey.EventSourcing
 
         protected void LoadFrom(IEnumerable<IVersionedEvent> pastEvents)
         {
-            foreach (var e in pastEvents)
+            foreach (var @event in pastEvents)
             {
-                ((dynamic)this).Rehydrate((dynamic)e);
-                this.version = e.Version;
+                ((dynamic)this).Rehydrate((dynamic)@event);
+                this.version = @event.Version;
             }
         }
 
-        protected void Update(VersionedEvent e)
+        protected void Update(VersionedEvent @event)
         {
-            e.SourceId = this.Id;
-            e.Version = this.version + 1;
-            e.SourceType = this.GetType().Name;
-            ((dynamic)this).Rehydrate((dynamic)e);
-            this.version = e.Version;
-            this.pendingEvents.Add(e);
+            @event.SourceId = this.Id;
+            @event.Version = this.version + 1;
+            @event.SourceType = this.GetType().Name;
+            ((dynamic)this).Rehydrate((dynamic)@event);
+            this.version = @event.Version;
+            this.pendingEvents.Add(@event);
         }
     }
 }

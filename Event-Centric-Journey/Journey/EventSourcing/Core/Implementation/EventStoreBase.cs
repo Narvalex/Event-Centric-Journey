@@ -1,6 +1,8 @@
 ﻿using Journey.Messaging;
+using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
+using Journey.Utils;
 using Journey.Utils.SystemTime;
 using Journey.Worker;
 using System;
@@ -26,6 +28,8 @@ namespace Journey.EventSourcing
         protected readonly Func<Guid, IMemento, IEnumerable<IVersionedEvent>, T> originatorEntityFactory;
         protected readonly Action<T> cacheMementoIfApplicable;
 
+        private Func<string> lastUpdateTimeProvider;
+
         public EventStoreBase(ITracer tracer, ITextSerializer serializer, ISystemTime dateTime, ISnapshotProvider snapshoter, IMetadataProvider metadataProvider)
         {
             this.tracer = tracer;
@@ -33,6 +37,8 @@ namespace Journey.EventSourcing
             this.dateTime = dateTime;
             this.snapshoter = snapshoter;
             this.metadataProvider = metadataProvider;
+            this.lastUpdateTimeProvider = () => dateTime.Now.ToString("o");
+
 
             // TODO: could be replaced with a compiled lambda
             var constructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IEnumerable<IVersionedEvent>) });
@@ -78,14 +84,58 @@ namespace Journey.EventSourcing
         {
             var metadata = this.metadataProvider.GetMetadata(message);
 
+            MessageLogEntity messageLogEntity;
             switch (metadata[StandardMetadata.Kind])
             {
                 case StandardMetadata.EventKind:
+                    messageLogEntity = this.CreateMessageLogEntityForEvent(message, metadata);
+                    this.Save(eventSourced, ((IVersionedEvent)message).CorrelationId, message.CreationDate, messageLogEntity);
                     break;
 
                 case StandardMetadata.CommandKind:
+                    messageLogEntity = this.CreateMessageLogEntityForCommand(message, metadata);
+                    this.Save(eventSourced, ((ICommand)message).Id, message.CreationDate, messageLogEntity);
                     break;
             }
+        }
+
+        protected abstract void Save(T eventSourced, Guid correlationId, DateTime creationDate, MessageLogEntity messageLogEntity);
+
+        private MessageLogEntity CreateMessageLogEntityForEvent(IMessage message, IDictionary<string, string> metadata)
+        {
+            return new MessageLogEntity
+            {
+                SourceId = metadata.TryGetValue(StandardMetadata.SourceId),
+                Version = metadata.TryGetValue(StandardMetadata.Version),
+                Kind = metadata.TryGetValue(StandardMetadata.Kind),
+                AssemblyName = metadata.TryGetValue(StandardMetadata.AssemblyName),
+                FullName = metadata.TryGetValue(StandardMetadata.FullName),
+                Namespace = metadata.TryGetValue(StandardMetadata.Namespace),
+                TypeName = metadata.TryGetValue(StandardMetadata.TypeName),
+                SourceType = metadata.TryGetValue(StandardMetadata.SourceType),
+                CreationDate = message.CreationDate.ToString("o"),
+                LastUpdateTime = lastUpdateTimeProvider.Invoke(),
+                Payload = serializer.Serialize(message),
+            };
+        }
+
+        private MessageLogEntity CreateMessageLogEntityForCommand(IMessage message, IDictionary<string, string> metadata)
+        {
+            return new MessageLogEntity
+            {
+                //Id = Guid.NewGuid(),
+                SourceId = metadata.TryGetValue(StandardMetadata.SourceId),
+                Version = metadata.TryGetValue(StandardMetadata.Version),
+                Kind = metadata.TryGetValue(StandardMetadata.Kind),
+                AssemblyName = metadata.TryGetValue(StandardMetadata.AssemblyName),
+                FullName = metadata.TryGetValue(StandardMetadata.FullName),
+                Namespace = metadata.TryGetValue(StandardMetadata.Namespace),
+                TypeName = metadata.TryGetValue(StandardMetadata.TypeName),
+                SourceType = metadata.TryGetValue(StandardMetadata.SourceType),
+                CreationDate = message.CreationDate.ToString("o"),
+                LastUpdateTime = this.lastUpdateTimeProvider.Invoke(),
+                Payload = serializer.Serialize(message),
+            };
         }
 
         public abstract T Find(Guid id);

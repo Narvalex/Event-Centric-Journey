@@ -21,7 +21,7 @@ namespace SimpleInventario.Handlers
                 actor = new Inventario(command.IdEmpresa);
 
             actor.Handle(command);
-            this.store.Save(actor, command.Id, command.CreationDate);
+            this.store.Save(actor, command);
         }
     }
 }

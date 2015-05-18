@@ -11,10 +11,10 @@ namespace Journey.Messaging.Processing
     {
         private readonly IEventDispatcher messageDispatcher;
 
-        public EventProcessor(IMessageReceiver receiver, ITextSerializer serializer, ITracer tracer)
+        public EventProcessor(IMessageReceiver receiver, ITextSerializer serializer, ITracer tracer, IEventDispatcher messageDispatcher)
             : base(receiver, serializer, tracer)
         {
-            this.messageDispatcher = new AsynchronousEventDispatcher(base.tracer);
+            this.messageDispatcher = messageDispatcher;
         }
 
         public void Register(IEventHandler eventHandler)

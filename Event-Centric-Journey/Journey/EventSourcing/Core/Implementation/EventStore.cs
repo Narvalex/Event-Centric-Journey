@@ -1,5 +1,6 @@
 ﻿using Journey.Database;
 using Journey.Messaging;
+using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
 using Journey.Utils;
@@ -103,10 +104,8 @@ namespace Journey.EventSourcing
             return null;
         }
 
-        public override void Save(T eventSourced, IMessage message)
+        protected override void Save(T eventSourced, Guid correlationId, DateTime creationDate, MessageLogEntity messageLogEntity)
         {
-
-
             var events = eventSourced.Events.ToArray();
             if (events.Count() == 0)
             {
@@ -121,67 +120,68 @@ namespace Journey.EventSourcing
 
             using (var context = this.contextFactory.Invoke())
             {
-                try
+                TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = true;
+
+                using (var dbContextTransaction = context.Database.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
-                    TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = true;
-
-                    using (var dbContextTransaction = context.Database.BeginTransaction(IsolationLevel.ReadCommitted))
+                    try
                     {
-                        try
+                        var eventsSet = context.Set<Event>();
+
+                        foreach (var e in events)
                         {
-                            var eventsSet = context.Set<Event>();
-
-                            foreach (var e in events)
-                            {
-                                // le pasamos el command id para que se serialice
-                                e.CorrelationId = correlationId;
-                                // la fecha en que se creó el evento
-                                e.CreationDate = creationDate;
-                                eventsSet.Add(this.Serialize(e));
-                            }
-
-                            this.GuaranteeIncrementalEventVersionStoring(eventSourced, events, context);
-
-
-
-                            var correlationIdString = correlationId.ToString();
-                            this.eventBus.Publish(events.Select(e => new Envelope<IEvent>(e) { CorrelationId = correlationIdString }), context);
-
-                            if (commands != null && commands.Count() > 0)
-                                this.commandBus.Send(commands.Select(c => new Envelope<ICommand>(c) { CorrelationId = correlationIdString }), context);
-
-                            context.SaveChanges();
-
-                            dbContextTransaction.Commit();
-
-                            this.cacheMementoIfApplicable.Invoke(eventSourced);
+                            // le pasamos el command id para que se serialice
+                            e.CorrelationId = correlationId;
+                            // la fecha en que se creó el evento
+                            e.CreationDate = creationDate;
+                            eventsSet.Add(this.Serialize(e));
                         }
-                        catch (EventStoreConcurrencyException)
-                        {
-                            try { this.RollbackEventAppending(eventSourced, dbContextTransaction); }
-                            catch (Exception) { }
-                            throw;
-                        }
-                        catch (DbUpdateException e)
-                        {
-                            try { this.RollbackEventAppending(eventSourced, dbContextTransaction); }
-                            catch (Exception) { }
-                            finally
-                            {
-                                throw new EventStoreConcurrencyException(
+
+                        // Guarantee that only incremental versions of the event are stored
+                        var lastCommitedVersion = GetLastComitedVersion(eventSourced, context);
+                        if (lastCommitedVersion + 1 != events[0].Version)
+                            throw new EventStoreConcurrencyException("Exception on 'Guarantee Incremental Event Version Storing' operation");
+
+
+
+                        var correlationIdString = correlationId.ToString();
+                        this.eventBus.Publish(events.Select(e => new Envelope<IEvent>(e) { CorrelationId = correlationIdString }), context);
+
+                        if (commands != null && commands.Count() > 0)
+                            this.commandBus.Send(commands.Select(c => new Envelope<ICommand>(c) { CorrelationId = correlationIdString }), context);
+
+                        context.AddToUnityOfWork(messageLogEntity);
+
+                        context.SaveChanges();
+
+                        dbContextTransaction.Commit();
+
+                        this.cacheMementoIfApplicable.Invoke(eventSourced);
+                    }
+                    catch (EventStoreConcurrencyException)
+                    {
+                        try { this.RollbackEventAppending(eventSourced, dbContextTransaction); }
+                        catch (Exception) { }
+                        throw;
+                    }
+                    catch (DbUpdateException e)
+                    {
+                        try { this.RollbackEventAppending(eventSourced, dbContextTransaction); }
+                        catch (Exception) { }
+
+                        var lastCommitedVersion = GetLastComitedVersion(eventSourced, context);
+
+                        if (lastCommitedVersion + 1 != events[0].Version)
+                            throw new EventStoreConcurrencyException(
                                 string.Format("Exeption on appending events to store. See inner message. {0}", e.Message),
                                 e.InnerException);
-                            }
-                        }
+                        else
+                            throw;
                     }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-                finally
-                {
-                    TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = false;
+                    finally
+                    {
+                        TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = false;
+                    }
                 }
             }
         }
@@ -192,10 +192,7 @@ namespace Journey.EventSourcing
             this.markCacheAsStale(eventSourced.Id);
         }
 
-        /// <summary>
-        /// Guarantee that only incremental versions of the event are stored
-        /// </summary>
-        private void GuaranteeIncrementalEventVersionStoring(T eventSourced, IVersionedEvent[] events, EventStoreDbContext context)
+        private int GetLastComitedVersion(T eventSourced, EventStoreDbContext context)
         {
             // Checking if this is the first ever event for this aggregate
             // Another option could be use the T-SQL method 'ISNULL'.
@@ -213,10 +210,7 @@ e
             new SqlParameter("@SourceId", eventSourced.Id),
             new SqlParameter("@SourceType", _sourceType))
             .FirstOrDefault() as int? ?? default(int);
-
-
-            if (lastCommitedVersion + 1 != events[0].Version)
-                throw new EventStoreConcurrencyException("Exception on 'Guarantee Incremental Event Version Storing' operation");
+            return lastCommitedVersion;
         }
     }
 }

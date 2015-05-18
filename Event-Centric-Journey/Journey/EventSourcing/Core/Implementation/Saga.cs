@@ -12,11 +12,12 @@ namespace Journey.EventSourcing
     /// implementor. Maybe it would be better if instead of using current sate values (properties in C# and columns in the SQL Database),
     /// we use event sourcing.
     /// </remarks>
-    public abstract class Saga : EventSourced, ISaga
+    public abstract class Saga : ComplexEventProcessor, ISaga
     {
         private readonly List<ICommand> commands = new List<ICommand>();
 
-        protected Saga(Guid id) : base(id) 
+        protected Saga(Guid id)
+            : base(id)
         { }
 
         public IEnumerable<ICommand> Commands { get { return this.commands; } }

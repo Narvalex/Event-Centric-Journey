@@ -1,11 +1,11 @@
 ﻿using Journey.EventSourcing.ReadModeling;
 using Journey.Messaging.Processing;
+using Journey.Utils;
 using SimpleInventario.ReadModel;
 using SimpleInventario.ReadModel.Entities;
 using SimpleInventario.Reporting.Events;
 using System;
 using System.Linq;
-using Journey.Utils;
 
 namespace SimpleInventario.ReadModeling
 {

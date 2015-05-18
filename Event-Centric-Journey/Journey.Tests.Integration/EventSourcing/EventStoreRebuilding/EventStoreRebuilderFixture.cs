@@ -7,6 +7,7 @@ using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
+using Journey.Tests.Integration.EventSourcing.Helpers;
 using Journey.Utils.SystemTime;
 using Journey.Worker;
 using Journey.Worker.Config;
@@ -298,7 +299,7 @@ namespace Journey.Tests.Integration.EventSourcing.EventStoreRebuilderFixture
                 if (aggregate == null)
                     aggregate = new FakeItemsSaga(command.ItemGuid);
                 aggregate.Handle(command);
-                this.store.Save(aggregate, command.Id, new DateTime());
+                this.store.Save(aggregate, new FakeCommand(Guid.Empty));
             }
 
             public void Handle(ItemAdded e)

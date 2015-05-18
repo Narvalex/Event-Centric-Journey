@@ -1,7 +1,9 @@
 ﻿using Journey.Database;
 using Journey.EventSourcing;
 using Journey.Messaging;
+using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
+using Journey.Tests.Integration.EventSourcing.Helpers;
 using Journey.Utils.SystemTime;
 using Journey.Worker;
 using Moq;
@@ -62,7 +64,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
-                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime()));
+                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime()), new StandardMetadataProvider());
 
                     this.aggregateId = Guid.NewGuid();
 
@@ -70,7 +72,7 @@ namespace Journey.Tests.Integration.EventSourcing
                     var aggregate = new FakeItemsAggregate(aggregateId);
                     aggregate.AddItem(item.Id, item.Name, 10);
 
-                    this.sut.Save(aggregate, Guid.NewGuid(), new DateTime());
+                    this.sut.Save(aggregate, new FakeCommand(this.aggregateId));
 
                     var retrivedAggregate = this.sut.Find(aggregateId);
                     Assert.NotNull(retrivedAggregate);
@@ -85,7 +87,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
-                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime()));
+                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime()), new StandardMetadataProvider());
                     
                     this.aggregateId = Guid.NewGuid();
 
@@ -98,7 +100,7 @@ namespace Journey.Tests.Integration.EventSourcing
                     aggregate.AddItem(item2.Id, item2.Name, 10);
                     aggregate.AddItem(item.Id, item.Name, 5);
 
-                    this.sut.Save(aggregate, Guid.NewGuid(), new DateTime());
+                    this.sut.Save(aggregate, new FakeCommand(Guid.Empty));
 
                     var retrivedAggregate = this.sut.Find(aggregateId);
 
@@ -115,7 +117,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 using (var context = new EventStoreDbContext(this.connectionString))
                 {
-                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime()));
+                    this.sut = new InMemoryEventStore<FakeItemsAggregate>(this.bus, this.serializer, context, new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime()), new StandardMetadataProvider());
                     this.aggregateId = Guid.NewGuid();
 
                     var item = new Item { Id = 1, Name = "item1" };
@@ -127,7 +129,7 @@ namespace Journey.Tests.Integration.EventSourcing
                     aggregate.AddItem(item2.Id, item2.Name, 10);
                     aggregate.AddItem(item.Id, item.Name, 5);
 
-                    this.sut.Save(aggregate, Guid.NewGuid(), new DateTime());
+                    this.sut.Save(aggregate, new FakeCommand(Guid.Empty));
 
                     var retrivedAggregate = this.sut.Find(aggregateId);
 
@@ -140,7 +142,7 @@ namespace Journey.Tests.Integration.EventSourcing
                     retrivedAggregate.RemoveItem(item2.Id, 7);
                     retrivedAggregate.RemoveItem(item.Id, 2);
 
-                    this.sut.Save(retrivedAggregate, Guid.NewGuid(), new DateTime()); 
+                    this.sut.Save(retrivedAggregate, new FakeCommand(Guid.Empty)); 
 
                     var overRetrivedAggregate = this.sut.Find(aggregateId);
 

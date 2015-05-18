@@ -14,7 +14,7 @@ namespace Journey.Messaging.Processing
     public class CommandProcessor : MessageProcessor, ICommandHandlerRegistry, ICommandProcessor
     {
         private Dictionary<Type, ICommandHandler> handlers = new Dictionary<Type, ICommandHandler>();
-        private readonly ICommandBusTransientFaultDetector faultDetector;
+        private readonly IBusTransientFaultDetector faultDetector;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandProcessor"/> class.
@@ -22,7 +22,7 @@ namespace Journey.Messaging.Processing
         /// <param name="receiver">The receiver to use. If the receiver is <see cref="IDisposable"/>, it will be
         ///  disposed.</param>
         /// <param name="serializer">The serializer to use for the message body.</param>
-        public CommandProcessor(IMessageReceiver receiver, ITextSerializer serializer, ITracer tracer, ICommandBusTransientFaultDetector faultDetector)
+        public CommandProcessor(IMessageReceiver receiver, ITextSerializer serializer, ITracer tracer, IBusTransientFaultDetector faultDetector)
             : base(receiver, serializer, tracer)
         {
             this.faultDetector = faultDetector;
@@ -61,24 +61,17 @@ namespace Journey.Messaging.Processing
             if (this.handlers.TryGetValue(commandType, out handler))
             {
 
-                lock (handler)
-                {
-                    // Esto es util por si el comando no se borro todavia, pero se proceso en el event store
-                    // If command was already processed, then no op in processing, but maybe we can log it
-                    if (!this.faultDetector.CommandWasAlreadyProcessed(payload))
-                    {
-                        // Actualy handling the message
-                        this.HandleMessage(payload, handler);
-                    }
+                // Actualy handling the message
+                this.HandleMessage(payload, handler);
 
 
-                    // There can be a generic logging/tracing/auditing handlers
-                    // El message log verifica que no existe el comando en el log
-                    if (this.handlers.TryGetValue(typeof(ICommand), out handler))
-                    {
-                        this.HandleMessage(payload, handler);
-                    }
-                }
+                // There can be a generic logging/tracing/auditing handlers
+                // El message log verifica que no existe el comando en el log
+                // Esto lo comentamos por que el propio event store loguea los comandos
+                //if (this.handlers.TryGetValue(typeof(ICommand), out handler))
+                //{
+                //    this.HandleMessage(payload, handler);
+                //}
             }
         }
 
@@ -91,11 +84,9 @@ namespace Journey.Messaging.Processing
             {
                 try
                 {
-                    //if (CommandingConcurrencyResolver.ThrottlingDetected)
-                    //    if (this.resolver.HandlerIsThrottled(handler))
-                    //        resolver.HandleConcurrentMessage(payload, handler);
+                    if (!this.faultDetector.MessageWasAlreadyProcessed(payload))
+                        ((dynamic)handler).Handle((dynamic)payload);
 
-                    ((dynamic)handler).Handle((dynamic)payload);
                     break;
                 }
                 catch (EventStoreConcurrencyException e)

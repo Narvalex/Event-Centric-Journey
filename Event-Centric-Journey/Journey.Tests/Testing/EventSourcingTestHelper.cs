@@ -1,5 +1,6 @@
 ﻿using Journey.EventSourcing;
 using Journey.Messaging;
+using Journey.Messaging.Logging.Metadata;
 using Journey.Messaging.Processing;
 using System;
 using System.Collections.Generic;
@@ -95,10 +96,12 @@ namespace Journey.Tests.Testing
             public readonly List<IVersionedEvent> History = new List<IVersionedEvent>();
             private readonly Action<T, string, DateTime> onSave;
             private readonly Func<Guid, IEnumerable<IVersionedEvent>, T> entityFactory;
+            private readonly IMetadataProvider metadataProvider;
 
             internal EventStoreStub(Action<T, string, DateTime> onSave)
             {
                 this.onSave = onSave;
+                this.metadataProvider = new StandardMetadataProvider();
                 var constructor = typeof(T).GetConstructor(new[] { typeof(Guid), typeof(IEnumerable<IVersionedEvent>) });
                 if (constructor == null)
                 {
@@ -117,9 +120,25 @@ namespace Journey.Tests.Testing
                 return default(T);
             }
 
-            void IEventStore<T>.Save(T eventSourced, Guid correlationId, DateTime dateTime)
+            private void Save(T eventSourced, Guid correlationId, DateTime dateTime)
             {
                 this.onSave(eventSourced, correlationId.ToString(), dateTime);
+            }
+
+            void IEventStore<T>.Save(T eventSourced, IMessage message)
+            {
+                var metadata = this.metadataProvider.GetMetadata(message);
+
+                switch (metadata[StandardMetadata.Kind])
+                {
+                    case StandardMetadata.EventKind:
+                        this.Save(eventSourced, ((IVersionedEvent)message).CorrelationId, message.CreationDate);
+                        break;
+
+                    case StandardMetadata.CommandKind:
+                        this.Save(eventSourced, ((ICommand)message).Id, message.CreationDate);
+                        break;
+                }
             }
 
             T IEventStore<T>.Get(Guid id)

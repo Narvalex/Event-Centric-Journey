@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Journey.Messaging.Processing
 {
-    public class CommandBusTransientFaultDetector : ICommandBusTransientFaultDetector
+    public class CommandBusTransientFaultDetector : IBusTransientFaultDetector
     {
         private readonly SqlCommandWrapper sql;
 
@@ -13,10 +13,10 @@ namespace Journey.Messaging.Processing
             this.sql = new SqlCommandWrapper(connectionString);
         }
 
-        public bool CommandWasAlreadyProcessed(object payload)
+        public bool MessageWasAlreadyProcessed(object payload)
         {
             return this.sql.ExecuteReader(@"
-            select count(*) from  EventStore.Events where CorrelationId = @CommandId
+            select count(*) from  MessageLog.Messages where SourceId = @CommandId
             ", r => r.SafeGetInt32(0) > 0 ? true : false,
                 new SqlParameter("@CommandId", ((dynamic)payload).Id)).FirstOrDefault();
         }

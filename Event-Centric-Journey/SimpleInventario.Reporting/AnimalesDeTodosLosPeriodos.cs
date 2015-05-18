@@ -12,7 +12,7 @@ namespace SimpleInventario.Reporting
     /// No se deberia crear uno que diga reporting. Quizas esto se utilice como logica para otros procesos y 
     /// no quede simplemente como un modulo netamente de reportes.
     /// </summary>
-    public class AnimalesDeTodosLosPeriodos : EventSourced, IMementoOriginator,
+    public class AnimalesDeTodosLosPeriodos : ComplexEventProcessor, IMementoOriginator,
         ISubscribedTo<SeAgregaronAnimalesAlInventario>,
         IRehydratesFrom<SeActualizoResumenDeAnimalesPorPeriodo>
     {
@@ -23,13 +23,13 @@ namespace SimpleInventario.Reporting
         { }
 
         public AnimalesDeTodosLosPeriodos(Guid id, IEnumerable<IVersionedEvent> history)
-            : base(id)
+            : this(id)
         {
             base.LoadFrom(history);
         }
 
         public AnimalesDeTodosLosPeriodos(Guid id, IMemento memento, IEnumerable<IVersionedEvent> history)
-            : base(id)
+            : this(id)
         {
             var state = memento as Memento;
             base.Version = state.Version;
@@ -56,17 +56,17 @@ namespace SimpleInventario.Reporting
             public KeyValuePair<int, int>[] AnimalesPorPeriodo { get; private set; }
         }
 
-        public void Consume(SeAgregaronAnimalesAlInventario e)
+        void ISubscribedTo<SeAgregaronAnimalesAlInventario>.Process(SeAgregaronAnimalesAlInventario e)
         {
             this.ComprobarPeriodo(e.Periodo);
 
             this.animalesPorPeriodo[e.Periodo] += e.Cantidad;
 
             base.Update(new SeActualizoResumenDeAnimalesPorPeriodo
-                {
-                    Periodo = e.Periodo,
-                    CantidadDeAnimales = this.animalesPorPeriodo[e.Periodo]
-                });
+            {
+                Periodo = e.Periodo,
+                CantidadDeAnimales = this.animalesPorPeriodo[e.Periodo]
+            });
         }
 
         public void Rehydrate(SeActualizoResumenDeAnimalesPorPeriodo e)

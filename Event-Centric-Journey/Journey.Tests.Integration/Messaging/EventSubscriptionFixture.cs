@@ -4,6 +4,7 @@ using Journey.Messaging.Processing;
 using System;
 using System.Diagnostics;
 using Xunit;
+using Moq;
 
 namespace Journey.Tests.Integration.Messaging.EventSubscriptionFixture
 {

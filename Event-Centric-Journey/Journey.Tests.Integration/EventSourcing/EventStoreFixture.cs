@@ -1,7 +1,9 @@
 ﻿using Journey.Database;
 using Journey.EventSourcing;
 using Journey.Messaging;
+using Journey.Messaging.Logging.Metadata;
 using Journey.Serialization;
+using Journey.Tests.Integration.EventSourcing.Helpers;
 using Journey.Utils.SystemTime;
 using Journey.Worker;
 using Moq;
@@ -54,7 +56,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 Assert.Throws<InvalidCastException>(() => this.sut =
                     new EventStore<FakePretendingEventSourcedAggregate>(eventBusMock.Object, commandBusMock.Object, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime())));
+                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("test", new LocalDateTime()), new StandardMetadataProvider()));
             }
 
             private static ITextSerializer CreateSerializer()
@@ -105,7 +107,7 @@ namespace Journey.Tests.Integration.EventSourcing
             {
                 Assert.Throws<InvalidCastException>(() => this.sut =
                     new EventStore<FakePretendingEventSourcedMementoAggregate>(eventBusMock.Object, commandBusMock.Object, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime())));
+                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime()), new StandardMetadataProvider()));
             }
 
             private static ITextSerializer CreateSerializer()
@@ -163,7 +165,7 @@ namespace Journey.Tests.Integration.EventSourcing
 
                 this.sut =
                     new EventStore<FakeItemsAggregate>(this.eventBus, this.commandBus, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime()));
+                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime()), new StandardMetadataProvider());
             }
 
             [Fact]
@@ -175,7 +177,7 @@ namespace Journey.Tests.Integration.EventSourcing
                 var aggregate = new FakeItemsAggregate(aggregateId);
                 aggregate.AddItem(item.Id, item.Name, 10);
 
-                this.sut.Save(aggregate, Guid.NewGuid(), new DateTime());
+                this.sut.Save(aggregate, new FakeCommand(Guid.Empty));
 
                 var retrivedAggregate = this.sut.Find(aggregateId);
                 Assert.NotNull(retrivedAggregate);
@@ -198,7 +200,7 @@ namespace Journey.Tests.Integration.EventSourcing
                 aggregate.AddItem(item2.Id, item2.Name, 10);
                 aggregate.AddItem(item.Id, item.Name, 5);
 
-                this.sut.Save(aggregate, Guid.NewGuid(), new DateTime());
+                this.sut.Save(aggregate, new FakeCommand(Guid.Empty));
 
                 var retrivedAggregate = this.sut.Find(aggregateId);
 
@@ -223,7 +225,7 @@ namespace Journey.Tests.Integration.EventSourcing
                 aggregate.AddItem(item2.Id, item2.Name, 10);
                 aggregate.AddItem(item.Id, item.Name, 5);
 
-                this.sut.Save(aggregate, Guid.NewGuid(), new DateTime());
+                this.sut.Save(aggregate, new FakeCommand(Guid.Empty));
 
                 var retrivedAggregate = this.sut.Find(aggregateId);
 
@@ -236,7 +238,7 @@ namespace Journey.Tests.Integration.EventSourcing
                 retrivedAggregate.RemoveItem(item2.Id, 7);
                 retrivedAggregate.RemoveItem(item.Id, 2);
 
-                this.sut.Save(retrivedAggregate, Guid.NewGuid(), new DateTime());
+                this.sut.Save(retrivedAggregate, new FakeCommand(Guid.Empty));
 
                 var overRetrivedAggregate = this.sut.Find(aggregateId);
 
@@ -327,7 +329,7 @@ DROP DATABASE [{0}]
 
                 this.sut =
                     new EventStore<FakeItemsSaga>(this.eventBus, this.commandBus, this.serializer,
-                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime()));
+                        () => (new EventStoreDbContext(this.connectionString)), new ConsoleTracer(), new LocalDateTime(), new InMemorySnapshotProvider("Test", new LocalDateTime()), new StandardMetadataProvider());
             }
 
             [Fact]
@@ -339,7 +341,7 @@ DROP DATABASE [{0}]
                 var saga = new FakeItemsSaga(sagaId);
                 saga.AddItem(item.Id, item.Name, 10);
 
-                this.sut.Save(saga, Guid.NewGuid(), new DateTime());
+                this.sut.Save(saga, new FakeCommand(Guid.Empty));
 
                 var retrivedAggregate = this.sut.Find(sagaId);
                 Assert.NotNull(retrivedAggregate);
@@ -362,7 +364,7 @@ DROP DATABASE [{0}]
                 saga.AddItem(item2.Id, item2.Name, 10);
                 saga.AddItem(item.Id, item.Name, 5);
 
-                this.sut.Save(saga, Guid.NewGuid(), new DateTime());
+                this.sut.Save(saga, new FakeCommand(Guid.Empty));
 
                 var retrivedSaga = this.sut.Find(sagaId);
 
@@ -387,7 +389,7 @@ DROP DATABASE [{0}]
                 saga.AddItem(item2.Id, item2.Name, 10);
                 saga.AddItem(item.Id, item.Name, 5);
 
-                this.sut.Save(saga, Guid.NewGuid(), new DateTime());
+                this.sut.Save(saga, new FakeCommand(Guid.Empty));
 
                 var retrivedSaga = this.sut.Find(sagaId);
 
@@ -400,7 +402,7 @@ DROP DATABASE [{0}]
                 retrivedSaga.RemoveItem(item2.Id, 7);
                 retrivedSaga.RemoveItem(item.Id, 2);
 
-                this.sut.Save(retrivedSaga, Guid.NewGuid(), new DateTime());
+                this.sut.Save(retrivedSaga, new FakeCommand(Guid.Empty));
 
                 var overRetrivedSaga = this.sut.Find(sagaId);
 
@@ -422,7 +424,7 @@ DROP DATABASE [{0}]
 
                 Assert.Empty(saga.Commands);
 
-                this.sut.Save(saga, Guid.NewGuid(), new DateTime());
+                this.sut.Save(saga, new FakeCommand(Guid.Empty));
 
                 var retrivedSaga = this.sut.Find(sagaId);
                 Assert.NotNull(retrivedSaga);
@@ -435,7 +437,7 @@ DROP DATABASE [{0}]
                 Assert.Equal(1, retrivedSaga.Commands.Count());
 
                 /* Command Publishing */
-                this.sut.Save(retrivedSaga, Guid.NewGuid(), new DateTime());
+                this.sut.Save(retrivedSaga, new FakeCommand(Guid.Empty));
                 var overRetrivedSaga = this.sut.Find(sagaId);
 
                 Assert.NotNull(overRetrivedSaga);

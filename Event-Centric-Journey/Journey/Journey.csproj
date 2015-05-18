@@ -88,6 +88,8 @@
     <Compile Include="Database\SqlCommandWrapper.cs" />
     <Compile Include="Database\SqlDataReaderExtensions.cs" />
     <Compile Include="Database\TransientFaultHandlingDbConfiguration.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\ComplexEventProcessor.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\ComplexVersionedEvent.cs" />
     <Compile Include="EventSourcing\Core\Implementation\EventStoreBase.cs" />
     <Compile Include="EventSourcing\Core\IEventSourced.cs" />
     <Compile Include="EventSourcing\Core\IEventStore.cs" />
@@ -163,7 +165,7 @@
     <Compile Include="Messaging\Logging\Metadata\IMetadataProvider.cs" />
     <Compile Include="Messaging\Logging\Metadata\Implementation\StandardMetadata.cs" />
     <Compile Include="Messaging\Logging\Metadata\Implementation\StandardMetadataProvider.cs" />
-    <Compile Include="Messaging\Processing\ICommandBusTransientFaultDetector.cs" />
+    <Compile Include="Messaging\Processing\IBusTransientFaultDetector.cs" />
     <Compile Include="Messaging\Processing\ICommandHandler.cs" />
     <Compile Include="Messaging\Processing\ICommandHandlerRegistry.cs" />
     <Compile Include="Messaging\Processing\ICommandProcessor.cs" />
