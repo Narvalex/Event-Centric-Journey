@@ -42,7 +42,7 @@ namespace SimpleInventario.Tests.Performance.InventarioPerformanceFixture
                         guid.NewGuid(),
                         Guid.Empty,
                         Guid.Parse("00000000-0000-0000-0000-000000000000"),
-                        Guid.Parse("00000000-0000-0000-0000-000000000005"),
+                        Guid.Parse("00000000-0000-0000-0000-000000000005"), 
                         -1,
                         2015
                     ));
