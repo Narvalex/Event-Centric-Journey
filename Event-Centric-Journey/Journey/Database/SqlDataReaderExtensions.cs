@@ -26,6 +26,19 @@ namespace Journey.Database
         }
 
         /// <summary>
+        /// Gets the value of the specified column as a string in Null-Safe mode.
+        /// </summary>
+        /// <param name="reader">The <see cref="SqlDataReader"/> instance.</param>
+        /// <param name="name">The column name.</param>
+        public static string SafeGetString(this IDataReader reader, string name)
+        {
+            if (reader[name] != null)
+                return reader[name] as string;
+            else
+                return string.Empty;
+        }
+
+        /// <summary>
         /// Gets the value of the specified column as a string in Null-Safe mode. Also trims the string to eliminate white spaces.
         /// </summary>
         /// <param name="reader">The <see cref="SqlDataReader"/> instance.</param>
@@ -34,6 +47,19 @@ namespace Journey.Database
         {
             if (!reader.IsDBNull(i))
                 return reader.GetString(i).Trim();
+            else
+                return string.Empty;
+        }
+
+        /// <summary>
+        /// Gets the value of the specified column as a string in Null-Safe mode. Also trims the string to eliminate white spaces.
+        /// </summary>
+        /// <param name="reader">The <see cref="SqlDataReader"/> instance.</param>
+        /// <param name="name">The zero-based column ordinal.</param>
+        public static string SafeGetAndTrimString(this IDataReader reader, string name)
+        {
+            if (reader[name] != null)
+                return ((string)reader[name]).Trim();
             else
                 return string.Empty;
         }
@@ -49,6 +75,18 @@ namespace Journey.Database
                 return reader.GetInt32(i);
             else
                 return default(int);
+        }
+
+        /// <summary>
+        /// Gets the value of the specified column as a an int in Null-Safe mode.
+        /// </summary>
+        /// <param name="reader">The <see cref="SqlDataReader"/> instance.</param>
+        /// <param name="name">The column name.</param>
+        public static int SafeGetInt32(this IDataReader reader, string name)
+        {
+            int number;
+            int.TryParse(reader[name].ToString(), out number);
+            return number;
         }
 
         /// <summary>
@@ -140,6 +178,21 @@ namespace Journey.Database
                 return reader.GetBoolean(i);
             else
                 return default(bool);
+        }
+
+        /// <summary>
+        /// Gets the value of the specified column as a DateTime in Null-Safe mode.
+        /// </summary>
+        /// <param name="reader">The <see cref="SqlDataReader"/> instance.</param>
+        /// <param name="i">The name of the column.</param>
+        public static bool SafeGetBool(this IDataReader reader, string name)
+        {
+            int number;
+            int.TryParse(reader[name].ToString(), out number);
+            if (number > 0)
+                return true;
+            else
+                return false;
         }
     }
 }
