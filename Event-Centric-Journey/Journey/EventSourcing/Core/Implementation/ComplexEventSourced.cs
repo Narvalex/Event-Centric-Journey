@@ -6,8 +6,8 @@ using System.Linq;
 namespace Journey.EventSourcing
 {
     public abstract class ComplexEventSourced : EventSourced,
-        IRehydratesFrom<EarlyEventReceived<IVersionedEvent>>,
-        IRehydratesFrom<CorrelatedEventProcessed<IVersionedEvent>>
+        IRehydratesFrom<EarlyEventReceived>,
+        IRehydratesFrom<CorrelatedEventProcessed>
     {
         private readonly IDictionary<string, int> lastProcessedEvents;
         private readonly IList<IVersionedEvent> earlyReceivedEvents;
@@ -34,9 +34,10 @@ namespace Journey.EventSourcing
             {
                 // el evento vino en el orden correcto
                 ((dynamic)this).Process((dynamic)@event);
-                base.Update(new CorrelatedEventProcessed<IVersionedEvent>
+                base.Update(new CorrelatedEventProcessed
                     {
-                        Event = @event
+                        CorrelatedEventTypeName = eventTypeName,
+                        CorrelatedEventVersion = @event.Version
                     });
 
                 this.ProcessEarlyEventsIfApplicable();
@@ -51,7 +52,7 @@ namespace Journey.EventSourcing
                     return false;
 
                 // el evento vino prematuramente, se almacena para procesarlo en el orden correcto
-                this.Update(new EarlyEventReceived<IVersionedEvent>
+                this.Update(new EarlyEventReceived
                 {
                     Event = @event
                 });
@@ -87,26 +88,23 @@ namespace Journey.EventSourcing
             }
         }
 
-        public void Rehydrate(EarlyEventReceived<IVersionedEvent> e)
+        public void Rehydrate(EarlyEventReceived e)
         {
-            this.earlyReceivedEvents.Add(e.Event);
+            this.earlyReceivedEvents.Add((IVersionedEvent)e.Event);
         }
 
-        public void Rehydrate(CorrelatedEventProcessed<IVersionedEvent> e)
+        public void Rehydrate(CorrelatedEventProcessed e)
         {
-            var correlated = e.Event;
-            var eventTypeName = ((object)correlated).GetType().FullName;
-
             // Marcamos como evento procesado en la lista de eventos procesados
-            if (this.lastProcessedEvents.ContainsKey(eventTypeName))
-                this.lastProcessedEvents[eventTypeName] = correlated.Version;
+            if (this.lastProcessedEvents.ContainsKey(e.CorrelatedEventTypeName))
+                this.lastProcessedEvents[e.CorrelatedEventTypeName] = e.Version;
             else
-                this.lastProcessedEvents.Add(eventTypeName, correlated.Version);
+                this.lastProcessedEvents.Add(e.CorrelatedEventTypeName, e.CorrelatedEventVersion);
 
             // Verificar aqui si esta en la lista o no.
             var earlyEvent = this.earlyReceivedEvents
-                .Where(x => ((object)x).GetType().FullName == eventTypeName
-                                && x.Version == correlated.Version)
+                .Where(x => ((object)x).GetType().FullName == e.CorrelatedEventTypeName
+                                && x.Version == e.CorrelatedEventVersion)
                 .FirstOrDefault();
 
             if (earlyEvent != null)
@@ -114,13 +112,14 @@ namespace Journey.EventSourcing
         }
     }
 
-    public class EarlyEventReceived<T> : VersionedEvent where T : IVersionedEvent
+    public class EarlyEventReceived : VersionedEvent
     {
-        public T Event { get; set; }
+        public object Event { get; set; }
     }
 
-    public class CorrelatedEventProcessed<T> : VersionedEvent where T : IVersionedEvent
+    public class CorrelatedEventProcessed : VersionedEvent
     {
-        public T Event { get; set; }
+        public string CorrelatedEventTypeName { get; set; }
+        public int CorrelatedEventVersion { get; set; }
     }
 }

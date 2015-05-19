@@ -32,9 +32,5 @@ namespace Journey.EventSourcing
         public Guid CorrelationId { get; set; }
 
         public DateTime CreationDate { get; set; }
-
-        public string CorrelatedEventType { get; set; }
-
-        public int CorrelatedSourceVersion { get; set; }
     }
 }
