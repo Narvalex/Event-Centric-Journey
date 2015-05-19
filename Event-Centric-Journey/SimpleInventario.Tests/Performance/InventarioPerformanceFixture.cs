@@ -25,7 +25,7 @@ namespace SimpleInventario.Tests.Performance.InventarioPerformanceFixture
         public void CUANDO_se_envian_comandos_masivamente_ENTONCES_se_procesan_rapidamente()
         {
             var guid = new SequentialGuid();
-            var commandsToSendCount = 100;
+            var commandsToSendCount = 10;
 
             var commands = new List<ICommand>();
             for (int i = 0; i < commandsToSendCount; i++)

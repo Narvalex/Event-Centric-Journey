@@ -16,12 +16,15 @@ namespace SimpleInventario.Handlers
 
         public void Handle(AgregarAnimales command)
         {
-            var actor = this.store.Find(command.IdEmpresa);
-            if (actor == null)
-                actor = new Inventario(command.IdEmpresa);
+            lock (this)
+            {
+                var actor = this.store.Find(command.IdEmpresa);
+                if (actor == null)
+                    actor = new Inventario(command.IdEmpresa);
 
-            actor.Handle(command);
-            this.store.Save(actor, command);
+                actor.Handle(command);
+                this.store.Save(actor, command);
+            }
         }
     }
 }

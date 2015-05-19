@@ -12,7 +12,10 @@ namespace SimpleInventario.Reporting
     /// No se deberia crear uno que diga reporting. Quizas esto se utilice como logica para otros procesos y 
     /// no quede simplemente como un modulo netamente de reportes.
     /// </summary>
-    public class AnimalesDeTodosLosPeriodos : ComplexEventProcessor, IMementoOriginator,
+    /// <remarks>
+    /// Is an <see cref="IMementoOriginator"/>
+    /// </remarks>
+    public class AnimalesDeTodosLosPeriodos : ComplexEventSourced,
         ISubscribedTo<SeAgregaronAnimalesAlInventario>,
         IRehydratesFrom<SeActualizoResumenDeAnimalesPorPeriodo>
     {
@@ -56,7 +59,7 @@ namespace SimpleInventario.Reporting
             public KeyValuePair<int, int>[] AnimalesPorPeriodo { get; private set; }
         }
 
-        void ISubscribedTo<SeAgregaronAnimalesAlInventario>.Process(SeAgregaronAnimalesAlInventario e)
+        public void Process(SeAgregaronAnimalesAlInventario e)
         {
             this.ComprobarPeriodo(e.Periodo);
 

@@ -16,7 +16,7 @@ namespace Journey.EventSourcing
 
         private readonly Guid id;
         //private int version = -1;
-        private int version = 0;
+        protected int version = 0;
 
         protected EventSourced(Guid id)
         {
@@ -45,7 +45,7 @@ namespace Journey.EventSourcing
             get { return this.pendingEvents; }
         }
 
-        protected void LoadFrom(IEnumerable<IVersionedEvent> pastEvents)
+        protected virtual void LoadFrom(IEnumerable<IVersionedEvent> pastEvents)
         {
             foreach (var @event in pastEvents)
             {
@@ -54,7 +54,7 @@ namespace Journey.EventSourcing
             }
         }
 
-        protected void Update(VersionedEvent @event)
+        protected virtual void Update(VersionedEvent @event)
         {
             @event.SourceId = this.Id;
             @event.Version = this.version + 1;

@@ -20,12 +20,17 @@ namespace SimpleInventario.Reporting
 
         public void Handle(SeAgregaronAnimalesAlInventario e)
         {
-            var aggregate = this.store.Find(e.IdEmpresa);
-            if (aggregate == null)
-                aggregate = new AnimalesDeTodosLosPeriodos(e.IdEmpresa);
+            lock (this)
+            {
+                //Thread.Sleep(TimeSpan.MaxValue);
 
-            aggregate.Consume(e);
-            this.store.Save(aggregate, e);
+                var aggregate = this.store.Find(e.IdEmpresa);
+                if (aggregate == null)
+                    aggregate = new AnimalesDeTodosLosPeriodos(e.IdEmpresa);
+
+                if (aggregate.TryProcessWithGuaranteedIdempotency(e))
+                    this.store.Save(aggregate, e);
+            }
         }
     }
 }
