@@ -1,6 +1,8 @@
 ﻿using Journey.EventSourcing;
 using Journey.Messaging.Processing;
 using SimpleInventario.Events;
+using System;
+using System.Threading;
 
 namespace SimpleInventario.Reporting
 {

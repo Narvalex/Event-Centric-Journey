@@ -22,22 +22,23 @@ namespace Journey.EventSourcing
         public bool TryProcessWithGuaranteedIdempotency(IVersionedEvent @event)
         {
             var eventTypeName = ((object)@event).GetType().FullName;
+            var eventVersion = @event.Version;
 
             var lastProcessedEventVersion = this.lastProcessedEvents.TryGetValue(eventTypeName);
 
-            if (@event.Version <= lastProcessedEventVersion)
+            if (eventVersion <= lastProcessedEventVersion)
             {
                 // el evento ya fue procesado.
                 return false;
             }
-            else if (lastProcessedEventVersion == @event.Version - 1)
+            else if (lastProcessedEventVersion == eventVersion - 1)
             {
                 // el evento vino en el orden correcto
                 ((dynamic)this).Process((dynamic)@event);
                 base.Update(new CorrelatedEventProcessed
                     {
                         CorrelatedEventTypeName = eventTypeName,
-                        CorrelatedEventVersion = @event.Version
+                        CorrelatedEventVersion = eventVersion
                     });
 
                 this.ProcessEarlyEventsIfApplicable();
@@ -46,7 +47,7 @@ namespace Journey.EventSourcing
             {
                 // verificando que no se agregue el mismo evento con la misma version varias veces
                 if (this.earlyReceivedEvents
-                    .Where(e => e.Version == @event.Version
+                    .Where(e => e.Version == eventVersion
                            && ((object)e).GetType().FullName == eventTypeName)
                     .Any())
                     return false;
@@ -97,7 +98,7 @@ namespace Journey.EventSourcing
         {
             // Marcamos como evento procesado en la lista de eventos procesados
             if (this.lastProcessedEvents.ContainsKey(e.CorrelatedEventTypeName))
-                this.lastProcessedEvents[e.CorrelatedEventTypeName] = e.Version;
+                this.lastProcessedEvents[e.CorrelatedEventTypeName] = e.CorrelatedEventVersion;
             else
                 this.lastProcessedEvents.Add(e.CorrelatedEventTypeName, e.CorrelatedEventVersion);
 
