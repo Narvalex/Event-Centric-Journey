@@ -240,6 +240,21 @@
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="Scripts\_references.js" />
+    <None Include="Web.config.feco">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web.config.Debug.feco">
+      <DependentUpon>Web.config.feco</DependentUpon>
+    </None>
+    <None Include="Web.config.Release.feco">
+      <DependentUpon>Web.config.feco</DependentUpon>
+    </None>
+    <Content Include="Views\Web.config" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Portal\Index.cshtml" />
     <None Include="Web.config">
       <SubType>Designer</SubType>
     </None>
@@ -248,21 +263,6 @@
     </None>
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <Content Include="Views\Web.config" />
-    <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Portal\Index.cshtml" />
-    <None Include="Web.config.casa">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Web.config.Debug.casa">
-      <DependentUpon>Web.config.casa</DependentUpon>
-    </None>
-    <None Include="Web.config.Release.casa">
-      <DependentUpon>Web.config.casa</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup />

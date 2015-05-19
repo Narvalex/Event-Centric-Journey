@@ -88,8 +88,7 @@
     <Compile Include="Database\SqlCommandWrapper.cs" />
     <Compile Include="Database\SqlDataReaderExtensions.cs" />
     <Compile Include="Database\TransientFaultHandlingDbConfiguration.cs" />
-    <Compile Include="EventSourcing\Core\Implementation\ComplexEventProcessor.cs" />
-    <Compile Include="EventSourcing\Core\Implementation\ComplexVersionedEvent.cs" />
+    <Compile Include="EventSourcing\Core\Implementation\ComplexEventSourced.cs" />
     <Compile Include="EventSourcing\Core\Implementation\EventStoreBase.cs" />
     <Compile Include="EventSourcing\Core\IEventSourced.cs" />
     <Compile Include="EventSourcing\Core\IEventStore.cs" />
