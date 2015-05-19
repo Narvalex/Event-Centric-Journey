@@ -45,7 +45,7 @@ namespace Journey.EventSourcing
             get { return this.pendingEvents; }
         }
 
-        protected virtual void LoadFrom(IEnumerable<IVersionedEvent> pastEvents)
+        protected void LoadFrom(IEnumerable<IVersionedEvent> pastEvents)
         {
             foreach (var @event in pastEvents)
             {
@@ -54,7 +54,7 @@ namespace Journey.EventSourcing
             }
         }
 
-        protected virtual void Update(VersionedEvent @event)
+        protected void Update(VersionedEvent @event)
         {
             @event.SourceId = this.Id;
             @event.Version = this.version + 1;

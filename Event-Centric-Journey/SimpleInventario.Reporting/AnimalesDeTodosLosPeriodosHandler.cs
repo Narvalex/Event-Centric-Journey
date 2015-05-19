@@ -1,8 +1,6 @@
 ﻿using Journey.EventSourcing;
 using Journey.Messaging.Processing;
 using SimpleInventario.Events;
-using System;
-using System.Threading;
 
 namespace SimpleInventario.Reporting
 {
@@ -24,7 +22,7 @@ namespace SimpleInventario.Reporting
         {
             lock (this)
             {
-                //Thread.Sleep(TimeSpan.FromDays(2));
+                //throw new NotFiniteNumberException();
 
                 var aggregate = this.store.Find(e.IdEmpresa);
                 if (aggregate == null)

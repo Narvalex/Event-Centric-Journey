@@ -15,7 +15,7 @@ namespace SimpleInventario.Reporting
     /// <remarks>
     /// Is an <see cref="IMementoOriginator"/>
     /// </remarks>
-    public class AnimalesDeTodosLosPeriodos : ComplexEventSourced,
+    public class AnimalesDeTodosLosPeriodos : ComplexEventSourced, IMementoOriginator,
         ISubscribedTo<SeAgregaronAnimalesAlInventario>,
         IRehydratesFrom<SeActualizoResumenDeAnimalesPorPeriodo>
     {
@@ -26,16 +26,18 @@ namespace SimpleInventario.Reporting
         { }
 
         public AnimalesDeTodosLosPeriodos(Guid id, IEnumerable<IVersionedEvent> history)
-            : this(id)
+            : base(id)
         {
             base.LoadFrom(history);
         }
 
         public AnimalesDeTodosLosPeriodos(Guid id, IMemento memento, IEnumerable<IVersionedEvent> history)
-            : this(id)
+            : base(id)
         {
-            var state = memento as Memento;
+            var state = memento as AnimalesDeTodosLosPeriodosMemento;
             base.Version = state.Version;
+            base.lastProcessedEvents.AddRange(state.LastProcessedEvents);
+            base.earlyReceivedEvents.AddRange(state.EarlyReceivedEvents);
             // make a copy of the state values to avoid concurrency problems with reusing references.
             // uses an extension method
             this.animalesPorPeriodo.AddRange(state.AnimalesPorPeriodo);
@@ -44,18 +46,18 @@ namespace SimpleInventario.Reporting
 
         public IMemento SaveToMemento()
         {
-            return new Memento(this.Version, this.animalesPorPeriodo.ToArray());
+            return new AnimalesDeTodosLosPeriodosMemento(base.Version, base.lastProcessedEvents.ToArray(), base.earlyReceivedEvents.ToArray(), this.animalesPorPeriodo.ToArray());
         }
 
-        public class Memento : IMemento
+        public class AnimalesDeTodosLosPeriodosMemento : ComplexMemento
         {
-            public Memento(int version, KeyValuePair<int, int>[] animalesPorPeriodo)
+            public AnimalesDeTodosLosPeriodosMemento(int version, KeyValuePair<string, int>[] lastProcessedEvents, IVersionedEvent[] earlyReceivedEvents,
+                KeyValuePair<int, int>[] animalesPorPeriodo)
+                : base(version, lastProcessedEvents, earlyReceivedEvents)
             {
-                this.Version = version;
                 this.AnimalesPorPeriodo = animalesPorPeriodo;
             }
 
-            public int Version { get; private set; }
             public KeyValuePair<int, int>[] AnimalesPorPeriodo { get; private set; }
         }
 

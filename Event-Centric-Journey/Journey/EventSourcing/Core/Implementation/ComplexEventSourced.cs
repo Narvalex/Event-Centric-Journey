@@ -9,15 +9,12 @@ namespace Journey.EventSourcing
         IRehydratesFrom<EarlyEventReceived>,
         IRehydratesFrom<CorrelatedEventProcessed>
     {
-        private readonly IDictionary<string, int> lastProcessedEvents;
-        private readonly IList<IVersionedEvent> earlyReceivedEvents;
+        protected readonly IDictionary<string, int> lastProcessedEvents = new Dictionary<string, int>();
+        protected readonly IList<IVersionedEvent> earlyReceivedEvents = new List<IVersionedEvent>(100);
 
         public ComplexEventSourced(Guid id)
             : base(id)
-        {
-            this.lastProcessedEvents = new Dictionary<string, int>();
-            this.earlyReceivedEvents = new List<IVersionedEvent>();
-        }
+        { }
 
         public bool TryProcessWithGuaranteedIdempotency(IVersionedEvent @event)
         {
