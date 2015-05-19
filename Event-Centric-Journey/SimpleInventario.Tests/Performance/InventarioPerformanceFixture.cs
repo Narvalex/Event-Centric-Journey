@@ -16,8 +16,8 @@ namespace SimpleInventario.Tests.Performance.InventarioPerformanceFixture
 
         public DADO_bus()
         {
-            //var messageSender = new MessageSender(Database.DefaultConnectionFactory, "server=(local);Database=Journey;User Id=sa;pwd =123456", "Bus.Commands");
-            var messageSender = new MessageSender(Database.DefaultConnectionFactory, "Data Source=.\\sqlexpress;Initial Catalog=journey;Integrated Security=True", "Bus.Commands");
+            var messageSender = new MessageSender(Database.DefaultConnectionFactory, "server=(local);Database=Journey;User Id=sa;pwd =123456", "Bus.Commands");
+            //var messageSender = new MessageSender(Database.DefaultConnectionFactory, "Data Source=.\\sqlexpress;Initial Catalog=journey;Integrated Security=True", "Bus.Commands");
             this.bus = new CommandBus(messageSender, new JsonTextSerializer(), new LocalDateTime());
         }
 
@@ -25,7 +25,7 @@ namespace SimpleInventario.Tests.Performance.InventarioPerformanceFixture
         public void CUANDO_se_envian_comandos_masivamente_ENTONCES_se_procesan_rapidamente()
         {
             var guid = new SequentialGuid();
-            var commandsToSendCount = 10;
+            var commandsToSendCount = 4;
 
             var commands = new List<ICommand>();
             for (int i = 0; i < commandsToSendCount; i++)

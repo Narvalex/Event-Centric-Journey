@@ -22,7 +22,7 @@ namespace SimpleInventario.Reporting
         {
             lock (this)
             {
-                //Thread.Sleep(TimeSpan.MaxValue);
+                //Thread.Sleep(TimeSpan.FromDays(2));
 
                 var aggregate = this.store.Find(e.IdEmpresa);
                 if (aggregate == null)
