@@ -3,7 +3,7 @@ using System;
 
 namespace SimpleInventario.Events
 {
-    public class SeAgregaronAnimalesAlInventario : VersionedEvent
+    public class SeAgregaronAnimalesAlInventario : InternalVersionedEvent
     {
         public Guid IdEmpresa { get; set; }
         public Guid Animal { get; set; }

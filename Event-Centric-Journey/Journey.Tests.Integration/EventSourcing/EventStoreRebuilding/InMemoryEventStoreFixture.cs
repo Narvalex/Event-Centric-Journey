@@ -252,7 +252,7 @@ DROP DATABASE [{0}]
             public string Name { get; set; }
         }
 
-        public class ItemAdded : VersionedEvent
+        public class ItemAdded : InternalVersionedEvent
         {
             public ItemAdded()
             { }
@@ -262,7 +262,7 @@ DROP DATABASE [{0}]
             public int Quantity { get; set; }
         }
 
-        public class ItemRemoved : VersionedEvent
+        public class ItemRemoved : InternalVersionedEvent
         {
             public ItemRemoved()
             { }
@@ -271,7 +271,7 @@ DROP DATABASE [{0}]
             public int Quantity { get; set; }
         }
 
-        public class ItemReserved : VersionedEvent
+        public class ItemReserved : InternalVersionedEvent
         {
             public ItemReserved()
             { }

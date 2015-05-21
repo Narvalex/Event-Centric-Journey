@@ -3,7 +3,6 @@ using Journey.EventSourcing;
 using Journey.EventSourcing.EventStoreRebuilding;
 using Journey.EventSourcing.RebuildPerfCounting;
 using Journey.Messaging;
-using Journey.Messaging.Logging;
 using Journey.Messaging.Logging.Metadata;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
@@ -55,8 +54,7 @@ namespace Journey.Worker.Rebuilding
 
             container.RegisterInstance<IMetadataProvider>(new StandardMetadataProvider());
 
-            container.RegisterType<EventStoreDbContext>(new ContainerControlledLifetimeManager(), new InjectionConstructor(config.EventStoreConnectionString));
-            container.RegisterType<MessageLogDbContext>(new ContainerControlledLifetimeManager(), new InjectionConstructor(config.SourceMessageLogConnectionString));
+            container.RegisterType<EventStoreDbContext>(new ContainerControlledLifetimeManager(), new InjectionConstructor(config.NewEventStoreConnectionString));
             container.RegisterType(typeof(IEventStore<>), typeof(InMemoryEventStore<>), new ContainerControlledLifetimeManager());
 
             container.RegisterInstance<IEventDispatcher>(eventProcessor);

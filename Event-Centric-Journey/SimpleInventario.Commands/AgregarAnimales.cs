@@ -3,7 +3,7 @@ using System;
 
 namespace SimpleInventario.Commands
 {
-    public class AgregarAnimales : Command
+    public class AgregarAnimales : ExternalCommand
     {
         public AgregarAnimales(Guid id,
             Guid idEmpresa,

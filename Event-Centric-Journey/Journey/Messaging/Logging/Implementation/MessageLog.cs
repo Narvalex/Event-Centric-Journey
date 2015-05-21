@@ -1,7 +1,7 @@
 ﻿
 namespace Journey.Messaging.Logging
 {
-    public class MessageLogEntity
+    public class MessageLog
     {
         public long Id { get; set; }
         public string Kind { get; set; }
@@ -15,5 +15,6 @@ namespace Journey.Messaging.Logging
         public string CreationDate { get; set; }
         public string LastUpdateTime { get; set; }
         public string Payload { get; set; }
+        public string Origin { get; set; }
     }
 }

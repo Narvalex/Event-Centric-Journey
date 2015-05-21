@@ -72,14 +72,14 @@ namespace Journey.Tests.EventSourcing.EventSourcedAggregateFixture
         }
     }
 
-    public class Command1 : Journey.Messaging.Command
+    public class Command1 : Journey.Messaging.ExternalCommand
     {
         public Command1(Guid id)
             : base(id)
         { }
     }
 
-    public class Event1ForCommand1 : VersionedEvent
+    public class Event1ForCommand1 : InternalVersionedEvent
     {
     }
 }

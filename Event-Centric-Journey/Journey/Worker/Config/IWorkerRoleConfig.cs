@@ -11,8 +11,6 @@ namespace Journey.Worker.Config
         /// </summary>
         string EventStoreConnectionString { get; }
 
-        string MessageLogConnectionString { get; }
-
         string ReadModelConnectionString { get; }
 
         int NumberOfProcessorsThreads { get; }

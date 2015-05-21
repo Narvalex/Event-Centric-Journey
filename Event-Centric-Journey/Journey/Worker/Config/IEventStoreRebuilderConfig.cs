@@ -3,11 +3,9 @@ namespace Journey.Worker.Config
 {
     public interface IEventStoreRebuilderConfig
     {
-        string EventStoreConnectionString { get; }
+        string SourceEventStoreConnectionString { get; }
 
-        string NewMessageLogConnectionString { get; }
-
-        string SourceMessageLogConnectionString { get; }
+        string NewEventStoreConnectionString { get; }
 
         ISystemTime SystemTime { get; }
     }

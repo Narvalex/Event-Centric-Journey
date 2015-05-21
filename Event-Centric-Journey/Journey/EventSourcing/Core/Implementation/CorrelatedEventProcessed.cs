@@ -1,6 +1,6 @@
 ﻿namespace Journey.EventSourcing
 {
-    public class CorrelatedEventProcessed : VersionedEvent
+    public class CorrelatedEventProcessed : InternalVersionedEvent
     {
         public string CorrelatedEventTypeName { get; set; }
         public int CorrelatedEventVersion { get; set; }

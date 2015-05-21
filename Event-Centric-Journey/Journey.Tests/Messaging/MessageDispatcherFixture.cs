@@ -126,6 +126,12 @@ namespace Journey.Tests.Messaging.MessageDispatcherFixture
                 throw new NotImplementedException();
             }
         }
+
+
+        public bool IsExternal
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 
     public class EventB : IEvent
@@ -147,6 +153,12 @@ namespace Journey.Tests.Messaging.MessageDispatcherFixture
                 throw new NotImplementedException();
             }
         }
+
+
+        public bool IsExternal
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 
     public class EventC : IEvent
@@ -167,6 +179,12 @@ namespace Journey.Tests.Messaging.MessageDispatcherFixture
             {
                 throw new NotImplementedException();
             }
+        }
+
+
+        public bool IsExternal
+        {
+            get { throw new NotImplementedException(); }
         }
     }
 }

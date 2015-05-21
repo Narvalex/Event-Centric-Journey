@@ -45,7 +45,7 @@ namespace Journey.Tests.Integration.Client
         }
     }
 
-    public class AddItem : Command
+    public class AddItem : ExternalCommand
     {
         public AddItem(Guid id)
             : base(id)

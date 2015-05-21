@@ -110,6 +110,12 @@ namespace Journey.Tests.Messaging.CommandProcessorFixture
                     throw new NotImplementedException();
                 }
             }
+
+
+            public bool IsExternal
+            {
+                get { throw new NotImplementedException(); }
+            }
         }
 
         public class Command2 : ICommand
@@ -129,6 +135,12 @@ namespace Journey.Tests.Messaging.CommandProcessorFixture
                 {
                     throw new NotImplementedException();
                 }
+            }
+
+
+            public bool IsExternal
+            {
+                get { throw new NotImplementedException(); }
             }
         }
 

@@ -55,5 +55,11 @@
         /// The name of the entity that originated this message.
         /// </summary>
         public const string SourceType = "SourceType";
+
+        public const string Origin = "Origin";
+
+        public const string InternalOrigin = "Internal";
+
+        public const string ExternalOrigin = "External";
     }
 }

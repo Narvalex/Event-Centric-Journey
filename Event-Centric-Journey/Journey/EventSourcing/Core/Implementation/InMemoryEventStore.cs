@@ -62,7 +62,7 @@ namespace Journey.EventSourcing
             }
         }
 
-        protected override void Save(T eventSourced, Guid correlationId, DateTime creationDate, MessageLogEntity messageLogEntity)
+        protected override void Save(T eventSourced, Guid correlationId, DateTime creationDate, MessageLog messageLogEntity)
         {
             var events = eventSourced.Events.ToArray();
 

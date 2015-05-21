@@ -55,7 +55,7 @@ namespace Journey.Messaging
             using (var payloadWriter = new StringWriter())
             {
                 this.serializer.Serialize(payloadWriter, @event.Body);
-                return new MessageForDelivery(payloadWriter.ToString(), correlationId: @event.CorrelationId);
+                return new MessageForDelivery(payloadWriter.ToString());
             }
         }
     }

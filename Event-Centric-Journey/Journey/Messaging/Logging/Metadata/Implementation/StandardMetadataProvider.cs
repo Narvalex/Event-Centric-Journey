@@ -50,6 +50,11 @@ namespace Journey.Messaging.Logging.Metadata
                 metadata[StandardMetadata.Kind] = StandardMetadata.CommandKind;
             }
 
+            if (((IMessage)payload).IsExternal)
+                metadata[StandardMetadata.Origin] = StandardMetadata.ExternalOrigin;
+            else
+                metadata[StandardMetadata.Origin] = StandardMetadata.InternalOrigin;
+
             // NOTE: here we may add an "Area" or "Subsystem" or 
             // whatever via .NET custom attributes on the payload 
             // type.

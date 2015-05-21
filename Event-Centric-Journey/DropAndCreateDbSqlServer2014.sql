@@ -240,6 +240,7 @@ CREATE TABLE [MessageLog].[Messages](
 	[CreationDate] [nvarchar](max) NULL,
 	[LastUpdateTime] [nvarchar](max) NULL,
 	[Payload] [nvarchar](max) NULL,
+	[IsExternal] [bit] not null,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
