@@ -22,7 +22,7 @@ namespace SimpleInventario.Reporting
         {
             lock (this)
             {
-                //throw new System.NotFiniteNumberException();
+                //throw new System.NotFiniteNumberException(); 
 
                 var aggregate = this.store.Find(e.IdEmpresa);
                 if (aggregate == null)
