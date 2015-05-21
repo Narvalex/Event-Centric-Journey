@@ -18,10 +18,10 @@ namespace Journey.EventSourcing
 
         public bool TryProcessWithGuaranteedIdempotency(IVersionedEvent @event)
         {
-            var eventTypeName = ((object)@event).GetType().FullName;
+            var eventKey = this.GetEventKey(@event);
             var eventVersion = @event.Version;
 
-            var lastProcessedEventVersion = this.lastProcessedEvents.TryGetValue(eventTypeName);
+            var lastProcessedEventVersion = this.lastProcessedEvents.TryGetValue(eventKey);
 
             if (eventVersion <= lastProcessedEventVersion)
             {
@@ -34,7 +34,7 @@ namespace Journey.EventSourcing
                 ((dynamic)this).Process((dynamic)@event);
                 base.Update(new CorrelatedEventProcessed
                     {
-                        CorrelatedEventTypeName = eventTypeName,
+                        CorrelatedEventTypeName = eventKey,
                         CorrelatedEventVersion = eventVersion
                     });
 
@@ -45,7 +45,7 @@ namespace Journey.EventSourcing
                 // verificando que no se agregue el mismo evento con la misma version varias veces
                 if (this.earlyReceivedEvents
                     .Where(e => e.Version == eventVersion
-                           && ((object)e).GetType().FullName == eventTypeName)
+                           && this.GetEventKey(e) == eventKey)
                     .Any())
                     return false;
 
@@ -57,33 +57,6 @@ namespace Journey.EventSourcing
             }
             // El caso cuando el evento es muy nuevo todavia y falta otro anterior.
             return true;
-        }
-
-        private void ProcessEarlyEventsIfApplicable()
-        {
-            // Después de cargar todo comprobamos que no exista un evento que no haya sido procesado.
-            var eventsOnTime = new List<IVersionedEvent>();
-            if (this.earlyReceivedEvents.Count > 0 && this.lastProcessedEvents.Count > 0)
-            {
-                // Recorremos todos los eventos que se recibieron prematuramente
-                foreach (var early in this.earlyReceivedEvents)
-                {
-                    // obtenemos el nombre del evento prematuro
-                    var earlyEventName = ((object)early).GetType().FullName;
-
-                    // verificamos si esta en la lista de eventos procesados un evento recibido prematuramente
-                    if (this.lastProcessedEvents.ContainsKey(earlyEventName))
-                    {
-                        var lastProcessed = lastProcessedEvents[earlyEventName];
-                        if (early.Version - 1 == lastProcessed)
-                            eventsOnTime.Add(early);
-                    }
-                }
-
-                foreach (var onTime in eventsOnTime)
-                    this.TryProcessWithGuaranteedIdempotency(onTime);
-                // se va a marcar aqui si si esta en la lista o no.
-            }
         }
 
         public void Rehydrate(EarlyEventReceived e)
@@ -101,23 +74,44 @@ namespace Journey.EventSourcing
 
             // Verificar aqui si esta en la lista o no.
             var earlyEvent = this.earlyReceivedEvents
-                .Where(x => ((object)x).GetType().FullName == e.CorrelatedEventTypeName
+                .Where(x => this.GetEventKey(x) == e.CorrelatedEventTypeName
                                 && x.Version == e.CorrelatedEventVersion)
                 .FirstOrDefault();
 
             if (earlyEvent != null)
                 this.earlyReceivedEvents.Remove(earlyEvent);
         }
-    }
 
-    public class EarlyEventReceived : VersionedEvent
-    {
-        public object Event { get; set; }
-    }
+        private void ProcessEarlyEventsIfApplicable()
+        {
+            // Después de cargar todo comprobamos que no exista un evento que no haya sido procesado.
+            var eventsOnTime = new List<IVersionedEvent>();
+            if (this.earlyReceivedEvents.Count > 0 && this.lastProcessedEvents.Count > 0)
+            {
+                // Recorremos todos los eventos que se recibieron prematuramente
+                foreach (var early in this.earlyReceivedEvents)
+                {
+                    // obtenemos el nombre del evento prematuro
+                    var earlyEventName = this.GetEventKey(early);
 
-    public class CorrelatedEventProcessed : VersionedEvent
-    {
-        public string CorrelatedEventTypeName { get; set; }
-        public int CorrelatedEventVersion { get; set; }
+                    // verificamos si esta en la lista de eventos procesados un evento recibido prematuramente
+                    if (this.lastProcessedEvents.ContainsKey(earlyEventName))
+                    {
+                        var lastProcessed = lastProcessedEvents[earlyEventName];
+                        if (early.Version - 1 == lastProcessed)
+                            eventsOnTime.Add(early);
+                    }
+                }
+
+                foreach (var onTime in eventsOnTime)
+                    this.TryProcessWithGuaranteedIdempotency(onTime);
+                // se va a marcar aqui si si esta en la lista o no.
+            }
+        }
+
+        private string GetEventKey(IVersionedEvent @event)
+        {
+            return @event.SourceType + "_" + @event.SourceId.ToString() + "_" + ((object)@event).GetType().FullName;
+        }
     }
 }
