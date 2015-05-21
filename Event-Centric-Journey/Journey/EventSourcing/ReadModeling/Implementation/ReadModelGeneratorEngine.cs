@@ -1,7 +1,7 @@
-﻿using Journey.Worker;
+﻿using Journey.Utils;
+using Journey.Worker;
 using System;
 using System.Linq;
-using Journey.Utils;
 
 namespace Journey.EventSourcing.ReadModeling
 {
@@ -43,7 +43,7 @@ namespace Journey.EventSourcing.ReadModeling
 
 
 
-        public void Project(IVersionedEvent e, Action<T> doLiveProjection, Action<T> doRebuildProjection) 
+        public void Project(IVersionedEvent e, Action<T> doLiveProjection, Action<T> doRebuildProjection)
         {
             if (isLiveProjection)
             {
@@ -75,7 +75,7 @@ namespace Journey.EventSourcing.ReadModeling
                 doRebuildProjection(this.rebuildContext as T);
 
                 this.rebuildContext.AddToUnityOfWork(this.BuildProjectedEventEntity(e));
-            }            
+            }
         }
 
         public void Project(IVersionedEvent e, Action<T> doProjectionOrRebuild)
@@ -110,7 +110,7 @@ namespace Journey.EventSourcing.ReadModeling
                 doProjectionOrRebuild(this.rebuildContext as T);
 
                 this.rebuildContext.AddToUnityOfWork(this.BuildProjectedEventEntity(e));
-            }            
+            }
         }
 
 
@@ -121,17 +121,18 @@ namespace Journey.EventSourcing.ReadModeling
             {
                 using (var context = this.liveContextFactory.Invoke())
                 {
-                        if (context.Set<Log>()
-                            .Where(l =>
-                                l.SourceId == e.SourceId &&
-                                l.SourceType == e.SourceType &&
-                                l.Version >= e.Version)
-                            .Any())
-                        {
-                            tracer.TraceAsync(string.Format("Event {0} was already consumed by {1}", e.GetType().Name, typeof(Log).Name));
-                            return;
-                        }
-                    
+                    if (context.Set<Log>()
+                        .Where(l =>
+                            l.SourceId == e.SourceId &&
+                            l.SourceType == e.SourceType &&
+                            l.EventType == ((object)e).GetType().FullName &&
+                            l.Version >= e.Version)
+                        .Any())
+                    {
+                        tracer.TraceAsync(string.Format("Event {0} was already consumed by {1}", e.GetType().Name, typeof(Log).Name));
+                        return;
+                    }
+
 
                     // Si el proceso esta en vivo, entonces se consume. 
                     // Si se esta reconstruyendo el read model, entonces se 
@@ -159,12 +160,12 @@ namespace Journey.EventSourcing.ReadModeling
                 SourceId = e.SourceId,
                 SourceType = e.SourceType,
                 Version = e.Version,
-                EventType = e.GetType().Name,
+                EventType = ((object)e).GetType().FullName,
                 CorrelationId = e.CorrelationId
             };
         }
 
-        private Log BuildConsumedEventEntity<Log>(IVersionedEvent e) 
+        private Log BuildConsumedEventEntity<Log>(IVersionedEvent e)
             where Log : class, IProcessedEvent, new()
         {
             return new Log
