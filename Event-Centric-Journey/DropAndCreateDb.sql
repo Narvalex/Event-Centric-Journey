@@ -178,23 +178,17 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [EventStore].[Events](
-	[SourceId] [uniqueidentifier] NOT NULL,
-	[SourceType] [nvarchar](128) NOT NULL,
-	[Version] [int] NOT NULL,
-	[EventType] [nvarchar](max) NULL,
-	[Payload] [nvarchar](max) NULL,
-	[CreationDate] [datetime] NOT NULL,
-	[LastUpdateTime] [datetime] NOT NULL,
-	[CorrelationId] [uniqueidentifier] NOT NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[SourceId] ASC,
-	[SourceType] ASC,
-	[Version] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-
+create table [EventStore].[Events] (
+    [SourceId] [uniqueidentifier] not null,
+    [SourceType] [nvarchar](255) not null,
+    [Version] [int] not null,
+    [EventType] [nvarchar](255) null,
+    [Payload] [nvarchar](max) null,
+    [CreationDate] [datetime] not null,
+    [LastUpdateTime] [datetime] not null,
+    [CorrelationId] [uniqueidentifier] not null,
+    primary key ([SourceId], [SourceType], [Version])
+);
 GO
 
 
@@ -208,15 +202,12 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [EventStore].[Snapshots](
-	[PartitionKey] [nvarchar](128) NOT NULL,
-	[Memento] [nvarchar](max) NULL,
-	[LastUpdateTime] [datetime] NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[PartitionKey] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+create table [EventStore].[Snapshots] (
+    [PartitionKey] [nvarchar](300) not null,
+    [Memento] [nvarchar](max) null,
+    [LastUpdateTime] [datetime] null,
+    primary key ([PartitionKey])
+);
 
 GO
 
@@ -231,25 +222,22 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [MessageLog].[Messages](
-	[Id] [bigint] IDENTITY(1,1) NOT NULL,
-	[Kind] [nvarchar](max) NULL,
-	[SourceId] [nvarchar](max) NULL,
-	[Version] [nvarchar](max) NULL,
-	[AssemblyName] [nvarchar](max) NULL,
-	[Namespace] [nvarchar](max) NULL,
-	[FullName] [nvarchar](max) NULL,
-	[TypeName] [nvarchar](max) NULL,
-	[SourceType] [nvarchar](max) NULL,
-	[CreationDate] [nvarchar](max) NULL,
-	[LastUpdateTime] [nvarchar](max) NULL,
-	[Payload] [nvarchar](max) NULL,
-	[IsExternal] [bit] not null,
-PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+create table [MessageLog].[Messages] (
+    [Id] [bigint] not null identity,
+    [Kind] [nvarchar](50) null,
+    [SourceId] [nvarchar](50) null,
+    [Version] [nvarchar](50) null,
+    [AssemblyName] [nvarchar](255) null,
+    [Namespace] [nvarchar](255) null,
+    [FullName] [nvarchar](255) null,
+    [TypeName] [nvarchar](255) null,
+    [SourceType] [nvarchar](255) null,
+    [CreationDate] [nvarchar](50) null,
+    [LastUpdateTime] [nvarchar](50) null,
+    [Payload] [nvarchar](max) null,
+    [Origin] [nvarchar](50) null,
+    primary key ([Id])
+);
 
 GO
 
