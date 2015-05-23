@@ -42,8 +42,8 @@ namespace Journey.EventSourcing
                 .HasKey(x => x.PartitionKey)
                 .ToTable(SnapshotsTableName, EventStoreSchemaName);
 
-            modelBuilder.Entity<MessageLogEntity>().ToTable(LogTableName, LogSchemaName);
-            modelBuilder.Entity<MessageLogEntity>().HasKey(m => m.Id);
+            modelBuilder.Entity<MessageLog>().ToTable(LogTableName, LogSchemaName);
+            modelBuilder.Entity<MessageLog>().HasKey(m => m.Id);
         }
     }
 }

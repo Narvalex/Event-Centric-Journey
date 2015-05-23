@@ -54,7 +54,7 @@ namespace Journey.EventSourcing
             }
         }
 
-        protected void Update(VersionedEvent @event)
+        protected void Update(InternalVersionedEvent @event)
         {
             @event.SourceId = this.Id;
             @event.Version = this.version + 1;

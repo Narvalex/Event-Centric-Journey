@@ -31,19 +31,13 @@ namespace Journey.Worker.Config
         }
 
         [ConfigurationProperty(connectionString, IsRequired = true)]
-        public string MessageLogConnectionString
+        public string SourceEventStoreConnectionString
         {
             get { return this[connectionString] as string; }
         }
 
         [ConfigurationProperty(connectionString, IsRequired = true)]
-        public string SourceMessageLogConnectionString
-        {
-            get { return this[connectionString] as string; }
-        }
-
-        [ConfigurationProperty(connectionString, IsRequired = true)]
-        public string NewMessageLogConnectionString
+        public string NewEventStoreConnectionString
         {
             get { return this[connectionString] as string; }
         }

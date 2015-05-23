@@ -6,10 +6,10 @@ namespace Journey.Messaging.Logging
 {
     internal static class MessageLogQueryCriteriaExtensions
     {
-        public static Expression<Func<MessageLogEntity, bool>> ToExpression(this EventLogQueryCriteria criteria)
+        public static Expression<Func<MessageLog, bool>> ToExpression(this EventLogQueryCriteria criteria)
         {
             // The full Where clause being built.
-            Expression<Func<MessageLogEntity, bool>> expression = null;
+            Expression<Func<MessageLog, bool>> expression = null;
 
             foreach (var asembly in criteria.AssemblyNames)
             {
@@ -21,7 +21,7 @@ namespace Journey.Messaging.Logging
             }
 
             // The current criteria filter being processed (i.e. FullName).
-            Expression<Func<MessageLogEntity, bool>> filter = null;
+            Expression<Func<MessageLog, bool>> filter = null;
             foreach (var item in criteria.FullNames)
             {
                 var value = item;

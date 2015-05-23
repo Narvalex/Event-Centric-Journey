@@ -1,6 +1,6 @@
 ﻿namespace Journey.EventSourcing
 {
-    public class EarlyEventReceived : VersionedEvent
+    public class EarlyEventReceived : InternalVersionedEvent
     {
         public object Event { get; set; }
     }

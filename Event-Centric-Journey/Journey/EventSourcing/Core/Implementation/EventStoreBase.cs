@@ -84,7 +84,7 @@ namespace Journey.EventSourcing
         {
             var metadata = this.metadataProvider.GetMetadata(message);
 
-            MessageLogEntity messageLogEntity;
+            MessageLog messageLogEntity;
             switch (metadata[StandardMetadata.Kind])
             {
                 case StandardMetadata.EventKind:
@@ -99,11 +99,11 @@ namespace Journey.EventSourcing
             }
         }
 
-        protected abstract void Save(T eventSourced, Guid correlationId, DateTime creationDate, MessageLogEntity messageLogEntity);
+        protected abstract void Save(T eventSourced, Guid correlationId, DateTime creationDate, MessageLog messageLogEntity);
 
-        private MessageLogEntity CreateMessageLogEntityForEvent(IMessage message, IDictionary<string, string> metadata)
+        private MessageLog CreateMessageLogEntityForEvent(IMessage message, IDictionary<string, string> metadata)
         {
-            return new MessageLogEntity
+            return new MessageLog
             {
                 SourceId = metadata.TryGetValue(StandardMetadata.SourceId),
                 Version = metadata.TryGetValue(StandardMetadata.Version),
@@ -116,12 +116,13 @@ namespace Journey.EventSourcing
                 CreationDate = message.CreationDate.ToString("o"),
                 LastUpdateTime = lastUpdateTimeProvider.Invoke(),
                 Payload = serializer.Serialize(message),
+                Origin = metadata.TryGetValue(StandardMetadata.Origin)
             };
         }
 
-        private MessageLogEntity CreateMessageLogEntityForCommand(IMessage message, IDictionary<string, string> metadata)
+        private MessageLog CreateMessageLogEntityForCommand(IMessage message, IDictionary<string, string> metadata)
         {
-            return new MessageLogEntity
+            return new MessageLog
             {
                 //Id = Guid.NewGuid(),
                 SourceId = metadata.TryGetValue(StandardMetadata.SourceId),
@@ -135,6 +136,7 @@ namespace Journey.EventSourcing
                 CreationDate = message.CreationDate.ToString("o"),
                 LastUpdateTime = this.lastUpdateTimeProvider.Invoke(),
                 Payload = serializer.Serialize(message),
+                Origin = metadata.TryGetValue(StandardMetadata.Origin)
             };
         }
 

@@ -93,6 +93,12 @@ namespace Journey.Worker.Portal
 
         public void RebuildEventStore()
         {
+            if (coordinator.PortalIsRebuilding)
+            {
+                this.Tracer.Notify("The portal is currently in rebuilding state.");
+                return;
+            }
+
             this.StopWorking();
 
             rebuildEventStore
@@ -102,6 +108,12 @@ namespace Journey.Worker.Portal
 
         public void RebuildEventStoreAndReadModel()
         {
+            if (coordinator.PortalIsRebuilding)
+            {
+                this.Tracer.Notify("The portal is currently in rebuilding state.");
+                return;
+            }
+
             this.StopWorking();
 
             var eventStoreRebuildingResults = rebuildEventStore.Invoke();

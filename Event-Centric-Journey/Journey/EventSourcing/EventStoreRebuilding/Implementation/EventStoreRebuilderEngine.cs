@@ -6,7 +6,6 @@ using Journey.Messaging.Logging.Metadata;
 using Journey.Messaging.Processing;
 using Journey.Serialization;
 using Journey.Utils;
-using Journey.Utils.SystemTime;
 using Journey.Worker;
 using Journey.Worker.Config;
 using System;
@@ -18,7 +17,12 @@ namespace Journey.EventSourcing.EventStoreRebuilding
 {
     public class EventStoreRebuilderEngine : IEventStoreRebuilderEngine
     {
-        private readonly Func<EventStoreDbContext> eventStoreContextFactory;
+        private readonly Func<EventStoreDbContext> sourceContextFactory;
+        private readonly Func<EventStoreDbContext> newContextFactory;
+
+        private readonly Func<ICommand, bool> isDuplicateCommand;
+        private readonly Func<IEvent, bool> isDuplicateEvent;
+
         private readonly ITextSerializer serializer;
         private readonly IMetadataProvider metadataProvider;
 
@@ -32,10 +36,6 @@ namespace Journey.EventSourcing.EventStoreRebuilding
         private readonly ICommandProcessor commandProcessor;
         private readonly ICommandHandlerRegistry commandHandlerRegistry;
 
-        private IMessageAuditLog auditLog;
-
-        private MessageLogHandler handler;
-
         private readonly IRebuilderPerfCounter perfCounter;
 
         public EventStoreRebuilderEngine(
@@ -44,11 +44,9 @@ namespace Journey.EventSourcing.EventStoreRebuilding
             ITextSerializer serializer, IMetadataProvider metadataProvider,
             ITracer tracer,
             IEventStoreRebuilderConfig config,
-            Func<EventStoreDbContext> eventStoreContextFactory,
             IRebuilderPerfCounter perfCounter)
         {
             this.bus = bus;
-            this.eventStoreContextFactory = eventStoreContextFactory;
             this.serializer = serializer;
             this.eventDispatcher = eventDispatcher;
             this.commandProcessor = commandProcessor;
@@ -57,6 +55,14 @@ namespace Journey.EventSourcing.EventStoreRebuilding
             this.tracer = tracer;
             this.metadataProvider = metadataProvider;
             this.perfCounter = perfCounter;
+
+            this.sourceContextFactory = () =>
+            {
+                var context = new EventStoreDbContext(this.config.SourceEventStoreConnectionString);
+                context.Configuration.AutoDetectChangesEnabled = false;
+                return context;
+            };
+            this.newContextFactory = () => new EventStoreDbContext(this.config.NewEventStoreConnectionString);
         }
 
         public void Rebuild()
@@ -66,69 +72,52 @@ namespace Journey.EventSourcing.EventStoreRebuilding
             this.perfCounter.OnStartingRebuildProcess(this.GetMessagesCount());
             this.perfCounter.OnOpeningDbConnectionAndCleaning();
 
-            using (var eventStoreContext = this.eventStoreContextFactory.Invoke())
+            using (var newContext = this.newContextFactory.Invoke())
             {
                 TransientFaultHandlingDbConfiguration.SuspendExecutionStrategy = true;
 
-                using (var eventStoreTransaction = eventStoreContext.Database.BeginTransaction())
+                using (var newContextTransaction = newContext.Database.BeginTransaction())
                 {
                     try
                     {
-                        eventStoreContext.Database.ExecuteSqlCommand(@"DELETE FROM [EventStore].[Events]
-                                                                           DELETE FROM [EventStore].[Snapshots]");
-
-                        using (var sourceContext = new MessageLogDbContext(config.SourceMessageLogConnectionString))
+                        using (var sourceContext = this.sourceContextFactory.Invoke())
                         {
-                            var messages = sourceContext.Set<MessageLogEntity>()
+                            var messages = sourceContext.Set<MessageLog>()
                                             .OrderBy(m => m.Id)
                                             .AsEnumerable()
                                             .Select(this.CreateMessage)
                                             .AsCachedAnyEnumerable();
 
-                            using (var newAuditLogContext = new MessageLogDbContext(config.NewMessageLogConnectionString))
-                            {
-                                using (var auditLogTransaction = newAuditLogContext.Database.BeginTransaction())
-                                {
-                                    try
-                                    {
-                                        this.RegisterLogger(newAuditLogContext);
 
-                                        this.perfCounter.OnDbConnectionOpenedAndCleansed();
-                                        this.perfCounter.OnStartingStreamProcessing();
 
-                                        this.ProcessMessages(messages);
+                            this.perfCounter.OnDbConnectionOpenedAndCleansed();
+                            this.perfCounter.OnStartingStreamProcessing();
 
-                                        this.perfCounter.OnStreamProcessingFinished();
-                                        this.perfCounter.OnStartingCommitting();
+                            this.ProcessMessages(messages);
 
-                                        // el borrado colocamos al final por si se este haciendo desde el mismo connection.
-                                        newAuditLogContext.Database.ExecuteSqlCommand(@"
+                            this.perfCounter.OnStreamProcessingFinished();
+                            this.perfCounter.OnStartingCommitting();
+
+                            // el borrado colocamos al final por si se este haciendo desde el mismo connection.
+                            newContext.Database.ExecuteSqlCommand(@"
+                                                DELETE FROM [EventStore].[Events]
+                                                DELETE FROM [EventStore].[Snapshots]
                                                 DELETE FROM [MessageLog].[Messages]
                                                 DBCC CHECKIDENT ('[MessageLog].[Messages]', RESEED, 0)");
 
 
-                                        rowsAffected = +newAuditLogContext.SaveChanges();
 
-                                        auditLogTransaction.Commit();
-                                    }
-                                    catch (Exception)
-                                    {
-                                        auditLogTransaction.Rollback();
-                                        throw;
-                                    }
-                                }
-                            }
                         }
 
-                        rowsAffected = +eventStoreContext.SaveChanges();
+                        rowsAffected = +newContext.SaveChanges();
 
-                        eventStoreTransaction.Commit();
+                        newContextTransaction.Commit();
 
                         this.perfCounter.OnCommitted(rowsAffected);
                     }
                     catch (Exception)
                     {
-                        eventStoreTransaction.Rollback();
+                        newContextTransaction.Rollback();
                         throw;
                     }
                     finally
@@ -141,20 +130,12 @@ namespace Journey.EventSourcing.EventStoreRebuilding
 
         private int GetMessagesCount()
         {
-            var sql = new SqlCommandWrapper(config.SourceMessageLogConnectionString);
+            var sql = new SqlCommandWrapper(config.SourceEventStoreConnectionString);
             return sql.ExecuteReader(@"
                         select count(*) as RwCnt 
                         from MessageLog.Messages 
                         ", r => r.SafeGetInt32(0))
                          .FirstOrDefault();
-        }
-
-        private void RegisterLogger(MessageLogDbContext newContext)
-        {
-            this.auditLog = new InMemoryMessageLog(this.serializer, this.metadataProvider, this.tracer, newContext, new LocalDateTime());
-            this.handler = new MessageLogHandler(this.auditLog);
-            this.commandHandlerRegistry.Register(this.handler);
-            this.eventDispatcher.Register(this.handler);
         }
 
         private void ProcessMessages(IEnumerable<MessageForDelivery> messages)
@@ -173,10 +154,19 @@ namespace Journey.EventSourcing.EventStoreRebuilding
 
         private void ProcessCommand(ICommand command)
         {
-            if (this.auditLog.IsDuplicateMessage(command))
+            if (this.isDuplicateCommand(command))
                 return;
 
             this.commandProcessor.ProcessMessage(command);
+            this.ProcessInnerMessages();
+        }
+
+        private void ProcessEvent(IEvent @event)
+        {
+            if (this.isDuplicateEvent(@event))
+                return;
+
+            this.eventDispatcher.DispatchMessage(@event, null, string.Empty, string.Empty);
             this.ProcessInnerMessages();
         }
 
@@ -191,16 +181,7 @@ namespace Journey.EventSourcing.EventStoreRebuilding
                     this.ProcessEvent(@event);
         }
 
-        private void ProcessEvent(IEvent @event)
-        {
-            if (this.auditLog.IsDuplicateMessage(@event))
-                return;
-
-            this.eventDispatcher.DispatchMessage(@event, null, string.Empty, string.Empty);
-            this.ProcessInnerMessages();
-        }
-
-        private MessageForDelivery CreateMessage(MessageLogEntity message)
+        private MessageForDelivery CreateMessage(MessageLog message)
         {
             return new MessageForDelivery(message.Payload);
         }

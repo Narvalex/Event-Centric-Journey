@@ -141,6 +141,12 @@ namespace Journey.Tests.Messaging.EventProcessorFixture
                     throw new NotImplementedException();
                 }
             }
+
+
+            public bool IsExternal
+            {
+                get { throw new NotImplementedException(); }
+            }
         }
 
         public class Event2 : IEvent
@@ -161,6 +167,12 @@ namespace Journey.Tests.Messaging.EventProcessorFixture
                 {
                     throw new NotImplementedException();
                 }
+            }
+
+
+            public bool IsExternal
+            {
+                get { throw new NotImplementedException(); }
             }
         }
 

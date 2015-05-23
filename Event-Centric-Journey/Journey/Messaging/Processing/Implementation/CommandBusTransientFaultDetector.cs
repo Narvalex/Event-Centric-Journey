@@ -16,9 +16,14 @@ namespace Journey.Messaging.Processing
         public bool MessageWasAlreadyProcessed(object payload)
         {
             return this.sql.ExecuteReader(@"
-            select count(*) from  MessageLog.Messages where SourceId = @CommandId
+            select count(*) from  
+            MessageLog.Messages where 
+            SourceId = @CommandId
+            and FullName = @FullName
             ", r => r.SafeGetInt32(0) > 0 ? true : false,
-                new SqlParameter("@CommandId", ((dynamic)payload).Id)).FirstOrDefault();
+                new SqlParameter("@CommandId", ((dynamic)payload).Id),
+                new SqlParameter("@FullName", payload.GetType().FullName))
+            .FirstOrDefault();
         }
     }
 }

@@ -1,13 +1,7 @@
 ﻿using System;
-
 namespace Journey.EventSourcing
 {
-    /// <summary>
-    /// Un evento versionado. Este tipo de evento es extendido cuando 
-    /// por un implementador que se utiliza para persitir eventos versionados 
-    /// en el Depósito de Eventos (Event Store).
-    /// </summary>
-    public abstract class VersionedEvent : IVersionedEvent
+    public abstract class VersionedEvent
     {
         /// <summary>
         /// El identificador de la fuente. Típicamente el identificador del 
@@ -30,6 +24,7 @@ namespace Journey.EventSourcing
         /// Esto se agrega en el motor del event store, antes de impactarlo en la tabla.
         /// </summary>
         public Guid CorrelationId { get; set; }
+
 
         public DateTime CreationDate { get; set; }
     }

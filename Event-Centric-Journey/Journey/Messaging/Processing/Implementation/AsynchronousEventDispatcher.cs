@@ -151,7 +151,7 @@ namespace Journey.Messaging.Processing
 
                             // Litle retry policy
                             var attempts = default(int);
-                            var threshold = 10;
+                            var threshold = 3;
                             while (true)
                             {
                                 try
