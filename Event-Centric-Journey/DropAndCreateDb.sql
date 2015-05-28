@@ -187,6 +187,7 @@ create table [EventStore].[Events] (
     [CreationDate] [datetime] not null,
     [LastUpdateTime] [datetime] not null,
     [CorrelationId] [uniqueidentifier] not null,
+	[IsProjectable] [bit] not null,
     primary key ([SourceId], [SourceType], [Version])
 );
 GO

@@ -24,6 +24,8 @@ namespace Journey.EventSourcing
         public string SourceType { get; set; }
 
         public int Version { get; set; }
+
+        public bool IsProjectable { get; set; }
     }
 }
 

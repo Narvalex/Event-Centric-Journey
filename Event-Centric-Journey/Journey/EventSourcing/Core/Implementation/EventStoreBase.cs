@@ -161,6 +161,13 @@ namespace Journey.EventSourcing
                 };
             }
 
+            var projectable = e as IProjectableEvent;
+
+            if (projectable != null)
+                serialized.IsProjectable = true;
+            else
+                serialized.IsProjectable = false;
+
             return serialized;
         }
 

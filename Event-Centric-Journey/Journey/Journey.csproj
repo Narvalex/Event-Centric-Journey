@@ -114,6 +114,7 @@
     <Compile Include="EventSourcing\Core\ISaga.cs" />
     <Compile Include="EventSourcing\Core\IVersionedEvent.cs" />
     <Compile Include="EventSourcing\Core\Implementation\SnapshotProvider.cs" />
+    <Compile Include="EventSourcing\Core\IProjectableEvent.cs" />
     <Compile Include="EventSourcing\EventStoreRebuilding\Implementation\EventStoreRebuilderPerfCounter.cs" />
     <Compile Include="EventSourcing\Handling\IDomainService.cs" />
     <Compile Include="EventSourcing\Handling\IHandlerOf.cs" />
